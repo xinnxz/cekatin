@@ -791,11 +791,19 @@
       "confidence": 0.5507,
       "routing": "nlp_driven",
       "timestamp": "2026-02-23T22:34:13.816342"
+    },
+    {
+      "message": "Bisa bayar pakai apa saja?",
+      "preprocessed": "bayar pakai",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.9641,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:35:10.826823"
     }
   ],
   "stats": {
-    "total": 99,
-    "nlp_driven": 68,
+    "total": 100,
+    "nlp_driven": 69,
     "ai_driven": 31,
     "patterns_learned": 7
   }
