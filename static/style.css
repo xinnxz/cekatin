@@ -107,22 +107,37 @@ body {
     border-radius: 50%;
     opacity: 0;
     animation: particleFloat linear infinite;
+    filter: blur(0.5px);
+}
+
+.particle.glow {
+    box-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
 }
 
 @keyframes particleFloat {
     0% {
         opacity: 0;
-        transform: translateY(100vh) scale(0);
+        transform: translateY(100vh) scale(0) translateX(0);
     }
     10% {
+        opacity: 0.8;
+    }
+    25% {
+        transform: translateY(75vh) scale(0.6) translateX(15px);
+    }
+    50% {
         opacity: 1;
+        transform: translateY(50vh) scale(0.85) translateX(-10px);
+    }
+    75% {
+        transform: translateY(25vh) scale(1) translateX(20px);
     }
     90% {
-        opacity: 1;
+        opacity: 0.6;
     }
     100% {
         opacity: 0;
-        transform: translateY(-10vh) scale(1);
+        transform: translateY(-10vh) scale(1.1) translateX(-5px);
     }
 }
 
@@ -181,17 +196,23 @@ body {
     position: relative;
     width: 44px;
     height: 44px;
-    border-radius: var(--radius-md);
-    background: var(--accent-gradient);
+    border-radius: 50%;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 0 0 2px var(--accent-primary), 0 0 12px rgba(6, 182, 212, 0.3);
 }
 
 .avatar-icon {
-    font-size: 22px;
+    width: 100%;
+    height: 100%;
     line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .status-dot {
@@ -391,17 +412,19 @@ body {
 .msg-avatar {
     width: 32px;
     height: 32px;
-    border-radius: var(--radius-sm);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
     flex-shrink: 0;
     margin-top: 2px;
+    overflow: hidden;
 }
 
 .message.bot .msg-avatar {
-    background: var(--accent-gradient);
+    background: transparent;
+    box-shadow: 0 0 0 1.5px var(--accent-primary);
 }
 
 .message.user .msg-avatar {

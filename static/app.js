@@ -373,37 +373,58 @@ function delay(ms) {
 // ============================================================
 
 /**
- * Membuat animasi partikel di background.
+ * Membuat animasi partikel/gelembung di background.
  * 
  * Penjelasan:
  * - Partikel menambah kesan premium & dinamis
  * - Menggunakan CSS animation (bukan Canvas) agar ringan
- * - Setiap partikel punya ukuran, posisi, dan durasi acak
- * - Warna partikel sesuai color scheme (cyan & purple)
+ * - Campuran ukuran: kecil (dot), sedang, besar (bubble)
+ * - Beberapa punya efek glow agar lebih hidup
+ * - Warna partikel sesuai color scheme (cyan, purple, pink)
  */
 function initParticles() {
     const colors = [
-        'rgba(6, 182, 212, 0.3)',    // Cyan
-        'rgba(139, 92, 246, 0.25)',   // Purple
-        'rgba(236, 72, 153, 0.2)',    // Pink
-        'rgba(6, 182, 212, 0.15)',    // Cyan light
+        'rgba(6, 182, 212, 0.5)',     // Cyan bright
+        'rgba(6, 182, 212, 0.3)',     // Cyan medium
+        'rgba(139, 92, 246, 0.4)',    // Purple
+        'rgba(139, 92, 246, 0.25)',   // Purple light
+        'rgba(236, 72, 153, 0.35)',   // Pink
+        'rgba(236, 72, 153, 0.2)',    // Pink light
+        'rgba(99, 102, 241, 0.3)',    // Indigo
     ];
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 45; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
 
-        const size = Math.random() * 4 + 2;
+        // Mix of sizes: 60% small, 25% medium, 15% large bubbles
+        let size;
+        const sizeRoll = Math.random();
+        if (sizeRoll < 0.6) {
+            size = Math.random() * 4 + 2;       // 2-6px (dots)
+        } else if (sizeRoll < 0.85) {
+            size = Math.random() * 6 + 6;       // 6-12px (medium)
+        } else {
+            size = Math.random() * 8 + 12;      // 12-20px (large bubbles)
+            particle.classList.add('glow');       // Large ones glow
+        }
+
         const left = Math.random() * 100;
-        const duration = Math.random() * 15 + 10;
-        const animDelay = Math.random() * 15;
+        const duration = Math.random() * 12 + 8;     // 8-20s (faster)
+        const animDelay = Math.random() * 10;
         const color = colors[Math.floor(Math.random() * colors.length)];
+
+        // Some particles have border (bubble look)
+        const hasBorder = size > 8 && Math.random() > 0.5;
+        const borderStyle = hasBorder 
+            ? `border: 1px solid ${color.replace(/[\d.]+\)$/, '0.4)')}; background: ${color.replace(/[\d.]+\)$/, '0.1)')};`
+            : `background: ${color};`;
 
         particle.style.cssText = `
             width: ${size}px;
             height: ${size}px;
             left: ${left}%;
-            background: ${color};
+            ${borderStyle}
             animation-duration: ${duration}s;
             animation-delay: ${animDelay}s;
         `;
