@@ -1,0 +1,610 @@
+{
+  "interactions": [
+    {
+      "message": "Jam berapa toko buka?",
+      "preprocessed": "jam toko buka",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9708,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:43:10.477991"
+    },
+    {
+      "message": "Jam berapa toko buka?",
+      "preprocessed": "jam toko buka",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9708,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:44:07.252034"
+    },
+    {
+      "message": "halo kak",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9219,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:44:21.130923"
+    },
+    {
+      "message": "harga samsung galaxy a15 berapa",
+      "preprocessed": "harga samsung galaxy a15",
+      "intent": "tanya_harga",
+      "confidence": 0.9052,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:44:28.292959"
+    },
+    {
+      "message": "ada promo samsung gak",
+      "preprocessed": "promo samsung",
+      "intent": "tanya_harga",
+      "confidence": 0.4204,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-22T06:44:36.138731"
+    },
+    {
+      "message": "bisa kirim ke bandung",
+      "preprocessed": "kirim bandung",
+      "intent": "tanya_pengiriman",
+      "confidence": 0.8072,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:44:48.865749"
+    },
+    {
+      "message": "bisa bayar pake gopay",
+      "preprocessed": "bayar pake gopay",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.9061,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:44:51.078160"
+    },
+    {
+      "message": "spek poco x6 gimana",
+      "preprocessed": "spesifikasi poco x6",
+      "intent": "unknown",
+      "confidence": 0.0867,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-22T06:44:53.193228"
+    },
+    {
+      "message": "hp murah yang bagus apa ya",
+      "preprocessed": "handphone murah bagus",
+      "intent": "tanya_harga",
+      "confidence": 0.8393,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:44:55.315108"
+    },
+    {
+      "message": "ada stok iphone 15 gak",
+      "preprocessed": "stok iphone",
+      "intent": "tanya_produk",
+      "confidence": 0.7031,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:44:57.432392"
+    },
+    {
+      "message": "halo kak",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9194,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:45:27.775940"
+    },
+    {
+      "message": "harga samsung galaxy a15 berapa",
+      "preprocessed": "harga samsung galaxy a15",
+      "intent": "tanya_harga",
+      "confidence": 0.7595,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:45:36.653429"
+    },
+    {
+      "message": "ada promo samsung gak",
+      "preprocessed": "promo samsung",
+      "intent": "tanya_promo",
+      "confidence": 0.842,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:45:44.457810"
+    },
+    {
+      "message": "bisa kirim ke bandung",
+      "preprocessed": "kirim bandung",
+      "intent": "tanya_pengiriman",
+      "confidence": 0.9019,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:45:49.610335"
+    },
+    {
+      "message": "bisa bayar pake gopay",
+      "preprocessed": "bayar pake gopay",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.9334,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:45:54.689193"
+    },
+    {
+      "message": "spek poco x6 gimana",
+      "preprocessed": "spesifikasi poco x6",
+      "intent": "tanya_harga",
+      "confidence": 0.6762,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-22T06:45:56.711650"
+    },
+    {
+      "message": "hp murah yang bagus apa ya",
+      "preprocessed": "handphone murah bagus",
+      "intent": "tanya_produk",
+      "confidence": 0.8456,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:45:58.748232"
+    },
+    {
+      "message": "ada stok iphone 15 gak",
+      "preprocessed": "stok iphone",
+      "intent": "tanya_produk",
+      "confidence": 0.9015,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:46:00.785236"
+    },
+    {
+      "message": "Jam berapa toko buka?",
+      "preprocessed": "jam toko buka",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9716,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:48:18.643881"
+    },
+    {
+      "message": "Ada promo apa bulan ini?",
+      "preprocessed": "promo bulan",
+      "intent": "tanya_promo",
+      "confidence": 0.9162,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:49:07.282265"
+    },
+    {
+      "message": "promonya sampai kapan",
+      "preprocessed": "promo sampai",
+      "intent": "tanya_promo",
+      "confidence": 0.4399,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-22T06:49:42.230945"
+    },
+    {
+      "message": "produk apa saja yang dijual",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:50:16.099051"
+    },
+    {
+      "message": "halo kak",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9194,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:51:46.308235"
+    },
+    {
+      "message": "daftar harga hp",
+      "preprocessed": "daftar harga handphone",
+      "intent": "tanya_harga",
+      "confidence": 0.9482,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:52:00.507344"
+    },
+    {
+      "message": "spesifikasi lengkapnya apa",
+      "preprocessed": "spesifikasi lengkap",
+      "intent": "tanya_lokasi",
+      "confidence": 0.4869,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-22T06:54:27.895947"
+    },
+    {
+      "message": "Halo, ada produk apa saja?",
+      "preprocessed": "halo produk",
+      "intent": "greeting",
+      "confidence": 0.5021,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-22T06:54:38.026123"
+    },
+    {
+      "message": "produk apa saja yang dijual",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:54:46.614540"
+    },
+    {
+      "message": "spesifikasi lengkapnya apa",
+      "preprocessed": "spesifikasi lengkap",
+      "intent": "tanya_lokasi",
+      "confidence": 0.4869,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-22T06:54:56.697000"
+    },
+    {
+      "message": "jam buka toko kapan",
+      "preprocessed": "jam buka toko",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9921,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:55:16.808541"
+    },
+    {
+      "message": "Halo, ada produk apa saja?",
+      "preprocessed": "halo produk",
+      "intent": "greeting",
+      "confidence": 0.5021,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-22T06:56:36.818686"
+    },
+    {
+      "message": "dimana alamat toko",
+      "preprocessed": "mana alamat toko",
+      "intent": "tanya_lokasi",
+      "confidence": 0.9778,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:58:22.296546"
+    },
+    {
+      "message": "produk apa saja yang dijual",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:59:15.282550"
+    },
+    {
+      "message": "stoknya masih ada gak",
+      "preprocessed": "stok",
+      "intent": "tanya_produk",
+      "confidence": 0.7852,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T06:59:54.010029"
+    },
+    {
+      "message": "halo kak",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9194,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:39:39.706085"
+    },
+    {
+      "message": "harga samsung galaxy a25",
+      "preprocessed": "harga samsung galaxy a25",
+      "intent": "tanya_harga",
+      "confidence": 0.8011,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:39:46.734620"
+    },
+    {
+      "message": "ada hp xiaomi apa aja",
+      "preprocessed": "handphone xiaomi",
+      "intent": "tanya_produk",
+      "confidence": 0.5775,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-22T14:39:52.051511"
+    },
+    {
+      "message": "spesifikasi oppo reno 11",
+      "preprocessed": "spesifikasi oppo reno",
+      "intent": "tanya_harga",
+      "confidence": 0.6661,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-22T14:39:58.474199"
+    },
+    {
+      "message": "hp murah dibawah 2 juta",
+      "preprocessed": "handphone murah bawah juta",
+      "intent": "tanya_harga",
+      "confidence": 0.9867,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:40:03.879893"
+    },
+    {
+      "message": "daftar harga hp",
+      "preprocessed": "daftar harga handphone",
+      "intent": "tanya_harga",
+      "confidence": 0.9482,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:40:14.632965"
+    },
+    {
+      "message": "produk apa saja yang dijual",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:40:18.859779"
+    },
+    {
+      "message": "jam buka toko",
+      "preprocessed": "jam buka toko",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9921,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:40:20.895620"
+    },
+    {
+      "message": "alamat toko dimana",
+      "preprocessed": "alamat toko mana",
+      "intent": "tanya_lokasi",
+      "confidence": 0.9877,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:40:22.927858"
+    },
+    {
+      "message": "bisa bayar pakai apa",
+      "preprocessed": "bayar pakai",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.9637,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-22T14:40:24.971408"
+    },
+    {
+      "message": "disini ada produk apa aja",
+      "preprocessed": "sini produk",
+      "intent": "tanya_produk",
+      "confidence": 0.843,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:10:25.817847"
+    },
+    {
+      "message": "bisa coba kasih saya info lanjutannya. saya mau beli tv tapi yg mahal",
+      "preprocessed": "kasih info lanjut beli tv mahal",
+      "intent": "terima_kasih",
+      "confidence": 0.504,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:10:56.729336"
+    },
+    {
+      "message": "saya mau tanya lagi",
+      "preprocessed": "tanya",
+      "intent": "unknown",
+      "confidence": 0.346,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:11:05.514349"
+    },
+    {
+      "message": "ada hp yg murah ga",
+      "preprocessed": "handphone murah",
+      "intent": "tanya_harga",
+      "confidence": 0.5828,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:11:17.648387"
+    },
+    {
+      "message": "kasih 10 coba sekarang",
+      "preprocessed": "kasih sekarang",
+      "intent": "unknown",
+      "confidence": 0.3169,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:11:33.601968"
+    },
+    {
+      "message": "promo nya ada apa aja",
+      "preprocessed": "promo",
+      "intent": "tanya_promo",
+      "confidence": 0.9142,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:11:53.578954"
+    },
+    {
+      "message": "produk",
+      "preprocessed": "produk",
+      "intent": "tanya_produk",
+      "confidence": 0.6692,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:12:07.285828"
+    },
+    {
+      "message": "coba berikan rekomendasi hp yg bagus",
+      "preprocessed": "ikan rekomendasi handphone bagus",
+      "intent": "tanya_produk",
+      "confidence": 0.9795,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:12:18.291312"
+    },
+    {
+      "message": "kulkas",
+      "preprocessed": "kulkas",
+      "intent": "tanya_produk",
+      "confidence": 0.4273,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:12:30.466097"
+    },
+    {
+      "message": "halo",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9194,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:13:56.988748"
+    },
+    {
+      "message": "mau tanya. disini ada hp yg baru ga yg lagi promo",
+      "preprocessed": "tanya sini handphone baru promo",
+      "intent": "tanya_produk",
+      "confidence": 0.8057,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:14:11.110937"
+    },
+    {
+      "message": "merek nya apa aja emang",
+      "preprocessed": "merek",
+      "intent": "unknown",
+      "confidence": 0.1592,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:14:34.334779"
+    },
+    {
+      "message": "merek nya apa aja",
+      "preprocessed": "merek",
+      "intent": "unknown",
+      "confidence": 0.1592,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:15:14.101289"
+    },
+    {
+      "message": "produk apa saja yang dijual",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:19:25.357590"
+    },
+    {
+      "message": "spesifikasi lengkapnya apa",
+      "preprocessed": "spesifikasi lengkap",
+      "intent": "tanya_lokasi",
+      "confidence": 0.4869,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:19:30.873265"
+    },
+    {
+      "message": "nomor whatsapp berapa",
+      "preprocessed": "nomor whatsapp",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.3807,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:31:53.556485"
+    },
+    {
+      "message": "ada cicilan 0 persen gak",
+      "preprocessed": "cicil persen",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.931,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:31:58.895684"
+    },
+    {
+      "message": "bisa kirim ke mana aja",
+      "preprocessed": "kirim mana",
+      "intent": "tanya_pengiriman",
+      "confidence": 0.6101,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:32:03.239551"
+    },
+    {
+      "message": "tes",
+      "preprocessed": "tes",
+      "intent": "unknown",
+      "confidence": 0.1592,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:32:18.177175"
+    },
+    {
+      "message": ".",
+      "preprocessed": "",
+      "intent": "unknown",
+      "confidence": 0.0,
+      "routing": "nlp_only",
+      "timestamp": "2026-02-23T03:32:22.634768"
+    },
+    {
+      "message": "produk apa saja yang dijual?",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:33:40.567998"
+    },
+    {
+      "message": "produk apa saja yang dijual?",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:35:41.774749"
+    },
+    {
+      "message": "produk apa saja yang dijual?",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9475,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:38:21.464773"
+    },
+    {
+      "message": "kalo HP nya merek apa aja?",
+      "preprocessed": "handphone merek",
+      "intent": "tanya_produk",
+      "confidence": 0.6463,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:48:03.382865"
+    },
+    {
+      "message": "spesifikasi Samsung Galaxy A25 dong",
+      "preprocessed": "spesifikasi samsung galaxy a25",
+      "intent": "tanya_produk",
+      "confidence": 0.752,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T03:48:26.647987"
+    },
+    {
+      "message": "ada produk apa aja",
+      "preprocessed": "produk",
+      "intent": "tanya_produk",
+      "confidence": 0.6692,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T04:54:37.315857"
+    },
+    {
+      "message": "stok yg ready ada apa aja",
+      "preprocessed": "stok sedia",
+      "intent": "tanya_produk",
+      "confidence": 0.9322,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T04:55:01.105248"
+    },
+    {
+      "message": "yg di gudang yg redi apa aja, saya mau beli hp",
+      "preprocessed": "gudang redi beli handphone",
+      "intent": "tanya_promo",
+      "confidence": 0.4962,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-23T04:55:30.793575"
+    },
+    {
+      "message": "emang ada total berapa hp yg stok redi",
+      "preprocessed": "total handphone stok redi",
+      "intent": "tanya_produk",
+      "confidence": 0.9107,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T04:55:57.747658"
+    },
+    {
+      "message": "ada saran ga buat saya yg pelajar mahasiswa hp nya apa",
+      "preprocessed": "rekomendasi buat ajar mahasiswa handphone",
+      "intent": "tanya_promo",
+      "confidence": 0.6564,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T04:56:28.788211"
+    },
+    {
+      "message": "boleh, pesen dong yg realme c67",
+      "preprocessed": "pesan realme c67",
+      "intent": "unknown",
+      "confidence": 0.2402,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-23T04:56:57.116668"
+    },
+    {
+      "message": "ada promo apa aja",
+      "preprocessed": "promo",
+      "intent": "tanya_promo",
+      "confidence": 0.9142,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T04:57:17.143806"
+    }
+  ],
+  "stats": {
+    "total": 75,
+    "nlp_driven": 50,
+    "ai_driven": 25,
+    "patterns_learned": 7
+  }
+}

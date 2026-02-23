@@ -1,0 +1,21 @@
+# CekatIn - NLP Chatbot Dependencies
+# ====================================
+
+# Web Framework
+flask==3.1.0
+flask-cors==5.0.1
+
+# Machine Learning & NLP
+scikit-learn==1.6.1
+numpy==2.2.3
+
+# Bahasa Indonesia NLP
+Sastrawi==1.0.1
+
+# Model Persistence
+joblib==1.4.2
+
+# AI Providers (Multi-Provider Architecture)
+google-genai>=1.0.0
+groq>=0.4.0
+

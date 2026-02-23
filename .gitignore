@@ -1,0 +1,43 @@
+# ============================================
+# CekatIn - .gitignore
+# ============================================
+# File ini memberitahu Git file mana yang TIDAK BOLEH
+# di-push ke GitHub. Terutama file sensitif seperti API key.
+
+# ── Environment & API Keys (PENTING!) ──
+.env
+.env.local
+.env.production
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+env/
+.venv/
+
+# ── Model Files (besar, ga perlu di GitHub) ──
+models/*.pkl
+models/*.joblib
+
+# ── Evaluation Results (opsional) ──
+# Uncomment baris di bawah jika tidak mau upload chart
+# evaluation_results/
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini

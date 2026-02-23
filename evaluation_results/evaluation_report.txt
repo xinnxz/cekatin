@@ -1,0 +1,278 @@
+======================================================================
+  LAPORAN EVALUASI — CekatIn NLP Chatbot
+  Perbandingan Naive Bayes vs SVM untuk Klasifikasi Intent
+======================================================================
+
+
+1. DISTRIBUSI DATASET
+--------------------------------------------------
+  Intent                     Jumlah Pattern
+  ----------------------------------------
+  goodbye                                50
+  greeting                               53
+  keluhan                                50
+  tanya_garansi                          50
+  tanya_harga                            51
+  tanya_jam_buka                         50
+  tanya_lokasi                           51
+  tanya_pembayaran                       50
+  tanya_pengiriman                       51
+  tanya_produk                           52
+  tanya_promo                            50
+  terima_kasih                           50
+  ----------------------------------------
+  TOTAL                                 608
+  Jumlah Intent                          12
+
+
+2. CONTOH HASIL PREPROCESSING
+----------------------------------------------------------------------
+  Intent               Original                       Preprocessed        
+  -----------------------------------------------------------------
+  greeting             halo                           halo                
+  goodbye              bye                            bye                 
+  terima_kasih         terima kasih                   terima kasih        
+  tanya_produk         produk apa aja yang dijual     produk apa aja yang dijual
+  tanya_harga          berapa harganya                berapa harganya     
+  tanya_lokasi         dimana alamatnya               dimana alamatnya    
+  tanya_jam_buka       jam berapa buka                jam berapa buka     
+  tanya_pembayaran     metode pembayaran apa saja     metode pembayaran apa saja
+  tanya_garansi        ada garansi gak                ada garansi gak     
+  tanya_pengiriman     bisa kirim gak                 bisa kirim gak      
+  tanya_promo          ada promo gak                  ada promo gak       
+  keluhan              saya mau komplain              saya mau komplain   
+
+
+3. DATA SPLIT
+--------------------------------------------------
+  Total data      : 608
+  Training set    : 486 (80%)
+  Testing set     : 122 (20%)
+  Stratified      : Ya
+  Random state    : 42
+  Fitur TF-IDF    : 1569
+
+
+4. HASIL CROSS-VALIDATION
+--------------------------------------------------
+
+  === 5-Fold Cross-Validation ===
+
+  Naive Bayes:
+    Accuracy (mean) : 0.7978 (79.78%)
+    Std. Deviation  : 0.0326
+    Per fold        : ['0.7541', '0.7623', '0.8279', '0.8264', '0.8182']
+
+  SVM (Linear):
+    Accuracy (mean) : 0.8143 (81.43%)
+    Std. Deviation  : 0.0333
+    Per fold        : ['0.8115', '0.7705', '0.7869', '0.8430', '0.8595']
+
+  === 10-Fold Cross-Validation ===
+
+  Naive Bayes:
+    Accuracy (mean) : 0.8109 (81.09%)
+    Std. Deviation  : 0.0309
+    Per fold        : ['0.7705', '0.8197', '0.8033', '0.7869', '0.8361', '0.8197', '0.8525', '0.7541', '0.8167', '0.8500']
+
+  SVM (Linear):
+    Accuracy (mean) : 0.8225 (82.25%)
+    Std. Deviation  : 0.0481
+    Per fold        : ['0.8197', '0.8525', '0.7213', '0.8361', '0.8361', '0.7541', '0.8689', '0.8033', '0.8500', '0.8833']
+
+
+5. CLASSIFICATION REPORT PER MODEL
+======================================================================
+
+  === Naive Bayes ===
+  Intent                     Precision     Recall   F1-Score    Support
+  --------------------------------------------------------------
+  goodbye                       1.0000     0.9000     0.9474         10
+  greeting                      0.8462     1.0000     0.9167         11
+  keluhan                       0.8889     0.8000     0.8421         10
+  tanya_garansi                 1.0000     0.9000     0.9474         10
+  tanya_harga                   0.7273     0.8000     0.7619         10
+  tanya_jam_buka                0.9091     1.0000     0.9524         10
+  tanya_lokasi                  0.8333     0.5000     0.6250         10
+  tanya_pembayaran              0.6667     0.8000     0.7273         10
+  tanya_pengiriman              0.8889     0.8000     0.8421         10
+  tanya_produk                  0.9000     0.8182     0.8571         11
+  tanya_promo                   0.6667     0.8000     0.7273         10
+  terima_kasih                  0.8182     0.9000     0.8571         10
+  --------------------------------------------------------------
+  Macro Avg                     0.8454     0.8348     0.8336
+  Weighted Avg                  0.8459     0.8361     0.8345
+
+  Overall Accuracy: 0.8361 (83.61%)
+
+  === SVM (Linear) ===
+  Intent                     Precision     Recall   F1-Score    Support
+  --------------------------------------------------------------
+  goodbye                       0.9000     0.9000     0.9000         10
+  greeting                      1.0000     0.8182     0.9000         11
+  keluhan                       0.6667     1.0000     0.8000         10
+  tanya_garansi                 1.0000     0.9000     0.9474         10
+  tanya_harga                   0.9000     0.9000     0.9000         10
+  tanya_jam_buka                1.0000     0.9000     0.9474         10
+  tanya_lokasi                  0.8571     0.6000     0.7059         10
+  tanya_pembayaran              0.6923     0.9000     0.7826         10
+  tanya_pengiriman              0.8889     0.8000     0.8421         10
+  tanya_produk                  0.8462     1.0000     0.9167         11
+  tanya_promo                   0.8889     0.8000     0.8421         10
+  terima_kasih                  1.0000     0.9000     0.9474         10
+  --------------------------------------------------------------
+  Macro Avg                     0.8867     0.8682     0.8693
+  Weighted Avg                  0.8873     0.8689     0.8699
+
+  Overall Accuracy: 0.8689 (86.89%)
+
+
+6. RINGKASAN PERBANDINGAN
+======================================================================
+  Metrik                          Naive Bayes SVM (Linear)    Selisih
+  -------------------------------------------------------------------
+  Accuracy                             0.8361       0.8689   -0.0328
+  Precision (macro)                    0.8454       0.8867   -0.0412
+  Recall (macro)                       0.8348       0.8682   -0.0333
+  F1-Score (macro)                     0.8336       0.8693   -0.0356
+  CV 5-Fold Mean                       0.7978       0.8143   -0.0165
+  CV 10-Fold Mean                      0.8109       0.8225   -0.0116
+
+
+7. UJI STATISTIK (Paired T-Test)
+======================================================================
+  Hipotesis:
+    H0: Tidak ada perbedaan signifikan antara NB dan SVM
+    H1: Ada perbedaan signifikan antara NB dan SVM
+    α (significance level): 0.05
+
+  5-Fold CV:
+    NB Mean  : 0.7978 ± 0.0326
+    SVM Mean : 0.8143 ± 0.0333
+    t-statistic : -0.9801
+    p-value     : 0.382533
+    Kesimpulan  : ⚖️  TIDAK SIGNIFIKAN (p >= 0.05) — perbedaan tidak bermakna
+
+  10-Fold CV:
+    NB Mean  : 0.8109 ± 0.0309
+    SVM Mean : 0.8225 ± 0.0481
+    t-statistic : -0.7676
+    p-value     : 0.462378
+    Kesimpulan  : ⚖️  TIDAK SIGNIFIKAN (p >= 0.05) — perbedaan tidak bermakna
+
+
+8. ANALISIS ERROR
+======================================================================
+
+  === Naive Bayes — Intent yang Sering Tertukar ===
+  Sebenarnya                Diprediksi                  Jumlah
+  ------------------------------------------------------------
+  tanya_produk              tanya_promo                      2
+  keluhan                   tanya_harga                      2
+  terima_kasih              greeting                         1
+  tanya_promo               tanya_pembayaran                 1
+  tanya_promo               tanya_harga                      1
+  tanya_pengiriman          tanya_pembayaran                 1
+  tanya_pengiriman          keluhan                          1
+  tanya_pembayaran          terima_kasih                     1
+  tanya_pembayaran          tanya_lokasi                     1
+  tanya_lokasi              tanya_promo                      1
+
+  === SVM (Linear) — Intent yang Sering Tertukar ===
+  Sebenarnya                Diprediksi                  Jumlah
+  ------------------------------------------------------------
+  tanya_lokasi              tanya_produk                     2
+  greeting                  keluhan                          2
+  terima_kasih              keluhan                          1
+  tanya_promo               tanya_pembayaran                 1
+  tanya_promo               tanya_harga                      1
+  tanya_pengiriman          tanya_pembayaran                 1
+  tanya_pengiriman          keluhan                          1
+  tanya_pembayaran          tanya_lokasi                     1
+  tanya_lokasi              tanya_pengiriman                 1
+  tanya_lokasi              tanya_pembayaran                 1
+
+
+9. CONTOH KASUS MISKLASIFIKASI
+======================================================================
+
+  === Naive Bayes ===
+  Teks                                     Asli                 Prediksi            
+  ------------------------------------------------------------------------------
+  ada vivo gak                             tanya_produk         tanya_promo         
+  poin belanja bisa ditukar apa            tanya_promo          tanya_pembayaran    
+  landmark terdekat apa                    tanya_lokasi         tanya_produk        
+  bisa datang langsung gak                 tanya_lokasi         tanya_pembayaran    
+  ada harga khusus gak                     tanya_harga          tanya_promo         
+  scan qris dimana                         tanya_pembayaran     tanya_lokasi        
+  mau mampir ke toko bisa gak              tanya_lokasi         tanya_pengiriman    
+  ada cabang lain gak                      tanya_lokasi         tanya_promo         
+  bisa bayar di tempat                     tanya_pengiriman     tanya_pembayaran    
+  terima qris                              tanya_pembayaran     terima_kasih        
+
+  === SVM (Linear) ===
+  Teks                                     Asli                 Prediksi            
+  ------------------------------------------------------------------------------
+  poin belanja bisa ditukar apa            tanya_promo          tanya_pembayaran    
+  landmark terdekat apa                    tanya_lokasi         tanya_produk        
+  bisa datang langsung gak                 tanya_lokasi         tanya_pembayaran    
+  ada harga khusus gak                     tanya_harga          tanya_promo         
+  scan qris dimana                         tanya_pembayaran     tanya_lokasi        
+  mau mampir ke toko bisa gak              tanya_lokasi         tanya_pengiriman    
+  ada cabang lain gak                      tanya_lokasi         tanya_produk        
+  bisa bayar di tempat                     tanya_pengiriman     tanya_pembayaran    
+  hallo                                    greeting             keluhan             
+  masih sempet dateng gak ya               tanya_jam_buka       goodbye             
+
+
+10. DOKUMENTASI HYPERPARAMETER
+======================================================================
+
+  === TF-IDF Vectorizer ===
+    max_features         : None
+    ngram_range          : (1, 2)
+    min_df               : 1
+    max_df               : 1.0
+    sublinear_tf         : True
+    jumlah_fitur         : 1569
+
+  === Naive Bayes (MultinomialNB) ===
+    alpha                : 1.0
+    fit_prior            : True
+
+  === SVM (Support Vector Machine) ===
+    kernel               : linear
+    C                    : 1.0
+    gamma                : scale
+    random_state         : 42
+
+  === Data Split ===
+    test_size            : 0.2
+    random_state         : 42
+    stratify             : True
+
+
+11. KESIMPULAN
+======================================================================
+  Model terbaik berdasarkan CV 5-Fold: SVM (Linear)
+
+  Naive Bayes:
+    → Accuracy  = 83.61%
+    → F1 (macro)= 83.36%
+    → CV 5-Fold = 79.78% ± 3.26%
+    → CV 10-Fold= 81.09% ± 3.09%
+
+  SVM (Linear):
+    → Accuracy  = 86.89%
+    → F1 (macro)= 86.93%
+    → CV 5-Fold = 81.43% ± 3.33%
+    → CV 10-Fold= 82.25% ± 4.81%
+
+
+Generating charts...
+  📊 confusion_matrix_nb.png
+  📊 confusion_matrix_svm.png
+  📊 comparison_f1_chart.png
+  📊 cv_comparison.png
+  📊 overall_comparison.png
+✅ Semua chart tersimpan di evaluation_results/
