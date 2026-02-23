@@ -22,13 +22,17 @@ venv/
 env/
 .venv/
 
-# ── Model Files (besar, ga perlu di GitHub) ──
-models/*.pkl
-models/*.joblib
+# ── Model Files ──
+# JANGAN ignore! Dibutuhkan Render untuk deploy
+# models/*.pkl  ← dikomment karena perlu untuk deployment
+# models/*.joblib
 
-# ── Evaluation Results (opsional) ──
-# Uncomment baris di bawah jika tidak mau upload chart
-# evaluation_results/
+# ── Data yang tidak perlu di GitHub ──
+dataset/learning_log.json
+journal_paper_structure.md
+
+# ── Evaluation Results ──
+evaluation_results/
 
 # ── IDE ──
 .vscode/

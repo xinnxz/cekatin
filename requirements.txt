@@ -19,3 +19,5 @@ joblib==1.4.2
 google-genai>=1.0.0
 groq>=0.4.0
 
+# Production Server
+gunicorn==23.0.0
