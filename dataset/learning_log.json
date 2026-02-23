@@ -599,12 +599,68 @@
       "confidence": 0.9142,
       "routing": "nlp_driven",
       "timestamp": "2026-02-23T04:57:17.143806"
+    },
+    {
+      "message": "halo.",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9194,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T19:27:21.723815"
+    },
+    {
+      "message": "disini ada apa aja",
+      "preprocessed": "sini",
+      "intent": "tanya_produk",
+      "confidence": 0.6232,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T19:27:34.172850"
+    },
+    {
+      "message": "boleh coba rekomendasiin hp nya apa aja yg bagus disini. saya mau beli hp soalnya",
+      "preprocessed": "rekomendasi handphone bagus sini beli handphone soal",
+      "intent": "tanya_produk",
+      "confidence": 0.9908,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T19:28:01.370753"
+    },
+    {
+      "message": "terserah kakak aja itu mah",
+      "preprocessed": "serah kakak mah",
+      "intent": "greeting",
+      "confidence": 0.4283,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-23T19:28:19.228301"
+    },
+    {
+      "message": "dimana alamat toko",
+      "preprocessed": "mana alamat toko",
+      "intent": "tanya_lokasi",
+      "confidence": 0.9778,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T19:28:34.765546"
+    },
+    {
+      "message": "jam buka toko kapan",
+      "preprocessed": "jam buka toko",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9921,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T21:55:08.158112"
+    },
+    {
+      "message": "jam buka toko kapan",
+      "preprocessed": "jam buka toko",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9921,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:00:01.132019"
     }
   ],
   "stats": {
-    "total": 75,
-    "nlp_driven": 50,
-    "ai_driven": 25,
+    "total": 82,
+    "nlp_driven": 56,
+    "ai_driven": 26,
     "patterns_learned": 7
   }
 }

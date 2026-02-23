@@ -60,7 +60,7 @@ from sklearn.metrics import classification_report
 # Semua respon akan menggunakan persona ini agar terasa personal.
 # ============================================================
 
-AGENT_NAME = "Ceka"
+AGENT_NAME = "Cika"
 AGENT_GREETING = f"Halo kak! 👋 Aku {AGENT_NAME}"
 AGENT_INTRO = f"asisten virtual yang siap bantu kamu"
 

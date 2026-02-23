@@ -411,7 +411,7 @@ There is no additional information that can be provided for this study.
 
 ## Data and Software Availability Statement
 
-The data and test artifacts generated or analyzed in this study are available on reasonable request to the corresponding author. The chatbot system which is used as a research object is an internal academic prototype and is not published openly due to institutional policy.
+The source code and dataset used in this study are publicly available on GitHub at https://github.com/xinnxz/cekatin. A live demonstration of the chatbot system is accessible at https://cekatin.up.railway.app. The data and test artifacts generated or analyzed in this study are available on reasonable request to the corresponding author.
 
 ---
 
@@ -427,17 +427,17 @@ The data and test artifacts generated or analyzed in this study are available on
 
 [5] C. M. K. Kappi and L. Marlina, "The effect of chatbot services on online shop customer satisfaction," *Brilliance: Research of Artificial Intelligence*, vol. 3, no. 2, pp. 413–422, 2023. doi: 10.47709/brilliance.v3i2.3133.
 
-[6] J. A. Mulyono and Sfenrianto, "Evaluation of customer satisfaction on Indonesian banking chatbot services during the COVID-19 pandemic," *CommIT Journal*, vol. 16, no. 1, pp. 69–85, 2022. doi: 10.21512/commit.v16i1.7611.
+[6] J. A. Mulyono and Sfenrianto, "Evaluation of customer satisfaction on Indonesian banking chatbot services after the COVID-19 pandemic," *JKBM (Jurnal Konsep Bisnis dan Manajemen)*, vol. 11, no. 1, pp. 69–85, 2024. doi: 10.31289/jkbm.v11i1.12590.
 
-[7] K. Kuligowska, M. Lasek, and A. Bujnowska-Fedak, "Methods for enhancing chatbot intent classification: a study of TF-IDF and n-grams in commercial chatbot datasets," *Applied Sciences*, vol. 14, no. 19, Art. no. 8745, 2024. doi: 10.3390/app14198745.
+[7] K. Kuligowska, M. Lasek, and A. Bujnowska-Fedak, "Enhancing chatbot intent classification using active learning pipeline for optimized data preparation," *Journal of Applied Engineering Sciences*, vol. 19, no. 3(85), pp. 1–12, 2024. doi: 10.57017/jaes.v19.3(85).07.
 
-[8] A. F. Hidayatullah, S. Apong, and R. Lai, "Indonesian social media sentiment analysis with slang and informal language normalization," *Journal of King Saud University – Computer and Information Sciences*, vol. 34, no. 10, pp. 9452–9462, 2022. doi: 10.1016/j.jksuci.2022.09.023.
+[8] A. F. Hidayatullah, R. T. Dirgahayu, and E. N. Rahmawati, "Text normalization for Indonesian slang words in sentiment analysis development," *ICIC Express Letters, Part B: Applications*, vol. 16, no. 2, pp. 121–129, 2025. doi: 10.24507/icicelb.16.02.121.
 
-[9] D. A. Sari, A. B. Mutiara, and E. Budiman, "Slang normalization for Indonesian tweet sentiment analysis using Levenshtein distance," *Journal of Physics: Conference Series*, vol. 1566, Art. no. 012048, 2020. doi: 10.1088/1742-6596/1566/1/012048.
+[9] D. S. Maylawati, W. B. Zulfikar, C. Slamet, and M. A. Ramdhani, "Comparison of Word2Vec and FastText on sentiment analysis of hotel reviews with slang normalization," *Jurnal RESTI (Rekayasa Sistem dan Teknologi Informasi)*, vol. 6, no. 3, pp. 371–377, 2022. doi: 10.29207/resti.v6i3.3711.
 
 [10] R. Rianto, "Improving the accuracy of text classification using stemming method, a case of non-formal Indonesian conversation," *Journal of Big Data*, vol. 8, no. 1, Art. no. 17, 2021. doi: 10.1186/s40537-021-00413-1.
 
-[11] N. Yusliani, R. Primartha, and M. D. Marieska, "Multiprocessing stemming: a case study of Indonesian stemming," *International Journal of Computer Applications*, vol. 182, no. 40, pp. 38–42, 2019. doi: 10.5120/ijca2019918455.
+[11] D. Mustikasari, I. Widaningrum, R. Arifin, and W. H. E. Putri, "Comparison of effectiveness of stemming algorithms in Indonesian documents," *Advances in Engineering Research*, vol. 209, pp. 178–183, 2021. doi: 10.2991/aer.k.210810.025.
 
 [12] Y. C. Yew, "Text classification with Naïve Bayes," *The Journal of Applied Technology and Innovation*, vol. 5, no. 1, pp. 1–10, 2023. doi: 10.65136/jati.v5i1.210.
 
@@ -447,7 +447,7 @@ The data and test artifacts generated or analyzed in this study are available on
 
 [15] W. Asriyanti and I. Gao, "Comparison of support vector machine and Naïve Bayes on Twitter data sentiment analysis," *Jurnal Penelitian Informatika dan Teknologi*, vol. 6, no. 1, pp. 56–60, 2021. doi: 10.30591/jpit.v6i1.3245.
 
-[16] N. Mamuriyah, H. Haeruddin, and Hero, "Pembangunan chatbot interaktif dengan menggunakan algoritma Naive Bayes," *Media Jurnal Informatika*, vol. 15, no. 2, pp. 143–148, 2023.
+[16] M. L. Harahap, Alfarizi, Ferdiansyah, Andi, M. Nasir, and Indriasari, "AI-based testing using NLP algorithm on Eggsperts website functionality using boundary value analysis technique," *Media Jurnal Informatika*, vol. 17, no. 2, pp. 247–265, 2025.
 
 [17] R. Saputra, I. Nurhaida, and H. Prabowo, "Comparative analysis of SVM and IndoBERT for intent classification in Indonesian overtime chatbots," *JSCE: Journal of System and Computer Engineering*, vol. 6, no. 3, pp. 420–430, 2023. doi: 10.61628/jsce.v6i3.2058.
 
@@ -455,11 +455,11 @@ The data and test artifacts generated or analyzed in this study are available on
 
 [19] M. D. Purbolaksono, F. D. Reskyadita, Adiwijaya, A. A. Suryani, and A. F. Huda, "Indonesian text classification using back propagation and Sastrawi stemming analysis with information gain for selection feature," *International Journal of Advances in Science, Engineering and Information Technology*, vol. 10, no. 1, pp. 234–238, 2020. doi: 10.18517/ijaseit.10.1.8811.
 
-[20] A. Pradana and M. Hayaty, "The effect of stemming and removal of stopwords on the accuracy of sentiment analysis on Indonesian-language texts," *Kinetik: Game Technology, Information System, Computer Network, Computing, Electronics, and Control*, vol. 4, no. 4, pp. 375–380, 2019. doi: 10.22219/kinetik.v4i4.912.
+[20] A. B. P. Negara, "The influence of applying stopword removal and SMOTE on Indonesian sentiment classification," *Lontar Komputer: Jurnal Ilmiah Teknologi Informasi*, vol. 14, no. 3, pp. 190–201, 2023. doi: 10.24843/LKJITI.2023.v14.i03.p05.
 
 [21] F. Alzami, E. D. Udayanti, D. P. Prabowo, and R. A. Megantara, "Document preprocessing with TF-IDF to improve the polarity classification performance of unstructured sentiment analysis," *Kinetik: Game Technology, Information System, Computer Network, Computing, Electronics, and Control*, vol. 5, no. 3, pp. 235–242, 2020. doi: 10.22219/kinetik.v5i3.1066.
 
-[22] D. Mustikasari, I. Widaningrum, R. Arifin, and W. H. E. Putri, "Comparison of effectiveness of stemming algorithms in Indonesian documents," *Advances in Engineering Research*, vol. 209, pp. 178–183, 2021. doi: 10.2991/aer.k.210810.025.
+[22] N. Yusliani, R. Primartha, and M. D. Marieska, "Multiprocessing stemming: a case study of Indonesian stemming," *International Journal of Computer Applications*, vol. 182, no. 40, pp. 38–42, 2019. doi: 10.5120/ijca2019918455.
 
 [23] T. T. Wong and P. Y. Yeh, "Reliable accuracy estimates from k-fold cross-validation," *IEEE Transactions on Knowledge and Data Engineering*, vol. 32, no. 8, pp. 1586–1594, 2020. doi: 10.1109/TKDE.2019.2912815.
 

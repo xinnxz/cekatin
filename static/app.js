@@ -215,7 +215,11 @@ function addMessage(type, text, debug = null) {
     // Avatar
     const avatarEl = document.createElement('div');
     avatarEl.className = 'msg-avatar';
-    avatarEl.textContent = type === 'bot' ? '🤖' : '👤';
+    if (type === 'bot') {
+        avatarEl.innerHTML = '<img src="https://violet-generous-roundworm-550.mypinata.cloud/ipfs/bafybeibn65jglv5z4uw5poziosackree3rxzh4mlfauyoie2ufk7cbtm2q" alt="Cika" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+    } else {
+        avatarEl.textContent = '👤';
+    }
 
     // Content wrapper
     const contentEl = document.createElement('div');
