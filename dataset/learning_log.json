@@ -751,11 +751,27 @@
       "confidence": 0.6463,
       "routing": "nlp_driven",
       "timestamp": "2026-02-23T22:23:42.148071"
+    },
+    {
+      "message": "halo",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9194,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:26:24.956764"
+    },
+    {
+      "message": "kamu cika kan bukan ceka",
+      "preprocessed": "cika bukan ceka",
+      "intent": "tanya_garansi",
+      "confidence": 0.5267,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:27:31.603034"
     }
   ],
   "stats": {
-    "total": 94,
-    "nlp_driven": 64,
+    "total": 96,
+    "nlp_driven": 66,
     "ai_driven": 30,
     "patterns_learned": 7
   }
