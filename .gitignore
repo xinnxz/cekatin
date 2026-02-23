@@ -41,3 +41,17 @@ models/*.joblib
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ── Documents & Images (ga perlu di GitHub) ──
+*.docx
+*.doc
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.bmp
+*.svg
+docs/
+evaluation_results/
