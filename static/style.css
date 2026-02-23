@@ -545,13 +545,15 @@ body {
 .typing-avatar {
     width: 32px;
     height: 32px;
-    border-radius: var(--radius-sm);
-    background: var(--accent-gradient);
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: 0 0 0 1.5px var(--accent-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .typing-bubble {

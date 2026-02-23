@@ -655,12 +655,108 @@
       "confidence": 0.9921,
       "routing": "nlp_driven",
       "timestamp": "2026-02-23T22:00:01.132019"
+    },
+    {
+      "message": "halo",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9194,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:15:13.839013"
+    },
+    {
+      "message": "Bisa bayar pakai apa saja?",
+      "preprocessed": "bayar pakai",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.9637,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:20:33.110125"
+    },
+    {
+      "message": "Bisa bayar pakai apa aja?",
+      "preprocessed": "bayar pakai",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.9637,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:20:48.827545"
+    },
+    {
+      "message": "Bisa bayar pakai apa?",
+      "preprocessed": "bayar pakai",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.9637,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:21:00.164160"
+    },
+    {
+      "message": "Bisa bayar ?",
+      "preprocessed": "bayar",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.8317,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:21:10.651996"
+    },
+    {
+      "message": "byr",
+      "preprocessed": "bayar",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.8317,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:21:20.667502"
+    },
+    {
+      "message": "br brp",
+      "preprocessed": "baru",
+      "intent": "unknown",
+      "confidence": 0.3453,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-23T22:21:31.045498"
+    },
+    {
+      "message": "pymnnnt brp",
+      "preprocessed": "pymnnt",
+      "intent": "unknown",
+      "confidence": 0.1592,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-23T22:21:53.175046"
+    },
+    {
+      "message": "klo bca itu apa",
+      "preprocessed": "bca",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.3881,
+      "routing": "nlp_fallback",
+      "timestamp": "2026-02-23T22:22:05.167622"
+    },
+    {
+      "message": "BCA bisa ga",
+      "preprocessed": "bca",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.3881,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-23T22:23:03.644656"
+    },
+    {
+      "message": "ada qris ga",
+      "preprocessed": "qris",
+      "intent": "tanya_pembayaran",
+      "confidence": 0.6666,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:23:18.069584"
+    },
+    {
+      "message": "berapa hp paling maha",
+      "preprocessed": "handphone maha",
+      "intent": "tanya_produk",
+      "confidence": 0.6463,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:23:42.148071"
     }
   ],
   "stats": {
-    "total": 82,
-    "nlp_driven": 56,
-    "ai_driven": 26,
+    "total": 94,
+    "nlp_driven": 64,
+    "ai_driven": 30,
     "patterns_learned": 7
   }
 }
