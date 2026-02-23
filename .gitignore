@@ -22,18 +22,6 @@ venv/
 env/
 .venv/
 
-# ── Model Files ──
-# JANGAN ignore! Dibutuhkan Render untuk deploy
-# models/*.pkl  ← dikomment karena perlu untuk deployment
-# models/*.joblib
-
-# ── Data yang tidak perlu di GitHub ──
-dataset/learning_log.json
-journal_paper_structure.md
-
-# ── Evaluation Results ──
-evaluation_results/
-
 # ── IDE ──
 .vscode/
 .idea/
@@ -59,3 +47,14 @@ desktop.ini
 *.svg
 docs/
 evaluation_results/
+
+# ── Scripts yang ga perlu di-deploy ──
+_check_kb.py
+_trim_kb.py
+evaluate.py
+expand_patterns.py
+generate_flowchart.py
+integrate_smartphones.py
+test_kb.py
+test_suggest.py
+journal_paper_structure.md

@@ -688,9 +688,11 @@ if __name__ == '__main__':
     else:
         mode_str = "📊 NLP Only (AI providers tidak tersedia)"
     
+    port = int(os.environ.get('PORT', 5000))
+
     print("\n" + "=" * 55)
     print(f"  🤖 CekatIn Chatbot Server")
-    print(f"  📡 Running on http://localhost:5000")
+    print(f"  📡 Running on http://localhost:{port}")
     print(f"  🔧 Mode: {mode_str}")
     print(f"  📊 NLP Threshold: {NLP_CONFIDENCE_THRESHOLD:.0%}")
     print(f"  📦 Intents: {len(engine.response_map)} categories")
@@ -698,6 +700,6 @@ if __name__ == '__main__':
 
     app.run(
         host='0.0.0.0',
-        port=5000,
-        debug=True
+        port=port,
+        debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     )
