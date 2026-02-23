@@ -767,12 +767,36 @@
       "confidence": 0.5267,
       "routing": "nlp_driven",
       "timestamp": "2026-02-23T22:27:31.603034"
+    },
+    {
+      "message": "kamu siapa",
+      "preprocessed": "",
+      "intent": "unknown",
+      "confidence": 0.0,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-23T22:33:39.089713"
+    },
+    {
+      "message": "produk apa saja yang dijual",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9476,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:33:53.782036"
+    },
+    {
+      "message": "oppo yg bagus apa",
+      "preprocessed": "oppo bagus",
+      "intent": "tanya_produk",
+      "confidence": 0.5507,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-23T22:34:13.816342"
     }
   ],
   "stats": {
-    "total": 96,
-    "nlp_driven": 66,
-    "ai_driven": 30,
+    "total": 99,
+    "nlp_driven": 68,
+    "ai_driven": 31,
     "patterns_learned": 7
   }
 }
