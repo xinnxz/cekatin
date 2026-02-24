@@ -58,3 +58,8 @@ integrate_smartphones.py
 test_kb.py
 test_suggest.py
 journal_paper_structure.md
+
+# ── Database (lokal, jangan push) ──
+*.db
+*.sqlite3
+migrate_json_to_db.py

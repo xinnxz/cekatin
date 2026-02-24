@@ -799,11 +799,19 @@
       "confidence": 0.9641,
       "routing": "nlp_driven",
       "timestamp": "2026-02-23T22:35:10.826823"
+    },
+    {
+      "message": "halo cika",
+      "preprocessed": "halo cika",
+      "intent": "greeting",
+      "confidence": 0.9247,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-24T18:40:41.214382"
     }
   ],
   "stats": {
-    "total": 100,
-    "nlp_driven": 69,
+    "total": 101,
+    "nlp_driven": 70,
     "ai_driven": 31,
     "patterns_learned": 7
   }

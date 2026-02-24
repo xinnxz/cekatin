@@ -47,11 +47,26 @@ Author: CekatIn Team
 
 import json
 import os
+import time
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
 from nlp_engine import NLPEngine
 from gemini_backend import GeminiBackend
+
+# ── Database (Phase 1 SaaS) ──
+try:
+    from database import init_db
+    from db_service import (
+        get_or_create_conversation,
+        save_chat_message,
+        log_learning_to_db,
+        get_chat_stats
+    )
+    DB_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ Database tidak tersedia: {e}")
+    DB_AVAILABLE = False
 
 # ============================================================
 # Inisialisasi Flask App
@@ -61,6 +76,16 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
 print("\n🚀 Memulai CekatIn Server (Hybrid NLP + AI)...")
+
+# ── Inisialisasi Database ──
+if DB_AVAILABLE:
+    try:
+        init_db()
+        print("✅ Database connected & tables ready")
+    except Exception as e:
+        print(f"⚠️ Database init error: {e}")
+        DB_AVAILABLE = False
+
 engine = NLPEngine()       # Layer 1: Klasifikasi intent (NB/SVM)
 gemini = GeminiBackend()   # Layer 3: AI enhancement (Gemini/Groq)
 
@@ -447,10 +472,6 @@ def chat():
     # ══════════════════════════════════════════════════════════
     # STEP 3: Suggested Replies (Rekomendasi Chat Lanjutan)
     # ══════════════════════════════════════════════════════════
-    # Berikan saran pertanyaan lanjutan berdasarkan intent saat ini.
-    # Ini membantu user menjelajah fitur chatbot tanpa bingung.
-    # Contoh: setelah tanya harga → suggest cek spek, promo, pembayaran
-    # ══════════════════════════════════════════════════════════
     result['suggested_replies'] = get_suggested_replies(nlp_intent)
 
     # ══════════════════════════════════════════════════════════
@@ -465,8 +486,48 @@ def chat():
             preprocessed=preprocessed
         )
     except Exception as e:
-        # Jangan sampai logging error mengganggu respons user
         print(f"⚠️ Learning log error: {e}")
+
+    # ══════════════════════════════════════════════════════════
+    # STEP 5: Simpan ke Database (Phase 1 SaaS)
+    # ══════════════════════════════════════════════════════════
+    # Simpan pesan user + bot response ke database.
+    # Data ini dipakai untuk analytics dan learning di dashboard.
+    # Jika DB tidak tersedia, skip (JSON log tetap jalan di atas).
+    # ══════════════════════════════════════════════════════════
+    if DB_AVAILABLE:
+        try:
+            # Get/create conversation untuk session ini
+            conv_id = get_or_create_conversation(session_id)
+
+            if conv_id:
+                # Simpan pesan user
+                save_chat_message(
+                    conversation_id=conv_id,
+                    sender='user',
+                    text=user_message
+                )
+
+                # Simpan response bot
+                save_chat_message(
+                    conversation_id=conv_id,
+                    sender='bot',
+                    text=result.get('response', ''),
+                    intent_tag=result.get('intent'),
+                    confidence=result.get('confidence'),
+                    source=result.get('source')
+                )
+
+                # Simpan ke learning log jika confidence rendah
+                if result.get('confidence', 0) < NLP_CONFIDENCE_THRESHOLD:
+                    log_learning_to_db(
+                        user_message=user_message,
+                        bot_response=result.get('response', ''),
+                        detected_intent=result.get('intent'),
+                        confidence=result.get('confidence')
+                    )
+        except Exception as e:
+            print(f"⚠️ DB logging error (non-fatal): {e}")
 
     return jsonify(result)
 

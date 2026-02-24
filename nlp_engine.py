@@ -300,14 +300,16 @@ class NLPEngine:
     3. MultinomialNB     - mengklasifikasikan intent dari vektor
     """
 
-    def __init__(self, dataset_path: str = None):
+    def __init__(self, dataset_path: str = None, use_database: bool = True):
         """
         Inisialisasi NLP Engine.
 
         Args:
-            dataset_path: Path ke file intents.json
+            dataset_path: Path ke file intents.json (fallback)
+            use_database: Jika True, coba muat dari database dulu
         """
         self.preprocessor = TextPreprocessor()
+        self.use_database = use_database
 
         # Tentukan path default
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -317,7 +319,7 @@ class NLPEngine:
         self.dataset_path = dataset_path
         self.model_dir = os.path.join(base_dir, 'models')
 
-        # Muat dataset intents
+        # Muat dataset intents (dari DB atau JSON)
         self.intents_data = self._load_dataset()
 
         # Mapping intent tag → list of responses (template fallback)
@@ -350,10 +352,32 @@ class NLPEngine:
             self.train()
 
     def _load_dataset(self) -> dict:
-        """Muat dataset intent dari file JSON."""
+        """
+        Muat dataset intent — prioritas dari DATABASE, fallback ke JSON file.
+        
+        Alur:
+        1. Jika use_database=True → coba load dari database
+        2. Jika database kosong/error → fallback ke intents.json
+        3. Return format yang SAMA persis agar training tidak berubah
+        """
+        # Coba load dari database dulu
+        if self.use_database:
+            try:
+                from db_service import load_intents_from_db
+                db_data = load_intents_from_db()
+                
+                if db_data and len(db_data.get('intents', [])) > 0:
+                    print(f"📦 Dataset dimuat dari DATABASE: {len(db_data['intents'])} intents")
+                    return db_data
+                else:
+                    print("⚠️ Database kosong, fallback ke file JSON...")
+            except Exception as e:
+                print(f"⚠️ Database tidak tersedia ({e}), fallback ke file JSON...")
+        
+        # Fallback ke file JSON
         with open(self.dataset_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        print(f"📂 Dataset dimuat: {len(data['intents'])} intents")
+        print(f"📂 Dataset dimuat dari FILE: {len(data['intents'])} intents")
         return data
 
     def train(self):
