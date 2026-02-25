@@ -46,6 +46,10 @@ class Config:
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
     GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 
+    # ── Google OAuth ──
+    # Dapatkan dari: Google Cloud Console → API & Services → Credentials
+    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
+
     # ── App Settings ──
     PORT = int(os.getenv('PORT', 5000))
     DEBUG = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'

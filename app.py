@@ -75,6 +75,17 @@ except Exception as e:
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
+# ── Register Auth Blueprint ──
+try:
+    from auth_routes import auth_bp
+    from middleware import require_auth, require_role
+    app.register_blueprint(auth_bp)
+    AUTH_AVAILABLE = True
+    print("🔐 Auth system loaded")
+except Exception as e:
+    print(f"⚠️ Auth system tidak tersedia: {e}")
+    AUTH_AVAILABLE = False
+
 print("\n🚀 Memulai CekatIn Server (Hybrid NLP + AI)...")
 
 # ── Inisialisasi Database ──
@@ -551,7 +562,17 @@ def clear_chat():
 
 @app.route('/api/retrain', methods=['POST'])
 def retrain():
-    """Retrain model NLP jika dataset diupdate."""
+    """Retrain model NLP jika dataset diupdate. (Protected jika auth tersedia)"""
+    # Cek auth jika tersedia
+    if AUTH_AVAILABLE:
+        from auth import verify_token
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header:
+            parts = auth_header.split(' ')
+            if len(parts) == 2 and parts[0] == 'Bearer':
+                payload = verify_token(parts[1])
+                if not payload:
+                    return jsonify({'error': 'Token invalid atau expired'}), 401
     try:
         engine.retrain()
         return jsonify({

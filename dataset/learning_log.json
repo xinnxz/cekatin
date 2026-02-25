@@ -807,11 +807,19 @@
       "confidence": 0.9247,
       "routing": "nlp_driven",
       "timestamp": "2026-02-24T18:40:41.214382"
+    },
+    {
+      "message": "Halo, ada produk apa saja?",
+      "preprocessed": "halo produk",
+      "intent": "greeting",
+      "confidence": 0.5082,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-25T01:41:05.704186"
     }
   ],
   "stats": {
-    "total": 101,
-    "nlp_driven": 70,
+    "total": 102,
+    "nlp_driven": 71,
     "ai_driven": 31,
     "patterns_learned": 7
   }

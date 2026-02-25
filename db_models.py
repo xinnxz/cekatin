@@ -105,12 +105,16 @@ class User(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     tenant_id = Column(String(36), ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
-    password_hash = Column(String(255), nullable=False)  # Hashed dengan bcrypt
+    password_hash = Column(String(255), nullable=True)    # Nullable untuk Google-only users
     full_name = Column(String(100), default='')
     role = Column(String(20), default='admin')           # superadmin/admin/viewer
     is_active = Column(Boolean, default=True)
     last_login = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utcnow)
+
+    # Google OAuth fields
+    google_id = Column(String(100), unique=True, nullable=True)  # Google sub ID
+    avatar_url = Column(String(500), default='')                 # Foto profil Google
 
     # Relationships
     tenant = relationship('Tenant', back_populates='users')
