@@ -141,11 +141,11 @@ The fourth and final stage applies **morphological stemming** using the Sastrawi
 
 #### 2.5.2 Feature Extraction
 
-Feature extraction was performed using the **Term Frequency–Inverse Document Frequency (TF-IDF)** vectorization method, which assigns a numerical weight to each term based on its frequency within a document relative to its frequency across the entire corpus [12]. The TF-IDF weight for a term *t* in document *d* is computed as shown in Equation (1):
+Feature extraction was performed using the **Term Frequency–Inverse Document Frequency (TF-IDF)** vectorization method, which assigns a numerical weight to each term based on its frequency within a document relative to its frequency across the entire corpus [12]. The TF-IDF weight *w* for a term *t* in document *d* is computed as shown in Equation (1):
 
-> TF-IDF(*t*, *d*) = TF(*t*, *d*) × log(*N* / DF(*t*))  ........  (1)
+> *w*<sub>*t*,*d*</sub> = *tf*(*t*, *d*) × log(*N* / *df*(*t*))  ........  (1)
 
-where TF(*t*, *d*) represents the frequency of term *t* in document *d*, *N* denotes the total number of documents in the corpus, and DF(*t*) is the number of documents containing term *t*. Sublinear TF scaling was enabled, applying a logarithmic transformation to the raw term frequency to reduce the dominance of highly frequent terms [13].
+where *w*<sub>*t*,*d*</sub> denotes the TF-IDF weight of term *t* in document *d*, *tf*(*t*, *d*) represents the term frequency of *t* in *d*, *N* denotes the total number of documents in the corpus, and *df*(*t*) is the document frequency—the number of documents containing term *t*. Sublinear TF scaling was enabled, applying a logarithmic transformation to the raw term frequency to reduce the dominance of highly frequent terms [13].
 
 The vectorizer was configured to use a unigram-bigram representation (n-gram range of 1 to 2), capturing both individual words and two-word combinations. This configuration is particularly beneficial for intent classification, as meaningful bigram features such as "jam buka" (operating hours), "metode pembayaran" (payment method), and "garansi resmi" (official warranty) provide stronger discriminative signals than their constituent unigrams alone [7]. No maximum feature limit was imposed, and the minimum document frequency was set to 1, resulting in a total of 1,569 extracted features. The complete feature extraction configuration is presented in Table 4.
 
@@ -164,17 +164,17 @@ The vectorizer was configured to use a unigram-bigram representation (n-gram ran
 
 Two classification algorithms were trained and compared in this study:
 
-**Multinomial Naive Bayes.** The Multinomial Naive Bayes classifier is a probabilistic model based on Bayes' theorem with the assumption of conditional independence among features [13]. Given a document represented as a feature vector ***x***, the posterior probability for class *c* is calculated as shown in Equation (2):
+**Multinomial Naive Bayes.** The Multinomial Naive Bayes classifier is a probabilistic model based on Bayes' theorem with the assumption of conditional independence among features [13]. Given a document represented as a feature vector ***x***, the posterior probability for class *c*<sub>*k*</sub> is calculated as shown in Equation (2):
 
-> P(*c* | ***x***) = P(***x*** | *c*) × P(*c*) / P(***x***)  ........  (2)
+> P(*c*<sub>*k*</sub> | ***x***) = P(***x*** | *c*<sub>*k*</sub>) · P(*c*<sub>*k*</sub>) / P(***x***)  ........  (2)
 
-The class with the highest posterior probability is selected as the predicted intent. Multinomial NB is particularly well-suited for text classification tasks where features represent word frequencies or TF-IDF scores [13]. In this study, Laplace smoothing with an alpha parameter of 1.0 was applied to prevent zero-probability estimates for unseen feature-class combinations, and prior class probabilities were estimated from the training data distribution.
+where P(*c*<sub>*k*</sub> | ***x***) represents the posterior probability of class *c*<sub>*k*</sub> given the feature vector ***x***, P(***x*** | *c*<sub>*k*</sub>) is the likelihood of observing ***x*** given class *c*<sub>*k*</sub>, P(*c*<sub>*k*</sub>) is the prior probability of class *c*<sub>*k*</sub>, and P(***x***) is the evidence serving as a normalization constant. The class with the highest posterior probability is selected as the predicted intent. Multinomial NB is particularly well-suited for text classification tasks where features represent word frequencies or TF-IDF scores [13]. In this study, Laplace smoothing with an alpha parameter of 1.0 was applied to prevent zero-probability estimates for unseen feature-class combinations, and prior class probabilities were estimated from the training data distribution.
 
 **Linear Support Vector Machine.** The Linear SVM classifier seeks to identify the optimal hyperplane that maximizes the margin between classes in the feature space [14]. For multi-class classification, the one-versus-rest strategy is employed, wherein a separate binary classifier is trained for each intent category. The decision function for a given input ***x*** is defined as shown in Equation (3):
 
-> f(***x***) = ***w*** · ***x*** + *b*  ........  (3)
+> f(***x***) = ***w***<sup>T</sup> · ***x*** + *b*  ........  (3)
 
-where ***w*** represents the weight vector and *b* is the bias term. SVM has been widely recognized for its effectiveness in high-dimensional text classification tasks, as the algorithm's performance does not degrade significantly with increasing feature dimensionality [14]. The regularization parameter *C* was set to 1.0, and the maximum number of iterations was limited to 1,000. Both models were implemented using the scikit-learn machine learning library version 1.3 in Python [21]. The hyperparameter configuration for both models is summarized in Table 5.
+where ***w***<sup>T</sup> denotes the transpose of the weight vector, ***x*** is the input feature vector, and *b* is the bias term. The transpose notation indicates the dot product operation between the weight vector and the input, producing a scalar decision value. SVM has been widely recognized for its effectiveness in high-dimensional text classification tasks, as the algorithm's performance does not degrade significantly with increasing feature dimensionality [14]. The regularization parameter *C* was set to 1.0, and the maximum number of iterations was limited to 1,000. Both models were implemented using the scikit-learn machine learning library version 1.3 in Python [21]. The hyperparameter configuration for both models is summarized in Table 5.
 
 **Table 5.** Model hyperparameter configuration.
 
@@ -191,15 +191,15 @@ where ***w*** represents the weight vector and *b* is the bias term. SVM has bee
 
 The dataset was partitioned into training and testing subsets using an **80:20 stratified random split** with a fixed random seed of 42, ensuring proportional representation of all intent categories in both subsets [18]. This configuration yielded 486 training samples and 122 testing samples.
 
-Model performance was assessed using four standard classification metrics: **accuracy, precision, recall, and F1-score**, computed as shown in Equations (4)–(7) [22]:
+Model performance was assessed using four standard classification metrics: **accuracy, precision, recall, and F₁-score**, computed as shown in Equations (4)–(7) [22]. Here, *TP* (True Positive) represents the number of correctly predicted positive instances, *TN* (True Negative) the correctly predicted negative instances, *FP* (False Positive) the incorrectly predicted positive instances, and *FN* (False Negative) the incorrectly predicted negative instances:
 
-> Accuracy = (TP + TN) / (TP + TN + FP + FN)  ........  (4)
+> *Accuracy* = (*TP* + *TN*) / (*TP* + *TN* + *FP* + *FN*)  ........  (4)
 
-> Precision = TP / (TP + FP)  ........  (5)
+> *Precision* = *TP* / (*TP* + *FP*)  ........  (5)
 
-> Recall = TP / (TP + FN)  ........  (6)
+> *Recall* = *TP* / (*TP* + *FN*)  ........  (6)
 
-> F1-Score = 2 × (Precision × Recall) / (Precision + Recall)  ........  (7)
+> *F*₁ = 2 · (*Precision* · *Recall*) / (*Precision* + *Recall*)  ........  (7)
 
 Macro-averaging was applied to compute aggregate precision, recall, and F1-score values, treating all intent categories with equal weight regardless of their sample size [22]. Confusion matrices were generated for both models to visualize patterns of correct and incorrect predictions across all intent categories.
 
