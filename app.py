@@ -102,6 +102,14 @@ try:
 except Exception as e:
     print(f"⚠️ Dashboard API tidak tersedia: {e}")
 
+# ── Register Widget Blueprint ──
+try:
+    from widget_routes import widget_bp
+    app.register_blueprint(widget_bp)
+    print("💬 Widget API loaded")
+except Exception as e:
+    print(f"⚠️ Widget API tidak tersedia: {e}")
+
 print("\n🚀 Memulai CekatIn Server (Hybrid NLP + AI)...")
 
 # ── Inisialisasi Database ──
@@ -326,6 +334,16 @@ def get_suggested_replies(intent: str) -> list:
 def serve_index():
     """Serve halaman utama."""
     return send_from_directory('static', 'index.html')
+
+@app.route('/widget.js')
+def serve_widget_js():
+    """Serve embeddable widget script."""
+    return send_from_directory('widget/src', 'widget.js', mimetype='application/javascript')
+
+@app.route('/widget.css')
+def serve_widget_css():
+    """Serve embeddable widget styles."""
+    return send_from_directory('widget/src', 'widget.css', mimetype='text/css')
 
 
 # ============================================================

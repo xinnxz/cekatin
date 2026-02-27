@@ -1,0 +1,348 @@
+/*
+ * CekatIn Embeddable Widget Styles
+ * CSS ini akan di-inject ke dalam Shadow DOM agar tidak konflik dengan website client.
+ */
+
+:host {
+  /* Default Colors (bisa di-override via JS config) */
+  --cekatin-primary: #4F46E5;
+  --cekatin-primary-hover: #4338CA;
+  --cekatin-bg: #ffffff;
+  --cekatin-text: #1f2937;
+  --cekatin-text-light: #6b7280;
+  --cekatin-border: #e5e7eb;
+  --cekatin-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --cekatin-zindex: 999999;
+  
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cekatin-text);
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Floating Action Button (FAB) */
+.cekatin-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  background-color: var(--cekatin-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: var(--cekatin-zindex);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.cekatin-fab:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.cekatin-fab svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  transition: transform 0.3s ease;
+}
+
+.cekatin-fab.is-open .icon-chat {
+  display: none;
+}
+
+.cekatin-fab.is-open .icon-close {
+  display: block;
+  transform: rotate(90deg);
+}
+
+.cekatin-fab:not(.is-open) .icon-close {
+  display: none;
+}
+
+/* Chat Window Container */
+.cekatin-window {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  width: 380px;
+  height: 600px;
+  max-height: calc(100vh - 120px);
+  background-color: var(--cekatin-bg);
+  border-radius: 16px;
+  box-shadow: var(--cekatin-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: var(--cekatin-zindex);
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  border: 1px solid var(--cekatin-border);
+}
+
+.cekatin-window.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Header */
+.cekatin-header {
+  background: linear-gradient(135deg, var(--cekatin-primary), #2563EB);
+  color: white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.cekatin-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cekatin-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cekatin-header-info {
+  flex: 1;
+}
+
+.cekatin-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cekatin-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cekatin-online-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #4ADE80;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Chat Body (Messages) */
+.cekatin-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #F9FAFB;
+}
+
+.cekatin-message {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  word-wrap: break-word;
+  animation: messageEnter 0.3s ease forwards;
+}
+
+@keyframes messageEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cekatin-message.bot {
+  background-color: white;
+  color: var(--cekatin-text);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--cekatin-border);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.cekatin-message.user {
+  background-color: var(--cekatin-primary);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+/* Typing Indicator */
+.cekatin-typing {
+  display: flex;
+  gap: 4px;
+  padding: 14px 16px;
+  background-color: white;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--cekatin-border);
+  align-self: flex-start;
+  width: fit-content;
+}
+
+.cekatin-typing-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #9CA3AF;
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.cekatin-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.cekatin-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* Suggested Replies */
+.cekatin-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cekatin-suggestion-btn {
+  background-color: white;
+  color: var(--cekatin-primary);
+  border: 1px solid var(--cekatin-primary);
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cekatin-suggestion-btn:hover {
+  background-color: var(--cekatin-primary);
+  color: white;
+}
+
+/* Footer (Input) */
+.cekatin-footer {
+  padding: 16px;
+  background-color: white;
+  border-top: 1px solid var(--cekatin-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cekatin-input {
+  flex: 1;
+  border: 1px solid var(--cekatin-border);
+  border-radius: 20px;
+  padding: 12px 16px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  background-color: #F9FAFB;
+}
+
+.cekatin-input:focus {
+  border-color: var(--cekatin-primary);
+  background-color: white;
+}
+
+.cekatin-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: var(--cekatin-primary);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.cekatin-send-btn:hover {
+  background-color: var(--cekatin-primary-hover);
+}
+
+.cekatin-send-btn:disabled {
+  background-color: #D1D5DB;
+  cursor: not-allowed;
+}
+
+.cekatin-send-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  margin-left: 2px; /* For optical alignment of send icon */
+}
+
+/* Powered By */
+.cekatin-powered {
+  text-align: center;
+  font-size: 11px;
+  color: #9CA3AF;
+  padding-bottom: 8px;
+  background-color: white;
+}
+
+.cekatin-powered a {
+  color: var(--cekatin-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Responsive (Mobile) */
+@media (max-width: 480px) {
+  .cekatin-window {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    transform: translateY(100%);
+  }
+  
+  .cekatin-window.is-open {
+    transform: translateY(0);
+  }
+  
+  .cekatin-fab {
+    bottom: 16px;
+    right: 16px;
+  }
+}

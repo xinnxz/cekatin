@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Website Client - CekatIn Widget Setup</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            color: #1f2937;
+        }
+        .header {
+            background-color: white;
+            padding: 24px 48px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4F46E5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 48px auto;
+            padding: 0 48px;
+        }
+        .hero {
+            background: linear-gradient(135deg, #4F46E5, #2563EB);
+            color: white;
+            padding: 64px 48px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin: 0 0 16px 0;
+        }
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+            margin: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #4F46E5;
+        }
+        footer {
+            margin-top: 64px;
+            text-align: center;
+            padding: 32px;
+            color: #6b7280;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">ReonShop</div>
+        <div style="display:flex; gap:16px;">
+            <a href="#" style="text-decoration:none; color:#4b5563;">Products</a>
+            <a href="#" style="text-decoration:none; color:#4b5563;">About</a>
+            <a href="#" style="text-decoration:none; color:#4b5563;">Contact</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Gadget Impian, Harga Nyaman</h1>
+            <p>Situs ini mensimulasikan website pelanggan (tenant) yang memasang widget live chat CekatIn. Coba klik tombol chat di pojok kanan bawah!</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Smartphone Terbaru</h3>
+                <p>Koleksi handphone flagship dengan garansi resmi dan potongan harga menarik setiap weekend.</p>
+            </div>
+            <div class="card">
+                <h3>Aksesoris Original</h3>
+                <p>TWS, charger, powerbank, dan case premium untuk melengkapi pengalaman digital Anda.</p>
+            </div>
+            <div class="card">
+                <h3>Layanan Tukar Tambah</h3>
+                <p>Mau upgrade HP? Kami menerima tukar tambah dengan harga terbaik di pasaran.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ReonShop. All rights reserved.</p>
+    </footer>
+
+    <!--
+      ======================================================================
+      Code to Embed CekatIn Widget
+      Client hanya perlu paste kode ini sebelum </body>
+      
+      Atribut yang didukung:
+      - data-host: URL backend (opsional, jika tidak ada pakai relative/origin)
+      - data-tenant: Slug dari tenant/toko yang terdaftar
+      - data-primary-color: Warna tema utama widget
+      ======================================================================
+    -->
+    <script 
+        src="http://localhost:5000/widget.js" 
+        data-host="http://localhost:5000"
+        data-tenant="reonshop" 
+        data-primary-color="#4F46E5">
+    </script>
+
+</body>
+</html>
