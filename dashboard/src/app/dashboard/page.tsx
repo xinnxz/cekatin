@@ -22,36 +22,76 @@ import {
    persis seperti screenshot cekat.ai.
    ═══════════════════════════════════════════════════════ */
 
+
+// SVG icons untuk setiap onboarding step
+// Kenapa SVG bukan emoji? SVG lebih konsisten antar OS/browser dan terlihat lebih profesional.
+const OnboardingIcons = {
+    platform: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        </svg>
+    ),
+    aiAgent: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2" />
+            <circle cx="12" cy="5" r="2" />
+            <path d="M12 7v4" />
+            <line x1="8" y1="16" x2="8" y2="16.01" />
+            <line x1="12" y1="16" x2="12" y2="16.01" />
+            <line x1="16" y1="16" x2="16" y2="16.01" />
+        </svg>
+    ),
+    team: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+    ),
+    connect: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+    ),
+};
+
 const onboardingSteps = [
     {
         number: 1,
         title: 'Hubungkan Platform',
         description: 'Mulai terima pesan dari WhatsApp, IG, dan FB Anda!',
-        emoji: '🤝',
+        icon: OnboardingIcons.platform,
         color: '#FEF3C7',
+        iconColor: '#D97706',
     },
     {
         number: 2,
         title: 'Buat AI Agent',
         description: 'Jawab pesan masuk dengan Agent AI anda',
-        emoji: '🤖',
+        icon: OnboardingIcons.aiAgent,
         color: '#DBEAFE',
+        iconColor: '#2563EB',
     },
     {
         number: 3,
         title: 'Undang Agen Manusia',
         description: 'Undang tim Anda untuk membantu menjawab chat',
-        emoji: '👥',
+        icon: OnboardingIcons.team,
         color: '#E0E7FF',
+        iconColor: '#4F46E5',
     },
     {
         number: 4,
         title: 'Konek AI Agent ke Inbox',
         description: 'Hubungkan AI Agent dan Human Agent ke Platform',
-        emoji: '🔗',
+        icon: OnboardingIcons.connect,
         color: '#FCE7F3',
+        iconColor: '#DB2777',
     },
 ];
+
 
 export default function ChatPage() {
     return (
@@ -125,12 +165,12 @@ export default function ChatPage() {
                                 transition={{ delay: 0.2 + i * 0.1 }}
                                 className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#E5E7EB] hover:border-[#C7D2FE] hover:shadow-sm transition-all cursor-pointer group"
                             >
-                                {/* Emoji icon */}
+                                {/* SVG icon */}
                                 <div
-                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                                    style={{ backgroundColor: step.color }}
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                                    style={{ backgroundColor: step.color, color: step.iconColor }}
                                 >
-                                    {step.emoji}
+                                    {step.icon}
                                 </div>
 
                                 {/* Text */}

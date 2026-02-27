@@ -36,7 +36,7 @@ const sidebarItems = [
     { label: 'Analytics', icon: IconChart, href: '/dashboard/analytics' },
     { label: 'Conversations', icon: IconConversation, href: '/dashboard/conversations' },
     { label: 'Broadcasts', icon: IconBroadcast, href: '/dashboard/broadcasts' },
-    { label: 'AI Agents', icon: IconAIAgent, href: '/dashboard/intents' },
+    { label: 'AI Agents', icon: IconAIAgent, href: '/dashboard/ai-agents' },
     { label: 'Connected Platforms', icon: IconPlatform, href: '/dashboard/platforms' },
     { label: 'Flow', icon: IconFlow, href: '/dashboard/flow' },
 ];

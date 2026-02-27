@@ -887,12 +887,60 @@
       "confidence": 0.9139,
       "routing": "nlp_driven",
       "timestamp": "2026-02-27T16:44:15.980366"
+    },
+    {
+      "message": "kalo gitu saya mau pesen 1 dong",
+      "preprocessed": "pesan",
+      "intent": "keluhan",
+      "confidence": 0.5361,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T16:47:25.032734"
+    },
+    {
+      "message": "yg hp xiaomi redmi note 5 ada kan",
+      "preprocessed": "handphone xiaomi redmi note",
+      "intent": "tanya_produk",
+      "confidence": 0.5698,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T16:47:44.814137"
+    },
+    {
+      "message": "yaudah, saya beli yg 12",
+      "preprocessed": "yaudah beli",
+      "intent": "unknown",
+      "confidence": 0.2957,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-27T16:48:05.607988"
+    },
+    {
+      "message": "saya mau pesen skrg, ada link shopee nya",
+      "preprocessed": "pesan sekarang link shopee",
+      "intent": "tanya_pengiriman",
+      "confidence": 0.4598,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-27T16:48:28.952875"
+    },
+    {
+      "message": "?",
+      "preprocessed": "",
+      "intent": "unknown",
+      "confidence": 0.0,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-27T16:48:36.649886"
+    },
+    {
+      "message": "perasaan ini toko reonshop. bukan took majujaya",
+      "preprocessed": "asa toko reonshop bukan took majujaya",
+      "intent": "tanya_lokasi",
+      "confidence": 0.5972,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T16:51:00.666790"
     }
   ],
   "stats": {
-    "total": 111,
-    "nlp_driven": 78,
-    "ai_driven": 33,
+    "total": 117,
+    "nlp_driven": 81,
+    "ai_driven": 36,
     "patterns_learned": 7
   }
 }

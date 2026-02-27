@@ -1034,7 +1034,7 @@ class NLPEngine:
             response = (
                 f"Maaf kak, {AGENT_NAME} belum paham pertanyaannya 😅 "
                 f"Coba sampaikan dengan cara lain ya, atau hubungi CS kami di:\n\n"
-                f"📞 WhatsApp: {self.kb.get('toko', {}).get('kontak', {}).get('whatsapp', '0812-3456-7890') if self.kb else '0812-3456-7890'}\n\n"
+                f"📞 WhatsApp: {self.kb.get('toko', {}).get('kontak', {}).get('whatsapp', '0878-3456-8565') if self.kb else '0878-3456-8565'}\n\n"
                 f"{AGENT_NAME} bisa bantu seputar: produk, harga, lokasi, jam buka, "
                 f"pengiriman, pembayaran, garansi, dan promo!"
             )

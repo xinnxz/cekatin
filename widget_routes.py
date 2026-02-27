@@ -15,6 +15,13 @@ from flask import Blueprint, request, jsonify
 
 widget_bp = Blueprint('widget_bp', __name__)
 
+# Ambil nama bot dari satu sumber kebenaran (nlp_engine.py)
+# Dengan ini, ganti nama Cika di nlp_engine.py → otomatis berubah di widget juga
+try:
+    from nlp_engine import AGENT_NAME
+except ImportError:
+    AGENT_NAME = 'Cika'  # Fallback jika import gagal
+
 
 def _get_db_components():
     """Lazy import DB components untuk menghindari circular imports."""
@@ -63,8 +70,8 @@ def get_widget_config():
     if not db_ok or get_db is None:
         return jsonify({
             'primaryColor': '#4F46E5',
-            'botName': 'Virtual Assistant',
-            'greetingMessage': 'Halo! Ada yang bisa kami bantu hari ini? 😊',
+            'botName': AGENT_NAME,
+            'greetingMessage': f'Halo! Ada yang bisa {AGENT_NAME} bantu hari ini?',
             'companyName': tenant_slug.replace('-', ' ').title(),
             'logoUrl': ''
         })
@@ -78,10 +85,10 @@ def get_widget_config():
 
         return jsonify({
             'primaryColor': '#4F46E5',
-            'botName': f'{tenant.name} Assistant',
+            'botName': AGENT_NAME,
             'greetingMessage': (
                 f'Halo! Selamat datang di {tenant.name}. '
-                'Ada yang bisa kami bantu? 😊'
+                f'Ada yang bisa {AGENT_NAME} bantu?'
             ),
             'companyName': tenant.name,
             'logoUrl': tenant.logo_url or ''
