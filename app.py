@@ -103,6 +103,8 @@ except Exception as e:
     print(f"⚠️ Dashboard API tidak tersedia: {e}")
 
 # ── Register Widget Blueprint ──
+# Widget blueprint menyajikan /api/widget/config dan /api/widget/history
+# (tanpa JWT auth karena diakses dari domain website client yang berbeda)
 try:
     from widget_routes import widget_bp
     app.register_blueprint(widget_bp)
@@ -335,15 +337,22 @@ def serve_index():
     """Serve halaman utama."""
     return send_from_directory('static', 'index.html')
 
+
+# ── Serve Widget Static Files ──────────────────
+# Tenant/client cukup include satu tag <script> di website mereka:
+#   <script src="https://your-backend.com/widget.js" data-tenant="slug"></script>
+
 @app.route('/widget.js')
 def serve_widget_js():
-    """Serve embeddable widget script."""
-    return send_from_directory('widget/src', 'widget.js', mimetype='application/javascript')
+    """Serve file JS utama widget chat (Vanilla JS)."""
+    return send_from_directory('widget/src', 'widget.js',
+                               mimetype='application/javascript')
 
 @app.route('/widget.css')
 def serve_widget_css():
-    """Serve embeddable widget styles."""
-    return send_from_directory('widget/src', 'widget.css', mimetype='text/css')
+    """Serve file CSS widget chat (Shadow DOM scoped)."""
+    return send_from_directory('widget/src', 'widget.css',
+                               mimetype='text/css')
 
 
 # ============================================================

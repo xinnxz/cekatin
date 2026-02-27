@@ -831,12 +831,52 @@
       "confidence": 0.9247,
       "routing": "nlp_driven",
       "timestamp": "2026-02-27T03:57:33.036341"
+    },
+    {
+      "message": "Berapa harganya?",
+      "preprocessed": "harga",
+      "intent": "tanya_harga",
+      "confidence": 0.9227,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T09:31:17.607267"
+    },
+    {
+      "message": "spesifikasi lengkapnya gimana",
+      "preprocessed": "spesifikasi lengkap",
+      "intent": "tanya_lokasi",
+      "confidence": 0.4859,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-27T09:33:36.259252"
+    },
+    {
+      "message": "Ada promo nggak?",
+      "preprocessed": "promo",
+      "intent": "tanya_promo",
+      "confidence": 0.9139,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T15:06:30.484739"
+    },
+    {
+      "message": "berapa harga iPhone 16?",
+      "preprocessed": "harga iphone",
+      "intent": "tanya_harga",
+      "confidence": 0.8888,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T16:28:41.210368"
+    },
+    {
+      "message": "spesifikasi lengkapnya gimana",
+      "preprocessed": "spesifikasi lengkap",
+      "intent": "tanya_lokasi",
+      "confidence": 0.4859,
+      "routing": "ai_driven",
+      "timestamp": "2026-02-27T16:28:59.293707"
     }
   ],
   "stats": {
-    "total": 104,
-    "nlp_driven": 73,
-    "ai_driven": 31,
+    "total": 109,
+    "nlp_driven": 76,
+    "ai_driven": 33,
     "patterns_learned": 7
   }
 }
