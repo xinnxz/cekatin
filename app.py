@@ -226,94 +226,95 @@ def log_interaction(user_message, intent, confidence, routing, preprocessed):
 # Mapping intent → saran follow-up yang relevan
 SUGGESTED_REPLIES_MAP = {
     'greeting': [
-        {'text': '📦 Lihat Produk', 'message': 'produk apa saja yang dijual'},
-        {'text': '💰 Cek Harga', 'message': 'daftar harga hp'},
-        {'text': '🎉 Promo', 'message': 'ada promo apa aja'},
-        {'text': '📍 Lokasi Toko', 'message': 'dimana alamat toko'},
-        {'text': '🕐 Jam Buka', 'message': 'jam buka toko'},
+        {'text': 'Lihat Produk',   'message': 'produk apa saja yang dijual'},
+        {'text': 'Cek Harga',      'message': 'daftar harga hp'},
+        {'text': 'Promo',          'message': 'ada promo apa aja'},
+        {'text': 'Lokasi Toko',    'message': 'dimana alamat toko'},
+        {'text': 'Jam Buka',       'message': 'jam buka toko'},
     ],
     'tanya_harga': [
-        {'text': '📋 Lihat Spesifikasi', 'message': 'spesifikasi lengkapnya gimana'},
-        {'text': '🎉 Ada Promo?', 'message': 'ada promo atau diskon gak'},
-        {'text': '💳 Cara Bayar', 'message': 'bisa bayar pakai apa aja'},
-        {'text': '🚚 Ongkir Berapa?', 'message': 'berapa ongkos kirimnya'},
-        {'text': '📦 Produk Lain', 'message': 'ada produk lain yang mirip'},
+        {'text': 'Lihat Spesifikasi', 'message': 'spesifikasi lengkapnya gimana'},
+        {'text': 'Ada Promo?',        'message': 'ada promo atau diskon gak'},
+        {'text': 'Cara Bayar',        'message': 'bisa bayar pakai apa aja'},
+        {'text': 'Ongkir Berapa?',    'message': 'berapa ongkos kirimnya'},
+        {'text': 'Produk Lain',       'message': 'ada produk lain yang mirip'},
     ],
     'tanya_produk': [
-        {'text': '💰 Cek Harga', 'message': 'berapa harganya'},
-        {'text': '📋 Spesifikasi', 'message': 'spesifikasi lengkapnya apa'},
-        {'text': '🎉 Promo', 'message': 'ada promo gak'},
-        {'text': '📦 Stok Ready?', 'message': 'stoknya masih ada gak'},
-        {'text': '🛡️ Garansi', 'message': 'garansinya berapa lama'},
+        {'text': 'Cek Harga',     'message': 'berapa harganya'},
+        {'text': 'Spesifikasi',   'message': 'spesifikasi lengkapnya apa'},
+        {'text': 'Promo',         'message': 'ada promo gak'},
+        {'text': 'Stok Ready?',   'message': 'stoknya masih ada gak'},
+        {'text': 'Garansi',       'message': 'garansinya berapa lama'},
     ],
     'tanya_spesifikasi': [
-        {'text': '💰 Berapa Harga?', 'message': 'harganya berapa'},
-        {'text': '🔄 Bandingkan', 'message': 'ada alternatif yang lebih bagus'},
-        {'text': '🎉 Ada Promo?', 'message': 'ada promo atau diskon'},
-        {'text': '🛒 Cara Beli', 'message': 'gimana cara belinya'},
-        {'text': '🛡️ Garansi', 'message': 'garansinya gimana'},
+        {'text': 'Berapa Harga?',  'message': 'harganya berapa'},
+        {'text': 'Bandingkan',     'message': 'ada alternatif yang lebih bagus'},
+        {'text': 'Ada Promo?',     'message': 'ada promo atau diskon'},
+        {'text': 'Cara Beli',      'message': 'gimana cara belinya'},
+        {'text': 'Garansi',        'message': 'garansinya gimana'},
     ],
     'tanya_promo': [
-        {'text': '📦 Lihat Produk', 'message': 'produk apa saja yang dijual'},
-        {'text': '💰 Cek Harga', 'message': 'harga setelah diskon berapa'},
-        {'text': '💳 Cara Bayar', 'message': 'metode pembayaran apa saja'},
-        {'text': '🚚 Pengiriman', 'message': 'bisa dikirim ke mana aja'},
-        {'text': '⏰ Sampai Kapan?', 'message': 'promonya sampai kapan'},
+        {'text': 'Lihat Produk',  'message': 'produk apa saja yang dijual'},
+        {'text': 'Cek Harga',     'message': 'harga setelah diskon berapa'},
+        {'text': 'Cara Bayar',    'message': 'metode pembayaran apa saja'},
+        {'text': 'Pengiriman',    'message': 'bisa dikirim ke mana aja'},
+        {'text': 'Sampai Kapan?', 'message': 'promonya sampai kapan'},
     ],
     'tanya_pengiriman': [
-        {'text': '💳 Cara Bayar', 'message': 'bisa bayar pakai apa aja'},
-        {'text': '📦 COD Bisa?', 'message': 'bisa bayar di tempat gak'},
-        {'text': '📍 Lokasi Toko', 'message': 'alamat tokonya dimana'},
-        {'text': '🛡️ Garansi', 'message': 'garansi berapa lama'},
-        {'text': '📦 Lihat Produk', 'message': 'mau lihat produk dulu'},
+        {'text': 'Cara Bayar',   'message': 'bisa bayar pakai apa aja'},
+        {'text': 'COD Bisa?',    'message': 'bisa bayar di tempat gak'},
+        {'text': 'Lokasi Toko',  'message': 'alamat tokonya dimana'},
+        {'text': 'Garansi',      'message': 'garansi berapa lama'},
+        {'text': 'Lihat Produk', 'message': 'mau lihat produk dulu'},
     ],
     'tanya_pembayaran': [
-        {'text': '🚚 Pengiriman', 'message': 'bisa kirim ke mana aja'},
-        {'text': '💰 Cicilan 0%', 'message': 'ada cicilan 0 persen gak'},
-        {'text': '📦 COD Bisa?', 'message': 'bisa cod bayar di tempat'},
-        {'text': '🎉 Promo', 'message': 'ada promo apa aja'},
-        {'text': '📦 Lihat Produk', 'message': 'mau lihat produk dulu'},
+        {'text': 'Pengiriman',   'message': 'bisa kirim ke mana aja'},
+        {'text': 'Cicilan 0%',   'message': 'ada cicilan 0 persen gak'},
+        {'text': 'COD Bisa?',    'message': 'bisa cod bayar di tempat'},
+        {'text': 'Promo',        'message': 'ada promo apa aja'},
+        {'text': 'Lihat Produk', 'message': 'mau lihat produk dulu'},
     ],
     'tanya_garansi': [
-        {'text': '🔧 Cara Klaim', 'message': 'gimana cara klaim garansi'},
-        {'text': '📦 Retur Barang', 'message': 'bisa retur barang gak'},
-        {'text': '💰 Cek Harga', 'message': 'berapa harga produknya'},
-        {'text': '📦 Lihat Produk', 'message': 'mau lihat produk lain'},
-        {'text': '📞 Hubungi CS', 'message': 'bagaimana cara hubungi cs'},
+        {'text': 'Cara Klaim',   'message': 'gimana cara klaim garansi'},
+        {'text': 'Retur Barang', 'message': 'bisa retur barang gak'},
+        {'text': 'Cek Harga',    'message': 'berapa harga produknya'},
+        {'text': 'Lihat Produk', 'message': 'mau lihat produk lain'},
+        {'text': 'Hubungi CS',   'message': 'bagaimana cara hubungi cs'},
     ],
     'tanya_jam_buka': [
-        {'text': '📍 Lokasi Toko', 'message': 'dimana alamat lengkap toko'},
-        {'text': '📞 Kontak', 'message': 'nomor telepon atau whatsapp'},
-        {'text': '📦 Lihat Produk', 'message': 'produk apa saja yang dijual'},
-        {'text': '🎉 Promo', 'message': 'ada promo apa aja sekarang'},
+        {'text': 'Lokasi Toko',  'message': 'dimana alamat lengkap toko'},
+        {'text': 'Kontak',       'message': 'nomor telepon atau whatsapp'},
+        {'text': 'Lihat Produk', 'message': 'produk apa saja yang dijual'},
+        {'text': 'Promo',        'message': 'ada promo apa aja sekarang'},
     ],
     'tanya_lokasi': [
-        {'text': '🕐 Jam Buka', 'message': 'jam buka toko kapan'},
-        {'text': '📞 Kontak', 'message': 'nomor whatsapp berapa'},
-        {'text': '🚚 Bisa Kirim?', 'message': 'bisa kirim ke alamat saya gak'},
-        {'text': '📦 Lihat Produk', 'message': 'produk apa saja yang dijual'},
+        {'text': 'Jam Buka',     'message': 'jam buka toko kapan'},
+        {'text': 'Kontak',       'message': 'nomor whatsapp berapa'},
+        {'text': 'Bisa Kirim?',  'message': 'bisa kirim ke alamat saya gak'},
+        {'text': 'Lihat Produk', 'message': 'produk apa saja yang dijual'},
     ],
     'keluhan': [
-        {'text': '🛡️ Garansi', 'message': 'bagaimana cara klaim garansi'},
-        {'text': '📦 Retur', 'message': 'bagaimana prosedur retur barang'},
-        {'text': '📞 Hubungi CS', 'message': 'mau bicara dengan customer service'},
-        {'text': '📍 Lokasi Toko', 'message': 'dimana alamat toko untuk datang langsung'},
+        {'text': 'Garansi',      'message': 'bagaimana cara klaim garansi'},
+        {'text': 'Retur',        'message': 'bagaimana prosedur retur barang'},
+        {'text': 'Hubungi CS',   'message': 'mau bicara dengan customer service'},
+        {'text': 'Lokasi Toko',  'message': 'dimana alamat toko untuk datang langsung'},
     ],
     'terima_kasih': [
-        {'text': '📦 Lihat Produk', 'message': 'mau lihat produk lain'},
-        {'text': '❓ Tanya Lagi', 'message': 'saya mau tanya lagi'},
-        {'text': '🎉 Promo', 'message': 'ada promo apa aja'},
+        {'text': 'Lihat Produk', 'message': 'mau lihat produk lain'},
+        {'text': 'Tanya Lagi',   'message': 'saya mau tanya lagi'},
+        {'text': 'Promo',        'message': 'ada promo apa aja'},
     ],
 }
 
 # Default suggestions jika intent tidak dikenal
 DEFAULT_SUGGESTIONS = [
-    {'text': '📦 Lihat Produk', 'message': 'produk apa saja yang dijual'},
-    {'text': '💰 Cek Harga', 'message': 'daftar harga hp'},
-    {'text': '🎉 Promo', 'message': 'ada promo apa aja'},
-    {'text': '📍 Lokasi Toko', 'message': 'dimana alamat toko'},
-    {'text': '💳 Pembayaran', 'message': 'metode pembayaran apa saja'},
+    {'text': 'Lihat Produk', 'message': 'produk apa saja yang dijual'},
+    {'text': 'Cek Harga',    'message': 'daftar harga hp'},
+    {'text': 'Promo',        'message': 'ada promo apa aja'},
+    {'text': 'Lokasi Toko',  'message': 'dimana alamat toko'},
+    {'text': 'Pembayaran',   'message': 'metode pembayaran apa saja'},
 ]
+
 
 def get_suggested_replies(intent: str) -> list:
     """
@@ -353,6 +354,11 @@ def serve_widget_css():
     """Serve file CSS widget chat (Shadow DOM scoped)."""
     return send_from_directory('widget/src', 'widget.css',
                                mimetype='text/css')
+
+@app.route('/test-widget')
+def serve_test_widget():
+    """Serve halaman demo/test untuk embeddable widget (development only)."""
+    return send_from_directory('.', 'test_widget.html')
 
 
 # ============================================================

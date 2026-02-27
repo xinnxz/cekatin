@@ -45,8 +45,8 @@
     pos:     $script.getAttribute('data-position')       || 'bottom-right',
   };
 
-  // Inject CSS Variable untuk warna kustom — bisa di-override dari config API
-  const colorDark = shadeColor(cfg.color, -15); // Sedikit lebih gelap untuk hover state
+  // Inject CSS Variable untuk warna kustom
+  const colorDark = shadeColor(cfg.color, -15);
 
   /* ─────────────── 2. Buat Shadow DOM Container ───────────────────── */
   /**
@@ -98,10 +98,10 @@
           <span class="ck-avatar-initials" id="ck-initials">AI</span>
         </div>
         <div class="ck-header-info">
-          <div class="ck-header-name" id="ck-botname">Memuat...</div>
+          <div class="ck-header-name" id="ck-botname">Loading...</div>
           <div class="ck-header-status">
             <span class="ck-status-dot"></span>
-            Online · AI-Powered
+            Online &middot; AI-Powered
           </div>
         </div>
       </div>
@@ -334,10 +334,8 @@
     );
 
     if (hist && hist.messages && hist.messages.length > 0) {
-      // Ada riwayat → tampilkan semua
       hist.messages.forEach(m => appendMsg(m.text, m.sender));
     } else {
-      // Tidak ada riwayat → tampilkan greeting setelah delay singkat
       setTimeout(() => {
         appendMsg(state.config.greetingMessage, 'bot');
         if (!state.open) {

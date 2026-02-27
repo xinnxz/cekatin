@@ -871,11 +871,27 @@
       "confidence": 0.4859,
       "routing": "ai_driven",
       "timestamp": "2026-02-27T16:28:59.293707"
+    },
+    {
+      "message": "ada promo gak hari ini?",
+      "preprocessed": "promo hari",
+      "intent": "tanya_promo",
+      "confidence": 0.834,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T16:33:04.518506"
+    },
+    {
+      "message": "ada promo?",
+      "preprocessed": "promo",
+      "intent": "tanya_promo",
+      "confidence": 0.9139,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T16:44:15.980366"
     }
   ],
   "stats": {
-    "total": 109,
-    "nlp_driven": 76,
+    "total": 111,
+    "nlp_driven": 78,
     "ai_driven": 33,
     "patterns_learned": 7
   }
