@@ -94,6 +94,14 @@ try:
 except Exception as e:
     print(f"⚠️ Tenant system tidak tersedia: {e}")
 
+# ── Register Dashboard Blueprint ──
+try:
+    from dashboard_routes import dashboard_bp
+    app.register_blueprint(dashboard_bp)
+    print("📊 Dashboard API loaded")
+except Exception as e:
+    print(f"⚠️ Dashboard API tidak tersedia: {e}")
+
 print("\n🚀 Memulai CekatIn Server (Hybrid NLP + AI)...")
 
 # ── Inisialisasi Database ──

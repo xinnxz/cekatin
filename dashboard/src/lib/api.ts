@@ -2,7 +2,7 @@
    API Client — Centralized fetch with tenant header
    ═══════════════════════════════════════════════════════ */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 interface FetchOptions extends RequestInit {
     tenant?: string;

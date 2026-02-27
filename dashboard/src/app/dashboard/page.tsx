@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import useSWR from 'swr';
 import {
     LayoutDashboard,
     MessageSquare,
@@ -22,40 +23,65 @@ import {
 } from 'recharts';
 import PageHeader from '@/components/PageHeader';
 import StatsCard from '@/components/StatsCard';
+import { fetcher } from '@/lib/api';
 
 /* ═══════════════════════════════════════════════════════
    Overview Page — Dashboard home
-   Stats cards + Chat volume chart + Top intents
+   
+   Penjelasan:
+   - Mengambil data dari GET /api/dashboard/stats
+   - Menampilkan 4 stats cards, line chart, bar chart, recent chats
+   - Jika API belum jalan, tampilkan fallback data
    ═══════════════════════════════════════════════════════ */
 
-// Mock data — nanti diganti dengan SWR fetch dari API
-const chatVolumeData = [
-    { day: 'Sen', chats: 120 },
-    { day: 'Sel', chats: 180 },
-    { day: 'Rab', chats: 250 },
-    { day: 'Kam', chats: 200 },
-    { day: 'Jum', chats: 310 },
-    { day: 'Sab', chats: 280 },
-    { day: 'Min', chats: 150 },
-];
+// TypeScript interface for API response
+interface ChatEntry { id: number; message: string; intent: string; confidence: number; time: string }
+interface DashboardStats {
+    total_chats: number;
+    nlp_accuracy: number;
+    avg_response_ms: number;
+    total_intents: number;
+    chat_volume: { day: string; chats: number }[];
+    top_intents: { name: string; count: number; fill: string }[];
+    recent_chats: ChatEntry[];
+}
 
-const topIntentsData = [
-    { name: 'tanya_harga', count: 342, fill: '#2563EB' },
-    { name: 'greeting', count: 289, fill: '#3B82F6' },
-    { name: 'tanya_stok', count: 198, fill: '#60A5FA' },
-    { name: 'tanya_promo', count: 156, fill: '#93C5FD' },
-    { name: 'goodbye', count: 120, fill: '#BFDBFE' },
-];
-
-const recentChats = [
-    { id: 1, message: 'Harga iPhone 15 berapa ya?', intent: 'tanya_harga', confidence: 0.95, time: '2 min ago' },
-    { id: 2, message: 'Hai kak, mau tanya dongg', intent: 'greeting', confidence: 0.88, time: '5 min ago' },
-    { id: 3, message: 'Stok Samsung S24 masih ada?', intent: 'tanya_stok', confidence: 0.92, time: '8 min ago' },
-    { id: 4, message: 'Ada promo apa hari ini?', intent: 'tanya_promo', confidence: 0.87, time: '12 min ago' },
-    { id: 5, message: 'Makasih ya kak', intent: 'goodbye', confidence: 0.91, time: '15 min ago' },
-];
+// Fallback data saat API belum tersedia
+const fallbackData: DashboardStats = {
+    total_chats: 0,
+    nlp_accuracy: 0,
+    avg_response_ms: 0,
+    total_intents: 0,
+    chat_volume: [
+        { day: 'Sen', chats: 0 },
+        { day: 'Sel', chats: 0 },
+        { day: 'Rab', chats: 0 },
+        { day: 'Kam', chats: 0 },
+        { day: 'Jum', chats: 0 },
+        { day: 'Sab', chats: 0 },
+        { day: 'Min', chats: 0 },
+    ],
+    top_intents: [],
+    recent_chats: [],
+};
 
 export default function OverviewPage() {
+    // SWR: fetch data dari backend Flask
+    // Penjelasan: useSWR otomatis cache, revalidate, dan handle loading state
+    const { data, error } = useSWR<DashboardStats>('/api/dashboard/stats', fetcher, {
+        fallbackData,
+        refreshInterval: 30000, // Refresh setiap 30 detik
+        onError: () => { }, // Suppress error toast
+    });
+
+    const stats = data || fallbackData;
+
+    // Format response time: ms → seconds atau tetap ms
+    const formatResponseTime = (ms: number) => {
+        if (ms >= 1000) return `${(ms / 1000).toFixed(1)}s`;
+        return `${ms}ms`;
+    };
+
     return (
         <div>
             <PageHeader
@@ -64,11 +90,23 @@ export default function OverviewPage() {
                 icon={LayoutDashboard}
             />
 
+            {/* API Connection Status */}
+            {error && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-6 px-4 py-3 bg-warning-light border border-warning/30 rounded-xl text-sm text-warning flex items-center gap-2"
+                >
+                    <span>⚠️</span>
+                    <span>Backend API belum terhubung. Jalankan Flask server di port 5000 untuk data live.</span>
+                </motion.div>
+            )}
+
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatsCard
                     label="Total Chats"
-                    value="1,523"
+                    value={stats.total_chats?.toLocaleString() || '0'}
                     icon={MessageSquare}
                     trend={{ value: 12.5, label: 'vs kemarin' }}
                     color="primary"
@@ -76,7 +114,7 @@ export default function OverviewPage() {
                 />
                 <StatsCard
                     label="NLP Accuracy"
-                    value="91.2%"
+                    value={`${stats.nlp_accuracy || 0}%`}
                     icon={Brain}
                     trend={{ value: 2.1, label: 'vs minggu lalu' }}
                     color="success"
@@ -84,7 +122,7 @@ export default function OverviewPage() {
                 />
                 <StatsCard
                     label="Avg Response"
-                    value="1.2s"
+                    value={formatResponseTime(stats.avg_response_ms || 0)}
                     icon={Zap}
                     trend={{ value: -8.3, label: 'lebih cepat' }}
                     color="warning"
@@ -92,7 +130,7 @@ export default function OverviewPage() {
                 />
                 <StatsCard
                     label="Active Intents"
-                    value="25"
+                    value={stats.total_intents || 0}
                     icon={TrendingUp}
                     trend={{ value: 3, label: 'baru ditambah' }}
                     color="primary"
@@ -124,7 +162,7 @@ export default function OverviewPage() {
                         </div>
                     </div>
                     <ResponsiveContainer width="100%" height={260}>
-                        <LineChart data={chatVolumeData}>
+                        <LineChart data={stats.chat_volume || []}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                             <XAxis
                                 dataKey="day"
@@ -166,28 +204,34 @@ export default function OverviewPage() {
                 >
                     <h3 className="font-semibold text-foreground mb-1">Top Intents</h3>
                     <p className="text-sm text-text-secondary mb-6">Yang paling sering ditanyakan</p>
-                    <ResponsiveContainer width="100%" height={260}>
-                        <BarChart data={topIntentsData} layout="vertical" barSize={20}>
-                            <XAxis type="number" hide />
-                            <YAxis
-                                type="category"
-                                dataKey="name"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 11, fill: '#64748B' }}
-                                width={90}
-                            />
-                            <Tooltip
-                                contentStyle={{
-                                    background: 'white',
-                                    border: '1px solid #E2E8F0',
-                                    borderRadius: '12px',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                                }}
-                            />
-                            <Bar dataKey="count" radius={[0, 8, 8, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    {(stats.top_intents?.length || 0) > 0 ? (
+                        <ResponsiveContainer width="100%" height={260}>
+                            <BarChart data={stats.top_intents} layout="vertical" barSize={20}>
+                                <XAxis type="number" hide />
+                                <YAxis
+                                    type="category"
+                                    dataKey="name"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fontSize: 11, fill: '#64748B' }}
+                                    width={90}
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        background: 'white',
+                                        border: '1px solid #E2E8F0',
+                                        borderRadius: '12px',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                                    }}
+                                />
+                                <Bar dataKey="count" radius={[0, 8, 8, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="h-[260px] flex items-center justify-center text-text-muted text-sm">
+                            Belum ada data intent
+                        </div>
+                    )}
                 </motion.div>
             </div>
 
@@ -203,36 +247,42 @@ export default function OverviewPage() {
                     <p className="text-sm text-text-secondary">5 percakapan terakhir</p>
                 </div>
                 <div className="divide-y divide-border">
-                    {recentChats.map((chat, i) => (
-                        <motion.div
-                            key={chat.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.5 + i * 0.05 }}
-                            className="flex items-center justify-between px-6 py-4 hover:bg-background/50 transition-colors"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
-                                    <MessageSquare className="w-4 h-4 text-primary" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-foreground">{chat.message}</p>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary-light text-primary font-medium">
-                                            {chat.intent}
-                                        </span>
-                                        <span className="text-xs text-text-muted">
-                                            {(chat.confidence * 100).toFixed(0)}% confidence
-                                        </span>
+                    {(stats.recent_chats?.length || 0) > 0 ? (
+                        stats.recent_chats.map((chat: ChatEntry, i: number) => (
+                            <motion.div
+                                key={chat.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.5 + i * 0.05 }}
+                                className="flex items-center justify-between px-6 py-4 hover:bg-background/50 transition-colors"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
+                                        <MessageSquare className="w-4 h-4 text-primary" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-foreground">{chat.message}</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-xs px-2 py-0.5 rounded-full bg-primary-light text-primary font-medium">
+                                                {chat.intent}
+                                            </span>
+                                            <span className="text-xs text-text-muted">
+                                                {(chat.confidence * 100).toFixed(0)}% confidence
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-2 text-text-muted">
-                                <Clock className="w-3.5 h-3.5" />
-                                <span className="text-xs">{chat.time}</span>
-                            </div>
-                        </motion.div>
-                    ))}
+                                <div className="flex items-center gap-2 text-text-muted">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    <span className="text-xs">{chat.time}</span>
+                                </div>
+                            </motion.div>
+                        ))
+                    ) : (
+                        <div className="px-6 py-12 text-center text-text-muted text-sm">
+                            Belum ada percakapan. Mulai chat untuk melihat data di sini.
+                        </div>
+                    )}
                 </div>
             </motion.div>
         </div>
