@@ -38,9 +38,9 @@ def get_default_tenant_id():
     Ambil ID tenant default.
     
     Penjelasan:
-    - Saat ini CekatIn masih single-tenant
-    - Semua data masuk ke tenant 'reonshop'
-    - Nanti di Phase 1.3 (Multi-Tenant) akan dinamis per request
+    - Dipakai sebagai fallback jika tenant_id tidak disediakan
+    - Setelah Phase 1.3 (Multi-Tenant), tenant_id biasanya
+      diberikan secara eksplisit dari TenantManager
     
     Returns:
         str: UUID tenant default, atau None jika belum ada

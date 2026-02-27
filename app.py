@@ -86,6 +86,14 @@ except Exception as e:
     print(f"⚠️ Auth system tidak tersedia: {e}")
     AUTH_AVAILABLE = False
 
+# ── Register Tenant Blueprint ──
+try:
+    from tenant_routes import tenant_bp
+    app.register_blueprint(tenant_bp)
+    print("🏢 Tenant system loaded")
+except Exception as e:
+    print(f"⚠️ Tenant system tidak tersedia: {e}")
+
 print("\n🚀 Memulai CekatIn Server (Hybrid NLP + AI)...")
 
 # ── Inisialisasi Database ──
@@ -97,8 +105,20 @@ if DB_AVAILABLE:
         print(f"⚠️ Database init error: {e}")
         DB_AVAILABLE = False
 
-engine = NLPEngine()       # Layer 1: Klasifikasi intent (NB/SVM)
+# ── Multi-Tenant NLP Manager ──
+# TenantManager mengelola NLP Engine per tenant (lazy-loaded & cached).
+# Menggantikan single NLPEngine() global untuk mendukung multi-tenant.
+from tenant_manager import TenantManager
+tenant_manager = TenantManager()
+app.config['TENANT_MANAGER'] = tenant_manager  # Agar bisa diakses dari blueprint
+
+# Fallback: single engine untuk backward compatibility
+# Jika tidak ada header X-Tenant-Slug, gunakan engine default ini
+engine = NLPEngine()       # Layer 1: Klasifikasi intent (NB/SVM) — default tenant
 gemini = GeminiBackend()   # Layer 3: AI enhancement (Gemini/Groq)
+
+# Simpan default tenant slug (untuk backward compatibility)
+DEFAULT_TENANT_SLUG = 'reonshop'
 
 # ── Threshold confidence untuk menentukan routing ──
 # Jika NLP confidence >= threshold → NLP-driven response
@@ -345,13 +365,37 @@ def chat():
     session_id = data.get('session_id', 'default')
 
     # ══════════════════════════════════════════════════════════
+    # STEP 0: Tenant Identification (Multi-Tenant)
+    # ──────────────────────────────────────────────────────────
+    # Identifikasi tenant dari:
+    # 1. Header X-Tenant-Slug (prioritas utama — dari widget)
+    # 2. Query param ?tenant=slug (alternatif)
+    # 3. Fallback ke default tenant (backward compatibility)
+    # ══════════════════════════════════════════════════════════
+    
+    tenant_slug = (
+        request.headers.get('X-Tenant-Slug') or
+        data.get('tenant') or
+        request.args.get('tenant') or
+        DEFAULT_TENANT_SLUG
+    )
+    
+    # Ambil engine untuk tenant ini (dari cache atau buat baru)
+    try:
+        current_engine = tenant_manager.get_engine_by_slug(tenant_slug)
+    except ValueError:
+        # Tenant tidak ditemukan → fallback ke default engine
+        current_engine = engine
+        tenant_slug = DEFAULT_TENANT_SLUG
+
+    # ══════════════════════════════════════════════════════════
     # STEP 1: NLP Classification (SELALU dijalankan)
     # ──────────────────────────────────────────────────────────
     # NLP Engine mengklasifikasi intent dari pesan user
     # menggunakan model NB/SVM yang sudah ditraining
     # ══════════════════════════════════════════════════════════
     
-    nlp_result = engine.get_response(user_message)
+    nlp_result = current_engine.get_response(user_message)
     nlp_confidence = nlp_result.get('confidence', 0)
     nlp_intent = nlp_result.get('intent', 'unknown')
     nlp_response = nlp_result.get('response', '')
@@ -366,7 +410,7 @@ def chat():
     # tapi tetap NATURAL dan BERVARIASI.
     # ══════════════════════════════════════════════════════════
     
-    kb_context = engine.get_kb_context(nlp_intent, user_message)
+    kb_context = current_engine.get_kb_context(nlp_intent, user_message)
 
     # ══════════════════════════════════════════════════════════
     # STEP 2: Response Routing berdasarkan confidence
@@ -479,6 +523,7 @@ def chat():
             }
 
     result['timestamp'] = datetime.now().isoformat()
+    result['tenant'] = tenant_slug  # Sertakan info tenant di response
 
     # ══════════════════════════════════════════════════════════
     # STEP 3: Suggested Replies (Rekomendasi Chat Lanjutan)
@@ -562,7 +607,13 @@ def clear_chat():
 
 @app.route('/api/retrain', methods=['POST'])
 def retrain():
-    """Retrain model NLP jika dataset diupdate. (Protected jika auth tersedia)"""
+    """
+    Retrain model NLP. (Protected jika auth tersedia)
+    
+    Mendukung multi-tenant:
+    - Header X-Tenant-Slug → retrain tenant tertentu
+    - Tanpa header → retrain default engine
+    """
     # Cek auth jika tersedia
     if AUTH_AVAILABLE:
         from auth import verify_token
@@ -574,11 +625,26 @@ def retrain():
                 if not payload:
                     return jsonify({'error': 'Token invalid atau expired'}), 401
     try:
-        engine.retrain()
-        return jsonify({
-            'status': 'success',
-            'message': 'Model berhasil di-retrain!'
-        })
+        # Cek apakah ada tenant slug di request
+        tenant_slug = request.headers.get('X-Tenant-Slug')
+        
+        if tenant_slug:
+            # Retrain tenant tertentu via TenantManager
+            result = tenant_manager.retrain_tenant_by_slug(tenant_slug)
+            return jsonify({
+                'status': 'success',
+                'message': f"Model tenant '{tenant_slug}' berhasil di-retrain!",
+                'result': result
+            })
+        else:
+            # Retrain default engine (backward compatibility)
+            engine.retrain()
+            return jsonify({
+                'status': 'success',
+                'message': 'Model default berhasil di-retrain!'
+            })
+    except ValueError as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 404
     except Exception as e:
         return jsonify({
             'status': 'error',
@@ -766,9 +832,9 @@ def health():
 
 if __name__ == '__main__':
     if gemini.available:
-        mode_str = "� HYBRID (NLP Classification + AI Enhancement)"
+        mode_str = "HYBRID (NLP Classification + AI Enhancement)"
     else:
-        mode_str = "📊 NLP Only (AI providers tidak tersedia)"
+        mode_str = "NLP Only (AI providers tidak tersedia)"
     
     port = int(os.environ.get('PORT', 5000))
 
@@ -778,6 +844,7 @@ if __name__ == '__main__':
     print(f"  🔧 Mode: {mode_str}")
     print(f"  📊 NLP Threshold: {NLP_CONFIDENCE_THRESHOLD:.0%}")
     print(f"  📦 Intents: {len(engine.response_map)} categories")
+    print(f"  🏢 Multi-Tenant: Enabled (default: {DEFAULT_TENANT_SLUG})")
     print("=" * 55 + "\n")
 
     app.run(

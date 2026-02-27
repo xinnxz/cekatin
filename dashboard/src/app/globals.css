@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════
+   CekatIn Design System
+   Inspired by: cekat.ai + kata.ai
+   ═══════════════════════════════════════════════════════ */
+
+@theme inline {
+  /* Primary */
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: #DBEAFE;
+  --color-primary-50: #EFF6FF;
+
+  /* Surfaces */
+  --color-surface: #FFFFFF;
+  --color-background: #F8FAFC;
+  --color-sidebar-bg: #F1F5F9;
+  --color-border: #E2E8F0;
+
+  /* Text */
+  --color-foreground: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #94A3B8;
+
+  /* Status */
+  --color-success: #10B981;
+  --color-success-light: #D1FAE5;
+  --color-warning: #F59E0B;
+  --color-warning-light: #FEF3C7;
+  --color-danger: #EF4444;
+  --color-danger-light: #FEE2E2;
+
+  /* AI Gradient */
+  --color-ai-start: #06B6D4;
+  --color-ai-end: #8B5CF6;
+
+  /* Spacing */
+  --sidebar-width: 260px;
+  --topbar-height: 64px;
+
+  /* Font */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Base ── */
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}

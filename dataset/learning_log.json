@@ -815,11 +815,27 @@
       "confidence": 0.5082,
       "routing": "nlp_driven",
       "timestamp": "2026-02-25T01:41:05.704186"
+    },
+    {
+      "message": "halo",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9247,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T03:57:13.186540"
+    },
+    {
+      "message": "halo",
+      "preprocessed": "halo",
+      "intent": "greeting",
+      "confidence": 0.9247,
+      "routing": "nlp_driven",
+      "timestamp": "2026-02-27T03:57:33.036341"
     }
   ],
   "stats": {
-    "total": 102,
-    "nlp_driven": 71,
+    "total": 104,
+    "nlp_driven": 73,
     "ai_driven": 31,
     "patterns_learned": 7
   }

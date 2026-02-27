@@ -300,16 +300,21 @@ class NLPEngine:
     3. MultinomialNB     - mengklasifikasikan intent dari vektor
     """
 
-    def __init__(self, dataset_path: str = None, use_database: bool = True):
+    def __init__(self, dataset_path: str = None, use_database: bool = True,
+                 tenant_id: str = None, tenant_slug: str = None):
         """
         Inisialisasi NLP Engine.
 
         Args:
             dataset_path: Path ke file intents.json (fallback)
             use_database: Jika True, coba muat dari database dulu
+            tenant_id: UUID tenant (untuk multi-tenant, load data dari DB)
+            tenant_slug: Slug tenant (untuk model path: models/{slug}/)
         """
         self.preprocessor = TextPreprocessor()
         self.use_database = use_database
+        self.tenant_id = tenant_id
+        self.tenant_slug = tenant_slug
 
         # Tentukan path default
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -317,7 +322,13 @@ class NLPEngine:
             dataset_path = os.path.join(base_dir, 'dataset', 'intents.json')
 
         self.dataset_path = dataset_path
-        self.model_dir = os.path.join(base_dir, 'models')
+
+        # Model directory: per tenant jika slug ada, global jika tidak
+        # Contoh: models/reonshop/chatbot_pipeline.pkl
+        if tenant_slug:
+            self.model_dir = os.path.join(base_dir, 'models', tenant_slug)
+        else:
+            self.model_dir = os.path.join(base_dir, 'models')
 
         # Muat dataset intents (dari DB atau JSON)
         self.intents_data = self._load_dataset()
@@ -364,10 +375,12 @@ class NLPEngine:
         if self.use_database:
             try:
                 from db_service import load_intents_from_db
-                db_data = load_intents_from_db()
+                # Pass tenant_id agar load data milik tenant tertentu
+                db_data = load_intents_from_db(tenant_id=self.tenant_id)
                 
                 if db_data and len(db_data.get('intents', [])) > 0:
-                    print(f"📦 Dataset dimuat dari DATABASE: {len(db_data['intents'])} intents")
+                    tenant_label = f" (tenant: {self.tenant_slug})" if self.tenant_slug else ""
+                    print(f"📦 Dataset dimuat dari DATABASE{tenant_label}: {len(db_data['intents'])} intents")
                     return db_data
                 else:
                     print("⚠️ Database kosong, fallback ke file JSON...")

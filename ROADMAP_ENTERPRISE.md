@@ -922,10 +922,14 @@ BULAN KE-24 (Scale):
 - [x] Journal paper
 
 ### Phase 1: SaaS MVP
-- [ ] Database migration (PostgreSQL)
-- [ ] SQLAlchemy models & migration
-- [ ] JWT authentication system
-- [ ] Multi-tenant architecture
+- [x] Database migration (PostgreSQL) — SQLite lokal, siap PostgreSQL
+- [x] SQLAlchemy models & migration
+- [x] JWT authentication system
+- [x] Multi-tenant architecture
+  - [x] TenantManager (per-tenant NLP model cache)
+  - [x] Tenant CRUD API (/api/tenants)
+  - [x] Tenant identification di chat (X-Tenant-Slug header)
+  - [x] Per-tenant model directories (models/{slug}/)
 - [ ] Admin dashboard (Next.js)
   - [ ] Overview page
   - [ ] Intent management (CRUD)
@@ -962,4 +966,4 @@ BULAN KE-24 (Scale):
 ---
 
 *Dokumen ini akan di-update seiring perkembangan project.*
-*Last updated: 24 Februari 2026*
+*Last updated: 27 Februari 2026*

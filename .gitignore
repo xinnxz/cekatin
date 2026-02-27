@@ -21,6 +21,8 @@ build/
 venv/
 env/
 .venv/
+venv_new/
+test_venv/
 
 # ── IDE ──
 .vscode/
