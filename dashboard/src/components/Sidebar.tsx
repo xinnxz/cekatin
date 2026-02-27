@@ -4,141 +4,97 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-    LayoutDashboard,
-    MessageSquare,
-    Brain,
-    GraduationCap,
-    BarChart3,
-    Settings,
-    LogOut,
-    Bot,
-    ChevronLeft,
-    ChevronRight,
-} from 'lucide-react';
-import { useState } from 'react';
+    IconChat,
+    IconTicket,
+    IconPhone,
+    IconChart,
+    IconConversation,
+    IconBroadcast,
+    IconAIAgent,
+    IconPlatform,
+    IconFlow,
+    IconSettings,
+} from './icons';
 
 /* ═══════════════════════════════════════════════════════
-   Sidebar — Fixed left navigation
-   Layout: cekat.ai dashboard reference
+   Sidebar — Vertical left navigation (cekat.ai exact style)
+   
+   Penjelasan layout reference dari screenshot:
+   - Posisi di bawah TopNavBar (bukan full height)
+   - Width: ~160px (lebih narrow dari sebelumnya)
+   - Menu items: Chat, Tickets, Calls, Analytics,
+                 Conversations, Broadcasts, AI Agents,
+                 Connected Platforms, Flow, Settings
+   - Active state: light blue background + blue text
+   - Settings di paling bawah (sticky)
    ═══════════════════════════════════════════════════════ */
 
-const menuItems = [
-    {
-        section: 'MAIN',
-        items: [
-            { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
-            { label: 'Intents', icon: MessageSquare, href: '/dashboard/intents' },
-            { label: 'Training', icon: GraduationCap, href: '/dashboard/training' },
-            { label: 'Learning', icon: Brain, href: '/dashboard/learning' },
-            { label: 'Analytics', icon: BarChart3, href: '/dashboard/analytics' },
-        ],
-    },
-    {
-        section: 'SYSTEM',
-        items: [
-            { label: 'Settings', icon: Settings, href: '/dashboard/settings' },
-        ],
-    },
+const sidebarItems = [
+    { label: 'Chat', icon: IconChat, href: '/dashboard' },
+    { label: 'Tickets', icon: IconTicket, href: '/dashboard/tickets' },
+    { label: 'Calls', icon: IconPhone, href: '/dashboard/calls' },
+    { label: 'Analytics', icon: IconChart, href: '/dashboard/analytics' },
+    { label: 'Conversations', icon: IconConversation, href: '/dashboard/conversations' },
+    { label: 'Broadcasts', icon: IconBroadcast, href: '/dashboard/broadcasts' },
+    { label: 'AI Agents', icon: IconAIAgent, href: '/dashboard/intents' },
+    { label: 'Connected Platforms', icon: IconPlatform, href: '/dashboard/platforms' },
+    { label: 'Flow', icon: IconFlow, href: '/dashboard/flow' },
 ];
 
 export default function Sidebar() {
     const pathname = usePathname();
-    const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <motion.aside
-            initial={false}
-            animate={{ width: collapsed ? 72 : 260 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-white border-r border-border"
-        >
-            {/* Logo */}
-            <div className="flex items-center gap-3 px-5 h-16 border-b border-border">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-[#8B5CF6] flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-white" />
-                </div>
-                {!collapsed && (
-                    <motion.span
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="font-bold text-lg text-foreground"
-                    >
-                        CekatIn
-                    </motion.span>
-                )}
-            </div>
+        <aside className="fixed left-0 top-[52px] bottom-0 w-[168px] flex flex-col bg-white border-r border-[#E5E7EB] z-40">
+            {/* Main Navigation */}
+            <nav className="flex-1 overflow-y-auto py-2 px-2">
+                <ul className="space-y-0.5">
+                    {sidebarItems.map((item) => {
+                        const Icon = item.icon;
+                        const isActive =
+                            item.href === '/dashboard'
+                                ? pathname === '/dashboard' || pathname.startsWith('/dashboard/chat')
+                                : pathname.startsWith(item.href);
 
-            {/* Menu */}
-            <nav className="flex-1 overflow-y-auto py-4 px-3">
-                {menuItems.map((section) => (
-                    <div key={section.section} className="mb-6">
-                        {!collapsed && (
-                            <p className="px-3 mb-2 text-[11px] font-semibold text-text-muted tracking-wider uppercase">
-                                {section.section}
-                            </p>
-                        )}
-                        <ul className="space-y-1">
-                            {section.items.map((item) => {
-                                const isActive =
-                                    pathname === item.href ||
-                                    (item.href !== '/dashboard' && pathname.startsWith(item.href));
-                                const Icon = item.icon;
-
-                                return (
-                                    <li key={item.href}>
-                                        <Link
-                                            href={item.href}
-                                            className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                        transition-all duration-200
-                        ${isActive
-                                                    ? 'bg-primary-light text-primary'
-                                                    : 'text-text-secondary hover:bg-background hover:text-foreground'
-                                                }
-                      `}
-                                        >
-                                            <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary' : ''}`} />
-                                            {!collapsed && (
-                                                <motion.span
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    className="truncate"
-                                                >
-                                                    {item.label}
-                                                </motion.span>
-                                            )}
-                                            {isActive && !collapsed && (
-                                                <motion.div
-                                                    layoutId="activeIndicator"
-                                                    className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"
-                                                />
-                                            )}
-                                        </Link>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
-                ))}
+                        return (
+                            <li key={item.href}>
+                                <Link
+                                    href={item.href}
+                                    className={`
+                    flex items-center gap-2.5 px-3 py-[9px] rounded-lg text-[13px]
+                    transition-all duration-150
+                    ${isActive
+                                            ? 'bg-[#EEF2FF] text-[#4F46E5] font-medium'
+                                            : 'text-[#374151] hover:bg-[#F9FAFB] font-normal'
+                                        }
+                  `}
+                                >
+                                    <Icon size={18} className={isActive ? 'text-[#4F46E5]' : 'text-[#9CA3AF]'} />
+                                    <span className="truncate">{item.label}</span>
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ul>
             </nav>
 
-            {/* Bottom: Collapse toggle */}
-            <div className="border-t border-border p-3">
-                <button
-                    onClick={() => setCollapsed(!collapsed)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-text-secondary hover:bg-background hover:text-foreground transition-all w-full"
+            {/* Bottom: Settings (sticky) */}
+            <div className="border-t border-[#E5E7EB] p-2">
+                <Link
+                    href="/dashboard/settings"
+                    className={`
+            flex items-center gap-2.5 px-3 py-[9px] rounded-lg text-[13px]
+            transition-all duration-150
+            ${pathname.startsWith('/dashboard/settings')
+                            ? 'bg-[#EEF2FF] text-[#4F46E5] font-medium'
+                            : 'text-[#374151] hover:bg-[#F9FAFB] font-normal'
+                        }
+          `}
                 >
-                    {collapsed ? (
-                        <ChevronRight className="w-5 h-5 flex-shrink-0" />
-                    ) : (
-                        <>
-                            <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-                            <span>Collapse</span>
-                        </>
-                    )}
-                </button>
+                    <IconSettings size={18} className={pathname.startsWith('/dashboard/settings') ? 'text-[#4F46E5]' : 'text-[#9CA3AF]'} />
+                    <span>Settings</span>
+                </Link>
             </div>
-        </motion.aside>
+        </aside>
     );
 }

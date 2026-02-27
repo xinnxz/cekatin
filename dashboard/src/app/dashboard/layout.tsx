@@ -2,11 +2,18 @@
 
 import Sidebar from '@/components/Sidebar';
 import Topbar from '@/components/Topbar';
-import { useState } from 'react';
 
 /* ═══════════════════════════════════════════════════════
-   Dashboard Layout — Sidebar + Topbar + Content
-   Structure: cekat.ai reference (sidebar kiri, content kanan)
+   Dashboard Layout — cekat.ai style
+   
+   Struktur:
+   ┌─────────────────────────────────┐
+   │ TopNavBar (52px, full width)     │
+   ├──────────┬──────────────────────┤
+   │ Sidebar  │  Content Area        │
+   │ (168px)  │  (scrollable)        │
+   │          │                      │
+   └──────────┴──────────────────────┘
    ═══════════════════════════════════════════════════════ */
 
 export default function DashboardLayout({
@@ -15,17 +22,17 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-background">
-            {/* Fixed Sidebar */}
+        <div className="min-h-screen bg-[#FAFBFC]">
+            {/* Top Navigation Bar — full width, fixed */}
+            <Topbar />
+
+            {/* Fixed Left Sidebar — below topbar */}
             <Sidebar />
 
-            {/* Main Content Area (offset by sidebar width) */}
-            <div className="ml-[260px] transition-all duration-300">
-                <Topbar />
-                <main className="p-8">
-                    {children}
-                </main>
-            </div>
+            {/* Main Content — offset by sidebar width + below topbar */}
+            <main className="ml-[168px] mt-0 min-h-[calc(100vh-52px)]">
+                {children}
+            </main>
         </div>
     );
 }

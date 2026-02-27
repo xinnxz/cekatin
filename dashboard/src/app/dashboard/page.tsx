@@ -1,290 +1,167 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import useSWR from 'swr';
 import {
-    LayoutDashboard,
-    MessageSquare,
-    Brain,
-    Zap,
-    Clock,
-    TrendingUp,
+    Plus,
+    Filter,
+    RefreshCw,
+    Check,
 } from 'lucide-react';
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    BarChart,
-    Bar,
-} from 'recharts';
-import PageHeader from '@/components/PageHeader';
-import StatsCard from '@/components/StatsCard';
-import { fetcher } from '@/lib/api';
 
 /* ═══════════════════════════════════════════════════════
-   Overview Page — Dashboard home
+   Chat Page — Main dashboard page (cekat.ai style)
    
    Penjelasan:
-   - Mengambil data dari GET /api/dashboard/stats
-   - Menampilkan 4 stats cards, line chart, bar chart, recent chats
-   - Jika API belum jalan, tampilkan fallback data
+   Ini adalah halaman utama saat user akses /dashboard.
+   Mirip cekat.ai, ada 3 column layout:
+   - Sidebar (sudah di layout)
+   - Chat list panel (secondary sidebar)
+   - Main content area (welcome message / chat detail)
+   
+   Welcome screen menampilkan 4 onboarding steps
+   persis seperti screenshot cekat.ai.
    ═══════════════════════════════════════════════════════ */
 
-// TypeScript interface for API response
-interface ChatEntry { id: number; message: string; intent: string; confidence: number; time: string }
-interface DashboardStats {
-    total_chats: number;
-    nlp_accuracy: number;
-    avg_response_ms: number;
-    total_intents: number;
-    chat_volume: { day: string; chats: number }[];
-    top_intents: { name: string; count: number; fill: string }[];
-    recent_chats: ChatEntry[];
-}
+const onboardingSteps = [
+    {
+        number: 1,
+        title: 'Hubungkan Platform',
+        description: 'Mulai terima pesan dari WhatsApp, IG, dan FB Anda!',
+        emoji: '🤝',
+        color: '#FEF3C7',
+    },
+    {
+        number: 2,
+        title: 'Buat AI Agent',
+        description: 'Jawab pesan masuk dengan Agent AI anda',
+        emoji: '🤖',
+        color: '#DBEAFE',
+    },
+    {
+        number: 3,
+        title: 'Undang Agen Manusia',
+        description: 'Undang tim Anda untuk membantu menjawab chat',
+        emoji: '👥',
+        color: '#E0E7FF',
+    },
+    {
+        number: 4,
+        title: 'Konek AI Agent ke Inbox',
+        description: 'Hubungkan AI Agent dan Human Agent ke Platform',
+        emoji: '🔗',
+        color: '#FCE7F3',
+    },
+];
 
-// Fallback data saat API belum tersedia
-const fallbackData: DashboardStats = {
-    total_chats: 0,
-    nlp_accuracy: 0,
-    avg_response_ms: 0,
-    total_intents: 0,
-    chat_volume: [
-        { day: 'Sen', chats: 0 },
-        { day: 'Sel', chats: 0 },
-        { day: 'Rab', chats: 0 },
-        { day: 'Kam', chats: 0 },
-        { day: 'Jum', chats: 0 },
-        { day: 'Sab', chats: 0 },
-        { day: 'Min', chats: 0 },
-    ],
-    top_intents: [],
-    recent_chats: [],
-};
-
-export default function OverviewPage() {
-    // SWR: fetch data dari backend Flask
-    // Penjelasan: useSWR otomatis cache, revalidate, dan handle loading state
-    const { data, error } = useSWR<DashboardStats>('/api/dashboard/stats', fetcher, {
-        fallbackData,
-        refreshInterval: 30000, // Refresh setiap 30 detik
-        onError: () => { }, // Suppress error toast
-    });
-
-    const stats = data || fallbackData;
-
-    // Format response time: ms → seconds atau tetap ms
-    const formatResponseTime = (ms: number) => {
-        if (ms >= 1000) return `${(ms / 1000).toFixed(1)}s`;
-        return `${ms}ms`;
-    };
-
+export default function ChatPage() {
     return (
-        <div>
-            <PageHeader
-                title="Overview"
-                description="Ringkasan performa chatbot Anda hari ini"
-                icon={LayoutDashboard}
-            />
+        <div className="flex h-[calc(100vh-52px)]">
+            {/* ═══ Chat List Panel (secondary sidebar) ═══ */}
+            <div className="w-[280px] bg-white border-r border-[#E5E7EB] flex flex-col flex-shrink-0">
+                {/* Panel Header */}
+                <div className="h-[52px] flex items-center justify-between px-4 border-b border-[#E5E7EB]">
+                    {/* Kebab menu */}
+                    <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F4F6] transition-colors text-[#9CA3AF]">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <circle cx="8" cy="3" r="1.2" />
+                            <circle cx="8" cy="8" r="1.2" />
+                            <circle cx="8" cy="13" r="1.2" />
+                        </svg>
+                    </button>
 
-            {/* API Connection Status */}
-            {error && (
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 px-4 py-3 bg-warning-light border border-warning/30 rounded-xl text-sm text-warning flex items-center gap-2"
-                >
-                    <span>⚠️</span>
-                    <span>Backend API belum terhubung. Jalankan Flask server di port 5000 untuk data live.</span>
-                </motion.div>
-            )}
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatsCard
-                    label="Total Chats"
-                    value={stats.total_chats?.toLocaleString() || '0'}
-                    icon={MessageSquare}
-                    trend={{ value: 12.5, label: 'vs kemarin' }}
-                    color="primary"
-                    index={0}
-                />
-                <StatsCard
-                    label="NLP Accuracy"
-                    value={`${stats.nlp_accuracy || 0}%`}
-                    icon={Brain}
-                    trend={{ value: 2.1, label: 'vs minggu lalu' }}
-                    color="success"
-                    index={1}
-                />
-                <StatsCard
-                    label="Avg Response"
-                    value={formatResponseTime(stats.avg_response_ms || 0)}
-                    icon={Zap}
-                    trend={{ value: -8.3, label: 'lebih cepat' }}
-                    color="warning"
-                    index={2}
-                />
-                <StatsCard
-                    label="Active Intents"
-                    value={stats.total_intents || 0}
-                    icon={TrendingUp}
-                    trend={{ value: 3, label: 'baru ditambah' }}
-                    color="primary"
-                    index={3}
-                />
-            </div>
-
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                {/* Chat Volume Chart */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="lg:col-span-2 bg-white rounded-2xl border border-border p-6"
-                >
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 className="font-semibold text-foreground">Chat Volume</h3>
-                            <p className="text-sm text-text-secondary">7 hari terakhir</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <button className="px-3 py-1.5 text-xs font-medium bg-primary-light text-primary rounded-lg">
-                                7D
-                            </button>
-                            <button className="px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-background rounded-lg transition-colors">
-                                30D
-                            </button>
-                        </div>
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-1">
+                        <button className="flex items-center gap-1 h-8 px-2.5 rounded-lg text-[12px] font-medium text-[#6B7280] hover:bg-[#F3F4F6] transition-colors border border-[#E5E7EB]">
+                            <Plus className="w-3.5 h-3.5" />
+                        </button>
+                        <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#9CA3AF] border border-[#E5E7EB]">
+                            <Filter className="w-3.5 h-3.5" />
+                        </button>
+                        <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#9CA3AF] border border-[#E5E7EB]">
+                            <RefreshCw className="w-3.5 h-3.5" />
+                        </button>
                     </div>
-                    <ResponsiveContainer width="100%" height={260}>
-                        <LineChart data={stats.chat_volume || []}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-                            <XAxis
-                                dataKey="day"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 12, fill: '#64748B' }}
-                            />
-                            <YAxis
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 12, fill: '#64748B' }}
-                            />
-                            <Tooltip
-                                contentStyle={{
-                                    background: 'white',
-                                    border: '1px solid #E2E8F0',
-                                    borderRadius: '12px',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                                }}
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="chats"
-                                stroke="#2563EB"
-                                strokeWidth={3}
-                                dot={{ r: 4, fill: '#2563EB', strokeWidth: 2, stroke: 'white' }}
-                                activeDot={{ r: 6, fill: '#2563EB', strokeWidth: 3, stroke: 'white' }}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </motion.div>
+                </div>
 
-                {/* Top Intents */}
+                {/* Tab: Assigned */}
+                <div className="px-3 py-2">
+                    <button className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-[#F3F4F6] text-[13px] font-medium text-foreground">
+                        <span>Assigned</span>
+                        <Check className="w-3.5 h-3.5 text-[#9CA3AF] ml-auto" />
+                    </button>
+                </div>
+
+                {/* Empty state */}
+                <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-[#F3F4F6] flex items-center justify-center mb-3">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 4H20V16H6L4 18V4Z" stroke="#D1D5DB" strokeWidth="1.5" strokeLinejoin="round" />
+                        </svg>
+                    </div>
+                    <p className="text-[13px] text-[#9CA3AF]">No conversations for now...</p>
+                </div>
+            </div>
+
+            {/* ═══ Main Content Area ═══ */}
+            <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto">
+                {/* Welcome Message */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    className="bg-white rounded-2xl border border-border p-6"
+                    transition={{ duration: 0.5 }}
+                    className="max-w-lg w-full px-6"
                 >
-                    <h3 className="font-semibold text-foreground mb-1">Top Intents</h3>
-                    <p className="text-sm text-text-secondary mb-6">Yang paling sering ditanyakan</p>
-                    {(stats.top_intents?.length || 0) > 0 ? (
-                        <ResponsiveContainer width="100%" height={260}>
-                            <BarChart data={stats.top_intents} layout="vertical" barSize={20}>
-                                <XAxis type="number" hide />
-                                <YAxis
-                                    type="category"
-                                    dataKey="name"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fontSize: 11, fill: '#64748B' }}
-                                    width={90}
-                                />
-                                <Tooltip
-                                    contentStyle={{
-                                        background: 'white',
-                                        border: '1px solid #E2E8F0',
-                                        borderRadius: '12px',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                                    }}
-                                />
-                                <Bar dataKey="count" radius={[0, 8, 8, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <div className="h-[260px] flex items-center justify-center text-text-muted text-sm">
-                            Belum ada data intent
-                        </div>
-                    )}
-                </motion.div>
-            </div>
+                    <h1 className="text-xl font-semibold text-center text-foreground mb-8">
+                        Selamat datang kembali di CekatIn!
+                    </h1>
 
-            {/* Recent Chats */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="bg-white rounded-2xl border border-border"
-            >
-                <div className="p-6 border-b border-border">
-                    <h3 className="font-semibold text-foreground">Chat Terbaru</h3>
-                    <p className="text-sm text-text-secondary">5 percakapan terakhir</p>
-                </div>
-                <div className="divide-y divide-border">
-                    {(stats.recent_chats?.length || 0) > 0 ? (
-                        stats.recent_chats.map((chat: ChatEntry, i: number) => (
+                    {/* Onboarding Steps */}
+                    <div className="space-y-3">
+                        {onboardingSteps.map((step, i) => (
                             <motion.div
-                                key={chat.id}
+                                key={step.number}
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.5 + i * 0.05 }}
-                                className="flex items-center justify-between px-6 py-4 hover:bg-background/50 transition-colors"
+                                transition={{ delay: 0.2 + i * 0.1 }}
+                                className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#E5E7EB] hover:border-[#C7D2FE] hover:shadow-sm transition-all cursor-pointer group"
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
-                                        <MessageSquare className="w-4 h-4 text-primary" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-foreground">{chat.message}</p>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-xs px-2 py-0.5 rounded-full bg-primary-light text-primary font-medium">
-                                                {chat.intent}
-                                            </span>
-                                            <span className="text-xs text-text-muted">
-                                                {(chat.confidence * 100).toFixed(0)}% confidence
-                                            </span>
-                                        </div>
-                                    </div>
+                                {/* Emoji icon */}
+                                <div
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                                    style={{ backgroundColor: step.color }}
+                                >
+                                    {step.emoji}
                                 </div>
-                                <div className="flex items-center gap-2 text-text-muted">
-                                    <Clock className="w-3.5 h-3.5" />
-                                    <span className="text-xs">{chat.time}</span>
+
+                                {/* Text */}
+                                <div>
+                                    <h3 className="text-sm font-semibold text-foreground">
+                                        {step.number}. {step.title}
+                                    </h3>
+                                    <p className="text-[12.5px] text-[#6B7280] mt-0.5 italic">
+                                        {step.description}
+                                    </p>
                                 </div>
                             </motion.div>
-                        ))
-                    ) : (
-                        <div className="px-6 py-12 text-center text-text-muted text-sm">
-                            Belum ada percakapan. Mulai chat untuk melihat data di sini.
-                        </div>
-                    )}
-                </div>
-            </motion.div>
+                        ))}
+                    </div>
+
+                    {/* Help link */}
+                    <p className="text-center mt-6 text-[12.5px] text-primary underline underline-offset-2 cursor-pointer hover:text-primary-hover">
+                        Butuh bantuan lebih? Lihat Tutorial Youtube kami
+                    </p>
+                </motion.div>
+
+                {/* Bottom-right float button (AI button) */}
+                <button className="fixed bottom-6 right-6 w-10 h-10 bg-[#F3F4F6] rounded-xl border border-[#E5E7EB] flex items-center justify-center hover:bg-white hover:shadow-md transition-all">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <rect x="4" y="3" width="12" height="10" rx="2" stroke="#9CA3AF" strokeWidth="1.3" />
+                        <circle cx="8" cy="8" r="1" fill="#9CA3AF" />
+                        <circle cx="12" cy="8" r="1" fill="#9CA3AF" />
+                        <path d="M10 13V16M8 16H12" stroke="#9CA3AF" strokeWidth="1.3" strokeLinecap="round" />
+                    </svg>
+                </button>
+            </div>
         </div>
     );
 }

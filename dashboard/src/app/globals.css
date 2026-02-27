@@ -1,27 +1,26 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════
-   CekatIn Design System
-   Inspired by: cekat.ai + kata.ai
+   CekatIn Design System — cekat.ai reference match
    ═══════════════════════════════════════════════════════ */
 
 @theme inline {
-  /* Primary */
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-primary-light: #DBEAFE;
-  --color-primary-50: #EFF6FF;
+  /* Primary (indigo-toned like cekat.ai) */
+  --color-primary: #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-primary-light: #EEF2FF;
+  --color-primary-50: #EEF2FF;
 
   /* Surfaces */
   --color-surface: #FFFFFF;
-  --color-background: #F8FAFC;
-  --color-sidebar-bg: #F1F5F9;
-  --color-border: #E2E8F0;
+  --color-background: #FAFBFC;
+  --color-sidebar-bg: #FFFFFF;
+  --color-border: #E5E7EB;
 
   /* Text */
-  --color-foreground: #0F172A;
-  --color-text-secondary: #64748B;
-  --color-text-muted: #94A3B8;
+  --color-foreground: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
 
   /* Status */
   --color-success: #10B981;
@@ -32,12 +31,12 @@
   --color-danger-light: #FEE2E2;
 
   /* AI Gradient */
-  --color-ai-start: #06B6D4;
-  --color-ai-end: #8B5CF6;
+  --color-ai-start: #6366F1;
+  --color-ai-end: #2563EB;
 
-  /* Spacing */
-  --sidebar-width: 260px;
-  --topbar-height: 64px;
+  /* Layout */
+  --sidebar-width: 168px;
+  --topbar-height: 52px;
 
   /* Font */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -52,17 +51,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Scrollbar ── */
+/* ── Scrollbar (cekat.ai style — minimal) ── */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #D1D5DB;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #9CA3AF;
+}
+
+/* Selection */
+::selection {
+  background: #C7D2FE;
+  color: #312E81;
 }
