@@ -1,0 +1,89 @@
+package models
+
+import "time"
+
+/*
+═══════════════════════════════════════════════════════
+Models — Struct definitions untuk database tables
+
+Penjelasan setiap struct:
+
+1. Inbox    = Platform connection (WhatsApp, IG, dll)
+2. Conversation = Thread percakapan dengan 1 customer
+3. Message  = Satu pesan dalam conversation
+
+Relasi:
+  Inbox (1) ──→ (*) Conversation ──→ (*) Message
+
+Tag `json:"..."` menentukan nama field di JSON response
+Tag `db:"..."` menentukan nama kolom di PostgreSQL
+═══════════════════════════════════════════════════════
+*/
+
+// Inbox merepresentasikan satu koneksi platform (WhatsApp, Instagram, dll)
+// Setiap inbox punya access token sendiri untuk berkomunikasi dengan API platform
+type Inbox struct {
+	ID            string    `json:"id" db:"id"`
+	Name          string    `json:"name" db:"name"`
+	Platform      string    `json:"platform" db:"platform"`           // whatsapp, instagram, messenger, web
+	PhoneNumber   string    `json:"phone_number" db:"phone_number"`
+	AccessToken   string    `json:"-" db:"access_token"`              // json:"-" → JANGAN expose di API response (rahasia!)
+	PhoneID       string    `json:"-" db:"phone_id"`                  // WhatsApp Phone Number ID dari Meta
+	WabaID        string    `json:"waba_id" db:"waba_id"`
+	WebhookSecret string    `json:"-" db:"webhook_secret"`
+	Status        string    `json:"status" db:"status"`
+	CreatedAt     time.Time `json:"created_at" db:"created_at"`
+}
+
+// Conversation merepresentasikan satu thread percakapan dengan customer
+// Satu customer + satu inbox = satu conversation
+type Conversation struct {
+	ID            string     `json:"id" db:"id"`
+	InboxID       string     `json:"inbox_id" db:"inbox_id"`
+	CustomerPhone string     `json:"customer_phone" db:"customer_phone"`
+	CustomerName  string     `json:"customer_name" db:"customer_name"`
+	Platform      string     `json:"platform" db:"platform"`
+	Status        string     `json:"status" db:"status"`               // open, resolved, pending
+	LastMessage   string     `json:"last_message" db:"last_message"`
+	LastMessageAt *time.Time `json:"last_message_at" db:"last_message_at"`
+	CreatedAt     time.Time  `json:"created_at" db:"created_at"`
+}
+
+// Message merepresentasikan satu pesan dalam conversation
+type Message struct {
+	ID             string    `json:"id" db:"id"`
+	ConversationID string    `json:"conversation_id" db:"conversation_id"`
+	Direction      string    `json:"direction" db:"direction"`          // inbound (masuk), outbound (keluar)
+	Content        string    `json:"content" db:"content"`
+	MessageType    string    `json:"message_type" db:"message_type"`    // text, image, document
+	WAMessageID    string    `json:"wa_message_id" db:"wa_message_id"`  // ID pesan dari WhatsApp
+	Status         string    `json:"status" db:"status"`                // sent, delivered, read, failed
+	CreatedAt      time.Time `json:"created_at" db:"created_at"`
+}
+
+// ── Request/Response structs ──
+
+// SendMessageRequest — body JSON saat kirim pesan dari dashboard
+type SendMessageRequest struct {
+	ConversationID string `json:"conversation_id" binding:"required"`
+	Content        string `json:"content" binding:"required"`
+	MessageType    string `json:"message_type"` // default "text"
+}
+
+// CreateInboxRequest — body JSON saat tambah inbox baru
+type CreateInboxRequest struct {
+	Name        string `json:"name" binding:"required"`
+	Platform    string `json:"platform" binding:"required"`
+	PhoneNumber string `json:"phone_number"`
+	AccessToken string `json:"access_token"`
+	PhoneID     string `json:"phone_id"`
+	WabaID      string `json:"waba_id"`
+}
+
+// WebSocketMessage — format pesan yang dikirim via WebSocket ke dashboard
+// Digunakan untuk real-time notification saat ada pesan masuk baru
+type WebSocketMessage struct {
+	Type         string       `json:"type"`          // "new_message", "status_update"
+	Conversation *Conversation `json:"conversation,omitempty"`
+	Message      *Message     `json:"message,omitempty"`
+}
