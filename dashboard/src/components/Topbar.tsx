@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -13,14 +14,23 @@ import {
     IconSettings,
     IconAssistant,
 } from './icons';
-import { ChevronDown, HelpCircle, Settings } from 'lucide-react';
+import { ChevronDown, HelpCircle, Settings, DollarSign } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════
    Topbar — Horizontal navigation bar (cekat.ai style)
    
    Layout reference dari screenshot:
    [Logo] [Chat] [Orders] [CRM] [Marketing] [Automation]  
-                                    [⚙️] [❓] [Assistant] [ReonShop 🔽]
+                          [$] [⚙️] [❓] [Assistant] [ReonShop 🔽]
+   
+   Penjelasan fitur Billing Icon:
+   - Icon "$" di area kanan Topbar (sesuai cekat.ai)
+   - Hover → Popover muncul dengan info:
+     • Paket aktif (FREE Plan)
+     • Tanggal expired
+     • Usage MAU (progress bar)
+     • Usage AI Responses (progress bar)
+   - Click → Navigate ke /dashboard/billings
    ═══════════════════════════════════════════════════════ */
 
 const topNavItems = [
@@ -31,8 +41,71 @@ const topNavItems = [
     { label: 'Automation', icon: IconAutomation, href: '/dashboard/automation' },
 ];
 
+// ═══ BILLING POPOVER ═══
+// Popover yang muncul saat hover icon "$" — menampilkan 
+// ringkasan paket aktif, usage MAU, dan AI Responses
+function BillingPopover() {
+    return (
+        <div className="absolute top-full right-0 mt-1 w-[280px] bg-white rounded-xl shadow-xl border border-[#E5E7EB] p-4 z-[60]">
+            {/* Arrow */}
+            <div className="absolute -top-1.5 right-4 w-3 h-3 bg-white border-l border-t border-[#E5E7EB] rotate-45" />
+
+            {/* Package Info */}
+            <div className="flex items-center justify-between mb-3">
+                <div>
+                    <p className="text-[10px] text-[#9CA3AF]">Current Plan</p>
+                    <p className="text-[14px] font-bold text-foreground">FREE Plan</p>
+                </div>
+                <span className="px-2 py-0.5 text-[9px] font-bold text-green-700 bg-green-100 rounded-full">Active</span>
+            </div>
+            <p className="text-[10px] text-[#9CA3AF] mb-3">Expires: March 29, 2026</p>
+
+            {/* MAU Usage */}
+            <div className="mb-3">
+                <div className="flex items-center justify-between text-[11px] mb-1">
+                    <span className="text-[#6B7280]">MAU Usage</span>
+                    <span className="font-medium text-foreground">0 / 20</span>
+                </div>
+                <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+                    <div className="h-full bg-teal-500 rounded-full" style={{ width: '0%' }} />
+                </div>
+            </div>
+
+            {/* AI Responses Usage */}
+            <div className="mb-3">
+                <div className="flex items-center justify-between text-[11px] mb-1">
+                    <span className="text-[#6B7280]">AI Responses</span>
+                    <span className="font-medium text-foreground">0 / 100</span>
+                </div>
+                <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+                    <div className="h-full bg-purple-500 rounded-full" style={{ width: '0%' }} />
+                </div>
+            </div>
+
+            {/* CTA */}
+            <Link href="/dashboard/billings"
+                className="block w-full py-2 text-center text-[11px] font-semibold text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors">
+                Manage Billing
+            </Link>
+        </div>
+    );
+}
+
 export default function Topbar() {
     const pathname = usePathname();
+    const [showBilling, setShowBilling] = useState(false);
+    const billingRef = useRef<HTMLDivElement>(null);
+
+    // Close popover when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (billingRef.current && !billingRef.current.contains(e.target as Node)) {
+                setShowBilling(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     return (
         <header className="sticky top-0 z-50 h-[52px] flex items-center justify-between px-4 bg-white border-b border-[#E5E7EB]">
@@ -75,10 +148,25 @@ export default function Topbar() {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-1.5">
+                {/* Billing icon — klik untuk popover, link ke /dashboard/billings */}
+                <div className="relative" ref={billingRef}>
+                    <button
+                        onClick={() => setShowBilling(!showBilling)}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${showBilling || pathname.startsWith('/dashboard/billings')
+                                ? 'bg-primary/10 text-primary'
+                                : 'hover:bg-[#F3F4F6] text-[#9CA3AF]'
+                            }`}
+                        title="Billing"
+                    >
+                        <DollarSign className="w-[18px] h-[18px]" />
+                    </button>
+                    {showBilling && <BillingPopover />}
+                </div>
+
                 {/* Settings gear */}
-                <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#9CA3AF]">
+                <Link href="/dashboard/settings" className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#9CA3AF]">
                     <Settings className="w-[18px] h-[18px]" />
-                </button>
+                </Link>
 
                 {/* Help */}
                 <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#9CA3AF]">
