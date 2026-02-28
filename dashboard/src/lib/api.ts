@@ -1,20 +1,27 @@
 /* ═══════════════════════════════════════════════════════
-   API Client — Centralized fetch with tenant header
+   CekatIn API Client — Dashboard ↔ Go Backend
+
+   Penjelasan:
+   File ini menghubungkan dashboard Next.js ke Go backend.
+   Ada 2 layer:
+   1. api() — generic fetch wrapper (backward compatible)
+   2. backend — typed functions untuk Go backend endpoints
+
+   Arsitektur:
+     Dashboard Component → api.ts → Go Backend (:8080)
+                                  → WebSocket (ws://localhost:8080/ws)
    ═══════════════════════════════════════════════════════ */
 
+// ── Base URLs ──
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+const WS_URL = BACKEND_URL.replace('http', 'ws');
 
+// ── Generic fetch wrapper (existing, backward compatible) ──
 interface FetchOptions extends RequestInit {
     tenant?: string;
 }
 
-/**
- * Fetch wrapper yang otomatis menambahkan:
- * - Base URL
- * - Content-Type: application/json
- * - X-Tenant-Slug header
- * - Authorization header (jika ada token)
- */
 export async function api<T = unknown>(
     endpoint: string,
     options: FetchOptions = {}
@@ -27,7 +34,6 @@ export async function api<T = unknown>(
         ...(fetchOptions.headers as Record<string, string>),
     };
 
-    // Tambah auth token jika ada
     if (typeof window !== 'undefined') {
         const token = localStorage.getItem('cekatin_token');
         if (token) {
@@ -48,11 +54,111 @@ export async function api<T = unknown>(
     return res.json();
 }
 
-/**
- * SWR fetcher — digunakan oleh useSWR untuk data fetching
- *
- * Contoh penggunaan:
- * const { data } = useSWR('/api/health', fetcher);
- */
 export const fetcher = <T = unknown>(url: string): Promise<T> =>
     api<T>(url);
+
+// ═══════════════════════════════════════════════════════
+// Go Backend API Client
+// ═══════════════════════════════════════════════════════
+
+// ── Types (match Go backend models) ──
+
+export interface Inbox {
+    id: string;
+    name: string;
+    platform: string;
+    phone_number: string;
+    waba_id: string;
+    status: string;
+    created_at: string;
+}
+
+export interface Conversation {
+    id: string;
+    inbox_id: string;
+    customer_phone: string;
+    customer_name: string;
+    platform: string;
+    status: string;
+    last_message: string;
+    last_message_at: string | null;
+    created_at: string;
+}
+
+export interface ChatMessage {
+    id: string;
+    conversation_id: string;
+    direction: 'inbound' | 'outbound';
+    content: string;
+    message_type: string;
+    wa_message_id: string;
+    status: string;
+    created_at: string;
+}
+
+export interface WSMessage {
+    type: 'new_message' | 'status_update';
+    conversation?: Conversation;
+    message?: ChatMessage;
+}
+
+// ── Backend fetch helper ──
+async function backendFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(err.error || `Backend Error: ${res.status}`);
+    }
+    return res.json();
+}
+
+// ── Typed backend functions ──
+export const backend = {
+    // Health
+    health: () => backendFetch<{ status: string; service: string; version: string }>('/health'),
+
+    // Inboxes
+    getInboxes: async () => (await backendFetch<{ inboxes: Inbox[] }>('/api/inboxes')).inboxes,
+    createInbox: async (data: { name: string; platform: string; phone_number?: string }) =>
+        (await backendFetch<{ inbox: Inbox }>('/api/inboxes', { method: 'POST', body: JSON.stringify(data) })).inbox,
+    getInbox: async (id: string) => (await backendFetch<{ inbox: Inbox }>(`/api/inboxes/${id}`)).inbox,
+    deleteInbox: (id: string) => backendFetch<{ message: string }>(`/api/inboxes/${id}`, { method: 'DELETE' }),
+
+    // Conversations
+    getConversations: async (status?: string) => {
+        const q = status ? `?status=${status}` : '';
+        return (await backendFetch<{ conversations: Conversation[] }>(`/api/conversations${q}`)).conversations;
+    },
+    getConversation: async (id: string) =>
+        (await backendFetch<{ conversation: Conversation }>(`/api/conversations/${id}`)).conversation,
+    updateConversation: (id: string, status: string) =>
+        backendFetch<{ message: string }>(`/api/conversations/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+
+    // Messages
+    getMessages: async (conversationId: string) =>
+        (await backendFetch<{ messages: ChatMessage[] }>(`/api/conversations/${conversationId}/messages`)).messages,
+    sendMessage: async (conversationId: string, content: string) =>
+        (await backendFetch<{ status: string; message: ChatMessage }>('/api/messages/send', {
+            method: 'POST', body: JSON.stringify({ conversation_id: conversationId, content, message_type: 'text' }),
+        })).message,
+
+    // WebSocket — real-time updates dari Go backend
+    connectWebSocket(onMessage: (msg: WSMessage) => void): WebSocket | null {
+        if (typeof window === 'undefined') return null;
+        try {
+            const ws = new WebSocket(`${WS_URL}/ws`);
+            ws.onopen = () => console.log('🔗 WebSocket connected');
+            ws.onmessage = (e) => {
+                try { onMessage(JSON.parse(e.data)); } catch { }
+            };
+            ws.onclose = () => {
+                console.log('🔌 WebSocket disconnected — reconnecting...');
+                setTimeout(() => backend.connectWebSocket(onMessage), 3000);
+            };
+            return ws;
+        } catch { return null; }
+    },
+};
