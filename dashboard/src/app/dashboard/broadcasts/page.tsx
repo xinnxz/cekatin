@@ -407,8 +407,8 @@ export default function BroadcastsPage() {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium transition-colors relative border-b-2 ${activeTab === tab.key
-                                    ? 'text-primary border-primary'
-                                    : 'text-[#6B7280] border-transparent hover:text-foreground'
+                                ? 'text-primary border-primary'
+                                : 'text-[#6B7280] border-transparent hover:text-foreground'
                                 }`}
                         >
                             <TabIcon tab={tab.key} />
@@ -433,6 +433,7 @@ export default function BroadcastsPage() {
                             onClick={() => setCampaignModal(true)}
                             className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg"
                         >
+                            <Plus className="w-3.5 h-3.5" />
                             Add Campaign
                         </button>
                     )}
@@ -446,6 +447,7 @@ export default function BroadcastsPage() {
                                 onClick={() => setTemplateModal(true)}
                                 className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg"
                             >
+                                <Plus className="w-3.5 h-3.5" />
                                 Add Template
                             </button>
                         </>
@@ -587,8 +589,8 @@ function TemplateTable() {
                         <td className="px-4 py-3 text-[12.5px] text-[#6B7280]">{row.language}</td>
                         <td className="px-4 py-3">
                             <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded border ${row.category === 'MARKETING'
-                                    ? 'bg-purple-50 text-purple-600 border-purple-200'
-                                    : 'bg-blue-50 text-blue-600 border-blue-200'
+                                ? 'bg-purple-50 text-purple-600 border-purple-200'
+                                : 'bg-blue-50 text-blue-600 border-blue-200'
                                 }`}>{row.category}</span>
                         </td>
                         <td className="px-4 py-3"><StatusBadge status={row.status} /></td>

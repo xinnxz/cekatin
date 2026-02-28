@@ -648,8 +648,8 @@ export default function ChatPage() {
                             key={tab.key}
                             onClick={() => { setActiveTab(tab.key); setSelectedConvId(null); }}
                             className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-[13px] font-medium border-b-2 transition-colors -mb-px ${activeTab === tab.key
-                                    ? 'border-primary text-primary'
-                                    : 'border-transparent text-[#6B7280] hover:text-foreground'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-[#6B7280] hover:text-foreground'
                                 }`}
                         >
                             {tab.icon || tab.label}
@@ -684,38 +684,54 @@ export default function ChatPage() {
                 Panel 2: Chat Box (tengah) / Welcome (jika belum pilih conversation)
             ═══════════════════════════════════════════ */}
             {!selectedConv ? (
-                /* Welcome / Onboarding — persis cekat.ai */
-                <div className="flex-1 flex flex-col items-center justify-center bg-[#F9FAFB] overflow-y-auto">
+                /* Welcome / Onboarding — enhanced cekat.ai style
+                   Penjelasan desain:
+                   - Greeting area dengan emoji robot + gradient subtle
+                   - Step cards dengan numbered badges berwarna
+                   - Hover efek lebih ekspresif (border + shadow)
+                   - Tutorial link tetap di bawah */
+                <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-[#F0F1FF]/60 to-[#F9FAFB] overflow-y-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                         className="max-w-lg w-full px-6"
                     >
-                        <h1 className="text-xl font-semibold text-center text-foreground mb-8">
-                            Selamat datang kembali di CekatIn!
-                        </h1>
+                        {/* Robot Greeting Illustration */}
+                        <div className="flex flex-col items-center mb-6">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-[#8B5CF6]/20 flex items-center justify-center mb-4 border border-primary/10">
+                                <span className="text-3xl">🤖</span>
+                            </div>
+                            <h1 className="text-xl font-semibold text-center text-foreground">
+                                Selamat datang kembali di CekatIn!
+                            </h1>
+                            <p className="text-[13px] text-[#9CA3AF] mt-1">Ikuti langkah-langkah berikut untuk memulai</p>
+                        </div>
                         <div className="space-y-3">
                             {[
-                                { icon: OnboardingIcons.platform, title: 'Hubungkan Platform', desc: 'Mulai terima pesan dari WhatsApp, IG, dan FB Anda!', color: '#FEF3C7', iconColor: '#D97706' },
-                                { icon: OnboardingIcons.aiAgent, title: 'Buat AI Agent', desc: 'Jawab pesan masuk dengan Agent AI anda', color: '#DBEAFE', iconColor: '#2563EB' },
-                                { icon: OnboardingIcons.team, title: 'Undang Agen Manusia', desc: 'Undang tim Anda untuk membantu menjawab chat', color: '#E0E7FF', iconColor: '#4F46E5' },
-                                { icon: OnboardingIcons.connect, title: 'Konek AI Agent ke Inbox', desc: 'Hubungkan AI Agent dan Human Agent ke Platform', color: '#FCE7F3', iconColor: '#DB2777' },
+                                { icon: OnboardingIcons.platform, title: 'Hubungkan Platform', desc: 'Mulai terima pesan dari WhatsApp, IG, dan FB Anda!', color: '#FEF3C7', iconColor: '#D97706', num: '1' },
+                                { icon: OnboardingIcons.aiAgent, title: 'Buat AI Agent', desc: 'Jawab pesan masuk dengan Agent AI anda', color: '#DBEAFE', iconColor: '#2563EB', num: '2' },
+                                { icon: OnboardingIcons.team, title: 'Undang Agen Manusia', desc: 'Undang tim Anda untuk membantu menjawab chat', color: '#E0E7FF', iconColor: '#4F46E5', num: '3' },
+                                { icon: OnboardingIcons.connect, title: 'Konek AI Agent ke Inbox', desc: 'Hubungkan AI Agent dan Human Agent ke Platform', color: '#FCE7F3', iconColor: '#DB2777', num: '4' },
                             ].map((step, i) => (
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.2 + i * 0.1 }}
-                                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#E5E7EB] hover:border-[#C7D2FE] hover:shadow-sm transition-all cursor-pointer"
+                                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#E5E7EB] hover:border-primary/40 hover:shadow-md transition-all cursor-pointer group"
                                 >
-                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: step.color, color: step.iconColor }}>
+                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 relative" style={{ backgroundColor: step.color, color: step.iconColor }}>
                                         {step.icon}
+                                        <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
+                                            {step.num}
+                                        </span>
                                     </div>
-                                    <div>
-                                        <h3 className="text-sm font-semibold text-foreground">{i + 1}. {step.title}</h3>
+                                    <div className="flex-1">
+                                        <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{step.title}</h3>
                                         <p className="text-[12.5px] text-[#6B7280] mt-0.5 italic">{step.desc}</p>
                                     </div>
+                                    <ArrowRight className="w-4 h-4 text-[#D1D5DB] group-hover:text-primary group-hover:translate-x-1 transition-all" />
                                 </motion.div>
                             ))}
                         </div>
@@ -807,8 +823,8 @@ export default function ChatPage() {
                                     </div>
                                     <button
                                         className={`flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold text-white rounded-lg transition-colors ${inputMode === 'note'
-                                                ? 'bg-[#F59E0B] hover:bg-[#D97706]'
-                                                : 'bg-primary hover:bg-primary-hover'
+                                            ? 'bg-[#F59E0B] hover:bg-[#D97706]'
+                                            : 'bg-primary hover:bg-primary-hover'
                                             }`}
                                     >
                                         <Send className="w-3.5 h-3.5" />
