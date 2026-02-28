@@ -593,13 +593,17 @@ export default function ChatPage() {
         try {
             const msgs = await backend.getMessages(convId);
             if (msgs) {
-                setLiveMessages(msgs.map(m => ({
-                    id: m.id,
-                    sender: m.direction === 'inbound' ? 'customer' as MessageSender : 'agent' as MessageSender,
-                    senderName: m.direction === 'inbound' ? 'Customer' : 'Agent',
-                    text: m.content,
-                    time: new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-                })));
+                setLiveMessages(msgs.map(m => {
+                    const isAI = m.message_type === 'ai';
+                    const isInbound = m.direction === 'inbound';
+                    return {
+                        id: m.id,
+                        sender: isInbound ? 'customer' as MessageSender : isAI ? 'ai' as MessageSender : 'agent' as MessageSender,
+                        senderName: isInbound ? 'Customer' : isAI ? 'Cika (AI)' : 'Agent',
+                        text: m.content,
+                        time: new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                    };
+                }));
             }
         } catch {
             setLiveMessages([]);
@@ -661,10 +665,12 @@ export default function ChatPage() {
         // Connect WebSocket untuk real-time updates
         const ws = backend.connectWebSocket((msg: WSMessage) => {
             if (msg.type === 'new_message' && msg.message) {
+                const isAI = msg.message.message_type === 'ai';
+                const isInbound = msg.message.direction === 'inbound';
                 const newMsg: ChatMessage = {
                     id: msg.message.id,
-                    sender: msg.message.direction === 'inbound' ? 'customer' : 'agent',
-                    senderName: msg.message.direction === 'inbound' ? 'Customer' : 'Agent',
+                    sender: isInbound ? 'customer' : isAI ? 'ai' : 'agent',
+                    senderName: isInbound ? 'Customer' : isAI ? 'Cika (AI)' : 'Agent',
                     text: msg.message.content,
                     time: new Date(msg.message.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
                 };
