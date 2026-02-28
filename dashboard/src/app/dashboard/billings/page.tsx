@@ -328,11 +328,26 @@ function GradientCard({ gradient, label, value, sub, badge, buttonLabel, onButto
 }
 
 // ═══ PRICING CARD ═══
-function PricingCard({ name, price, originalPrice, discount, duration, features, color, agentCounter, onBuy }: {
+// Penjelasan Detail:
+// Di cekat.ai, setiap pricing card menunjukkan:
+// 1. Harga per bulan (setelah diskon)
+// 2. Harga asli (coret) + badge "Save X%"  
+// 3. "Duration discount: Rp X" ← TOTAL savings untuk seluruh periode
+// 4. "Total: Rp X" ← TOTAL biaya untuk seluruh periode (hijau)
+// 5. Label durasi (Monthly/Quarterly/Half-Yearly/Yearly Package)
+// 6. Feature checklist
+// 7. Additional Agents counter (hanya CRM)
+function PricingCard({ name, price, originalPrice, discount, duration, durationMonths, features, color, agentCounter, onBuy }: {
     name: string; price: number; originalPrice?: number; discount?: string; duration: string;
-    features: string[]; color: string; agentCounter?: boolean; onBuy: () => void;
+    durationMonths: number; features: string[]; color: string; agentCounter?: boolean; onBuy: () => void;
 }) {
     const [agents, setAgents] = useState(0);
+    // Total discount = (originalPrice - discountedPrice) × jumlah bulan
+    const discountPerMonth = originalPrice ? originalPrice - price : 0;
+    const totalDiscount = discountPerMonth * durationMonths;
+    // Total harga = harga diskon × jumlah bulan
+    const totalPrice = price * durationMonths;
+
     return (
         <div className="border border-[#E5E7EB] rounded-xl bg-white flex flex-col">
             <div className="p-5 flex-1">
@@ -343,10 +358,16 @@ function PricingCard({ name, price, originalPrice, discount, duration, features,
                 </div>
                 {originalPrice && (
                     <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[11px] text-[#9CA3AF] line-through">{formatIDR(originalPrice)} IDR</span>
-                        {discount && <span className="px-1.5 py-0.5 text-[9px] font-bold text-white bg-red-500 rounded">Save {discount}</span>}
+                        <span className="text-[11px] text-[#9CA3AF] line-through">{formatIDR(originalPrice)} IDR / mo</span>
+                        {discount && <span className="px-1.5 py-0.5 text-[9px] font-bold text-white bg-green-500 rounded">Save {discount}</span>}
                     </div>
                 )}
+                {/* Duration discount — menampilkan total penghematan */}
+                {totalDiscount > 0 && (
+                    <p className="text-[11px] text-[#6B7280]">Duration discount: Rp {formatIDR(totalDiscount)}</p>
+                )}
+                {/* Total — menampilkan total biaya (warna hijau) */}
+                <p className="text-[11px] text-green-600 font-semibold">Total: Rp {formatIDR(totalPrice)}</p>
                 <p className="text-[11px] text-primary mb-4">{duration}</p>
 
                 {agentCounter && (
@@ -430,11 +451,11 @@ export default function BillingsPage() {
     const [modal, setModal] = useState<ModalType>(null);
     const [buyPkg, setBuyPkg] = useState<{ name: string; price: number; orig: number; disc: string; dur: string; color: string } | null>(null);
 
-    const discountMap: Record<Duration, { mult: number; label: string; pct: string }> = {
-        monthly: { mult: 1, label: 'Monthly Package', pct: '' },
-        '3months': { mult: 0.95, label: 'Quarterly Package', pct: '5%' },
-        halfyearly: { mult: 0.90, label: 'Half-Yearly Package', pct: '10%' },
-        yearly: { mult: 0.80, label: 'Yearly Package', pct: '20%' },
+    const discountMap: Record<Duration, { mult: number; label: string; pct: string; months: number }> = {
+        monthly: { mult: 1, label: 'Monthly Package', pct: '', months: 1 },
+        '3months': { mult: 0.95, label: 'Quarterly Package', pct: '5%', months: 3 },
+        halfyearly: { mult: 0.90, label: 'Half-Yearly Package', pct: '10%', months: 6 },
+        yearly: { mult: 0.80, label: 'Yearly Package', pct: '20%', months: 12 },
     };
     const d = discountMap[duration];
 
@@ -505,19 +526,19 @@ export default function BillingsPage() {
 
                         <div className="grid grid-cols-4 gap-4">
                             <PricingCard name="Pro" price={Math.round(1499000 * d.mult)} originalPrice={1499000}
-                                discount={d.pct} duration={d.label} color="#1E3A8A"
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#1E3A8A"
                                 onBuy={() => handleBuy('Pro', 1499000, '#1E3A8A')}
                                 features={['3,000 Monthly Active Users', '5 Human Agents', 'Unlimited AI Agents', 'Unlimited Connected Platforms', '15,000 AI Responses', 'Advanced AI Models']} />
                             <PricingCard name="Business" price={Math.round(3799000 * d.mult)} originalPrice={3799000}
-                                discount={d.pct} duration={d.label} color="#0D9488"
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#0D9488"
                                 onBuy={() => handleBuy('Business', 3799000, '#0D9488')}
                                 features={['10,000 Monthly Active Users', '7 Human Agents', 'Unlimited AI Agents', 'Unlimited Connected Platforms', '50,000 AI Responses', 'Advanced AI Models']} />
                             <PricingCard name="Enterprise" price={Math.round(5799000 * d.mult)} originalPrice={5799000}
-                                discount={d.pct} duration={d.label} color="#7C3AED"
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#7C3AED"
                                 onBuy={() => handleBuy('Enterprise', 5799000, '#7C3AED')}
                                 features={['30,000 Monthly Active Users', '10 Human Agents', 'Unlimited AI Agents', 'Unlimited Connected Platforms', '150,000 AI Responses', 'Advanced AI Models']} />
                             <PricingCard name="Unlimited" price={Math.round(15799000 * d.mult)} originalPrice={15799000}
-                                discount={d.pct} duration={d.label} color="#059669"
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#059669"
                                 onBuy={() => handleBuy('Unlimited', 15799000, '#059669')}
                                 features={['Unlimited Monthly Active Users', '30 Human Agents', 'Unlimited AI Agents', 'Unlimited Connected Platforms', '500,000 AI Responses', 'Advanced AI Models']} />
                         </div>
@@ -539,15 +560,15 @@ export default function BillingsPage() {
 
                         <div className="grid grid-cols-3 gap-4">
                             <PricingCard name="Marketing Pro" price={Math.round(2000000 * d.mult)} originalPrice={2000000}
-                                discount={d.pct} duration={d.label} color="#1E3A8A"
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#1E3A8A"
                                 onBuy={() => handleBuy('Marketing Pro', 2000000, '#1E3A8A')}
                                 features={['Track up to 3,000 leads per month', 'Automatic Ad Attribution', 'Automatic META CAPI Integration', 'Website Customer Journey', 'Ads Performance Analytics Dashboard', 'Google, Tiktok, and other Ad platforms Coming Soon']} />
                             <PricingCard name="Marketing Business" price={Math.round(4000000 * d.mult)} originalPrice={4000000}
-                                discount={d.pct} duration={d.label} color="#7C3AED"
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#7C3AED"
                                 onBuy={() => handleBuy('Marketing Business', 4000000, '#7C3AED')}
                                 features={['Track up to 10,000 leads per month', 'Automatic Ad Attribution', 'Automatic META CAPI Integration', 'Website Customer Journey', 'Ads Performance Analytics Dashboard', 'Google, Tiktok, and other Ad platforms Coming Soon']} />
                             <PricingCard name="Marketing Enterprise" price={Math.round(5000000 * d.mult)} originalPrice={5000000}
-                                discount={d.pct} duration={d.label} color="#059669"
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#059669"
                                 onBuy={() => handleBuy('Marketing Enterprise', 5000000, '#059669')}
                                 features={['Track up to 30,000 leads per month', 'Automatic Ad Attribution', 'Automatic META CAPI Integration', 'Website Customer Journey', 'Ads Performance Analytics Dashboard', 'Google, Tiktok, and other Ad platforms Coming Soon']} />
                         </div>
@@ -570,19 +591,19 @@ export default function BillingsPage() {
 
                         <div className="grid grid-cols-4 gap-4">
                             <PricingCard name="CRM Pro" price={Math.round(1000000 * d.mult)} originalPrice={1000000}
-                                discount={d.pct} duration={d.label} color="#1E3A8A" agentCounter
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#1E3A8A" agentCounter
                                 onBuy={() => handleBuy('CRM Pro', 1000000, '#1E3A8A')}
                                 features={['CRM Contacts and Company List', 'Unified Customer Data Platform', 'Unlimited Boards', 'Unlimited Views', 'Up to 10,000 Items per Board', 'Up to 3 Agents (can be upgraded)', 'CRM Automations', 'CRM OpenAPI']} />
                             <PricingCard name="CRM Business" price={Math.round(2000000 * d.mult)} originalPrice={2000000}
-                                discount={d.pct} duration={d.label} color="#0D9488" agentCounter
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#0D9488" agentCounter
                                 onBuy={() => handleBuy('CRM Business', 2000000, '#0D9488')}
                                 features={['CRM Contacts and Company List', 'Unified Customer Data Platform', 'Unlimited Boards', 'Unlimited Views', 'Up to 50,000 Items per Board', 'Up to 3 Agents (can be upgraded)', 'CRM Automations', 'CRM OpenAPI']} />
                             <PricingCard name="CRM Enterprise" price={Math.round(3000000 * d.mult)} originalPrice={3000000}
-                                discount={d.pct} duration={d.label} color="#7C3AED" agentCounter
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#7C3AED" agentCounter
                                 onBuy={() => handleBuy('CRM Enterprise', 3000000, '#7C3AED')}
                                 features={['CRM Contacts and Company List', 'Unified Customer Data Platform', 'Unlimited Boards', 'Unlimited Views', 'Up to 100,000 Items per Board', 'Up to 3 Agents (can be upgraded)', 'CRM Automations', 'CRM OpenAPI']} />
                             <PricingCard name="CRM Unlimited" price={Math.round(5000000 * d.mult)} originalPrice={5000000}
-                                discount={d.pct} duration={d.label} color="#059669" agentCounter
+                                discount={d.pct} duration={d.label} durationMonths={d.months} color="#059669" agentCounter
                                 onBuy={() => handleBuy('CRM Unlimited', 5000000, '#059669')}
                                 features={['CRM Contacts and Company List', 'Unified Customer Data Platform', 'Unlimited Boards', 'Unlimited Views', 'Unlimited Items per Board', 'Up to 3 Agents (can be upgraded)', 'CRM Automations', 'CRM OpenAPI']} />
                         </div>
