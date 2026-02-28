@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
 import {
     IconChat,
     IconTicket,
@@ -15,18 +15,20 @@ import {
     IconFlow,
     IconSettings,
 } from './icons';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════
-   Sidebar — Vertical left navigation (cekat.ai exact style)
+   Sidebar — Collapsible vertical left navigation
    
-   Penjelasan layout reference dari screenshot:
-   - Posisi di bawah TopNavBar (bukan full height)
-   - Width: ~160px (lebih narrow dari sebelumnya)
-   - Menu items: Chat, Tickets, Calls, Analytics,
-                 Conversations, Broadcasts, AI Agents,
-                 Connected Platforms, Flow, Settings
-   - Active state: light blue background + blue text
-   - Settings di paling bawah (sticky)
+   Penjelasan fitur collapsible:
+   - State collapsed: sidebar menyempit ke ~56px (icon only)
+   - State expanded: sidebar lebar ~168px (icon + label)
+   - Toggle button di bagian bawah (chevron left/right)
+   - Saat collapsed: hover pada icon → tooltip nama muncul
+   - Smooth transition menggunakan CSS transition
+   
+   Di cekat.ai, sidebar bisa di-collapse ke icon-only mode
+   sehingga area konten menjadi lebih luas dan bersih.
    ═══════════════════════════════════════════════════════ */
 
 const sidebarItems = [
@@ -37,17 +39,20 @@ const sidebarItems = [
     { label: 'Conversations', icon: IconConversation, href: '/dashboard/conversations' },
     { label: 'Broadcasts', icon: IconBroadcast, href: '/dashboard/broadcasts' },
     { label: 'AI Agents', icon: IconAIAgent, href: '/dashboard/ai-agents' },
-    { label: 'Connected Platforms', icon: IconPlatform, href: '/dashboard/platforms' },
+    { label: 'Connected Pla...', icon: IconPlatform, href: '/dashboard/platforms' },
     { label: 'Flow', icon: IconFlow, href: '/dashboard/flow' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
     const pathname = usePathname();
 
     return (
-        <aside className="fixed left-0 top-[52px] bottom-0 w-[168px] flex flex-col bg-white border-r border-[#E5E7EB] z-40">
+        <aside
+            className={`fixed left-0 top-[52px] bottom-0 flex flex-col bg-white border-r border-[#E5E7EB] z-40
+                transition-all duration-200 ease-in-out ${collapsed ? 'w-[56px]' : 'w-[168px]'}`}
+        >
             {/* Main Navigation */}
-            <nav className="flex-1 overflow-y-auto py-2 px-2">
+            <nav className="flex-1 overflow-y-auto py-2 px-1.5">
                 <ul className="space-y-0.5">
                     {sidebarItems.map((item) => {
                         const Icon = item.icon;
@@ -60,17 +65,19 @@ export default function Sidebar() {
                             <li key={item.href}>
                                 <Link
                                     href={item.href}
+                                    title={collapsed ? item.label : undefined}
                                     className={`
-                    flex items-center gap-2.5 px-3 py-[9px] rounded-lg text-[13px]
-                    transition-all duration-150
-                    ${isActive
+                                        flex items-center ${collapsed ? 'justify-center' : ''} gap-2.5 
+                                        ${collapsed ? 'px-0 py-[9px]' : 'px-3 py-[9px]'} 
+                                        rounded-lg text-[13px] transition-all duration-150
+                                        ${isActive
                                             ? 'bg-[#EEF2FF] text-[#4F46E5] font-medium'
                                             : 'text-[#374151] hover:bg-[#F9FAFB] font-normal'
                                         }
-                  `}
+                                    `}
                                 >
-                                    <Icon size={18} className={isActive ? 'text-[#4F46E5]' : 'text-[#9CA3AF]'} />
-                                    <span className="truncate">{item.label}</span>
+                                    <Icon size={18} className={`flex-shrink-0 ${isActive ? 'text-[#4F46E5]' : 'text-[#9CA3AF]'}`} />
+                                    {!collapsed && <span className="truncate">{item.label}</span>}
                                 </Link>
                             </li>
                         );
@@ -78,22 +85,41 @@ export default function Sidebar() {
                 </ul>
             </nav>
 
-            {/* Bottom: Settings (sticky) */}
-            <div className="border-t border-[#E5E7EB] p-2">
+            {/* Bottom: Settings + Collapse Toggle */}
+            <div className="border-t border-[#E5E7EB] p-1.5">
+                {/* Settings */}
                 <Link
                     href="/dashboard/settings"
+                    title={collapsed ? 'Settings' : undefined}
                     className={`
-            flex items-center gap-2.5 px-3 py-[9px] rounded-lg text-[13px]
-            transition-all duration-150
-            ${pathname.startsWith('/dashboard/settings')
+                        flex items-center ${collapsed ? 'justify-center' : ''} gap-2.5 
+                        ${collapsed ? 'px-0 py-[9px]' : 'px-3 py-[9px]'} 
+                        rounded-lg text-[13px] transition-all duration-150
+                        ${pathname.startsWith('/dashboard/settings')
                             ? 'bg-[#EEF2FF] text-[#4F46E5] font-medium'
                             : 'text-[#374151] hover:bg-[#F9FAFB] font-normal'
                         }
-          `}
+                    `}
                 >
-                    <IconSettings size={18} className={pathname.startsWith('/dashboard/settings') ? 'text-[#4F46E5]' : 'text-[#9CA3AF]'} />
-                    <span>Settings</span>
+                    <IconSettings size={18} className={`flex-shrink-0 ${pathname.startsWith('/dashboard/settings') ? 'text-[#4F46E5]' : 'text-[#9CA3AF]'}`} />
+                    {!collapsed && <span>Settings</span>}
                 </Link>
+
+                {/* Collapse Toggle Button */}
+                <button
+                    onClick={onToggle}
+                    className="w-full flex items-center justify-center gap-2 mt-1 py-2 rounded-lg text-[#9CA3AF] hover:bg-[#F3F4F6] hover:text-[#374151] transition-colors"
+                    title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                >
+                    {collapsed ? (
+                        <ChevronRight className="w-4 h-4" />
+                    ) : (
+                        <>
+                            <ChevronLeft className="w-4 h-4" />
+                            <span className="text-[11px]">Collapse</span>
+                        </>
+                    )}
+                </button>
             </div>
         </aside>
     );
