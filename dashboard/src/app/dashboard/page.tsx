@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, SlidersHorizontal, Plus, ListChecks, RefreshCw, Check,
     ChevronDown, X, Send, Paperclip, Smile, MoreVertical,
     Phone, User, Clock, Tag, FileText, Shield, Ticket, ArrowRight,
+    Wifi, WifiOff,
 } from 'lucide-react';
+import { backend, type Conversation as BackendConv, type ChatMessage as BackendMsg, type WSMessage } from '@/lib/api';
 
 /* ═══════════════════════════════════════════════════
    Chat Page — 3 Panel Layout (persis chat.cekat.ai)
@@ -540,11 +542,154 @@ export default function ChatPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [inputMode, setInputMode] = useState<'reply' | 'note'>('reply');
     const [messageText, setMessageText] = useState('');
+    const [sending, setSending] = useState(false);
+
+    // ── Backend state (dual mode: backend → fallback ke sample data) ──
+    const [backendConnected, setBackendConnected] = useState(false);
+    const [conversations, setConversations] = useState<Conversation[]>(sampleConversations);
+    const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([]);
+    const wsRef = useRef<WebSocket | null>(null);
 
     const chatEndRef = useRef<HTMLDivElement>(null);
 
+    // ── Load conversations dari Go backend (jika tersedia) ──
+    const loadConversations = useCallback(async () => {
+        try {
+            const convs = await backend.getConversations();
+            if (convs && convs.length > 0) {
+                setConversations(convs.map(c => ({
+                    id: c.id,
+                    customerName: c.customer_name || c.customer_phone,
+                    phone: c.customer_phone,
+                    platform: (c.platform as Platform) || 'whatsapp',
+                    status: (c.status === 'open' ? 'assigned' : c.status === 'resolved' ? 'resolved' : 'unassigned') as ConvStatus,
+                    lastMessage: c.last_message || '',
+                    lastTime: c.last_message_at ? new Date(c.last_message_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '',
+                    unread: 0,
+                    agent: '',
+                    labels: [],
+                    messages: [],
+                    aiSummary: '',
+                    pipelineStatus: 'New Lead',
+                    createdAt: new Date(c.created_at).toLocaleString('id-ID'),
+                    assignedAt: '-',
+                })));
+                setBackendConnected(true);
+            } else {
+                // Backend tersedia tapi kosong → tetap gunakan sample + flag connected
+                setBackendConnected(true);
+                setConversations(sampleConversations);
+            }
+        } catch {
+            // Backend tidak tersedia → gunakan sample data
+            setBackendConnected(false);
+            setConversations(sampleConversations);
+        }
+    }, []);
+
+    // ── Load messages saat conversation dipilih ──
+    const loadMessages = useCallback(async (convId: string) => {
+        if (!backendConnected) return;
+        try {
+            const msgs = await backend.getMessages(convId);
+            if (msgs) {
+                setLiveMessages(msgs.map(m => ({
+                    id: m.id,
+                    sender: m.direction === 'inbound' ? 'customer' as MessageSender : 'agent' as MessageSender,
+                    senderName: m.direction === 'inbound' ? 'Customer' : 'Agent',
+                    text: m.content,
+                    time: new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                })));
+            }
+        } catch {
+            setLiveMessages([]);
+        }
+    }, [backendConnected]);
+
+    // ── Send message via Go backend ──
+    const handleSend = useCallback(async () => {
+        if (!messageText.trim() || !selectedConvId) return;
+        const text = messageText.trim();
+        setMessageText('');
+
+        if (inputMode === 'note') {
+            // Private note — hanya local (tidak kirim ke WhatsApp)
+            const noteMsg: ChatMessage = {
+                id: `note-${Date.now()}`,
+                sender: 'note',
+                senderName: 'Agent',
+                text,
+                time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            };
+            setConversations(prev => prev.map(c =>
+                c.id === selectedConvId ? { ...c, messages: [...c.messages, noteMsg] } : c
+            ));
+            setLiveMessages(prev => [...prev, noteMsg]);
+            return;
+        }
+
+        // Optimistic UI — langsung tampilkan bubble
+        const optimisticMsg: ChatMessage = {
+            id: `sending-${Date.now()}`,
+            sender: 'agent',
+            senderName: 'Agent',
+            text,
+            time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+        };
+        setLiveMessages(prev => [...prev, optimisticMsg]);
+        setConversations(prev => prev.map(c =>
+            c.id === selectedConvId ? { ...c, messages: [...c.messages, optimisticMsg], lastMessage: text } : c
+        ));
+
+        // Kirim ke backend (jika connected)
+        if (backendConnected) {
+            setSending(true);
+            try {
+                await backend.sendMessage(selectedConvId, text);
+            } catch (err) {
+                console.error('Gagal kirim pesan:', err);
+            } finally {
+                setSending(false);
+            }
+        }
+    }, [messageText, selectedConvId, inputMode, backendConnected]);
+
+    // ── Init: coba connect ke backend saat mount ──
+    useEffect(() => {
+        loadConversations();
+
+        // Connect WebSocket untuk real-time updates
+        const ws = backend.connectWebSocket((msg: WSMessage) => {
+            if (msg.type === 'new_message' && msg.message) {
+                const newMsg: ChatMessage = {
+                    id: msg.message.id,
+                    sender: msg.message.direction === 'inbound' ? 'customer' : 'agent',
+                    senderName: msg.message.direction === 'inbound' ? 'Customer' : 'Agent',
+                    text: msg.message.content,
+                    time: new Date(msg.message.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                };
+                setLiveMessages(prev => [...prev, newMsg]);
+
+                // Update conversation list juga
+                if (msg.conversation) {
+                    loadConversations();
+                }
+            }
+        });
+        wsRef.current = ws;
+
+        return () => { ws?.close(); };
+    }, [loadConversations]);
+
+    // ── Load messages saat pilih conversation ──
+    useEffect(() => {
+        if (selectedConvId) {
+            loadMessages(selectedConvId);
+        }
+    }, [selectedConvId, loadMessages]);
+
     // Filter conversations berdasarkan tab & search
-    const filteredConvs = sampleConversations.filter(c => {
+    const filteredConvs = conversations.filter(c => {
         const matchTab = c.status === activeTab;
         const matchSearch = searchQuery === '' ||
             c.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -552,12 +697,15 @@ export default function ChatPage() {
         return matchTab && matchSearch;
     });
 
-    const selectedConv = sampleConversations.find(c => c.id === selectedConvId) || null;
+    const selectedConv = conversations.find(c => c.id === selectedConvId) || null;
 
-    // Auto-scroll ke bawah saat conversation dipilih
+    // Tentukan messages yang ditampilkan: dari backend (liveMessages) atau sample data
+    const displayMessages = (backendConnected && liveMessages.length > 0) ? liveMessages : (selectedConv?.messages || []);
+
+    // Auto-scroll ke bawah saat conversation dipilih atau ada pesan baru
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [selectedConvId]);
+    }, [selectedConvId, displayMessages.length]);
 
     const tabs: { key: TabKey; label: string; icon?: React.ReactNode }[] = [
         { key: 'assigned', label: 'Assigned' },
@@ -609,10 +757,15 @@ export default function ChatPage() {
                         <ListChecks className="w-4 h-4" />
                     </button>
 
-                    {/* Refresh */}
-                    <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] text-[#6B7280] transition-colors">
+                    {/* Refresh — reload dari backend */}
+                    <button onClick={() => loadConversations()} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] text-[#6B7280] transition-colors">
                         <RefreshCw className="w-3.5 h-3.5" />
                     </button>
+
+                    {/* Backend status indicator */}
+                    <div className="flex items-center gap-1 ml-auto" title={backendConnected ? 'Backend connected' : 'Using demo data'}>
+                        {backendConnected ? <Wifi className="w-3 h-3 text-green-500" /> : <WifiOff className="w-3 h-3 text-[#D1D5DB]" />}
+                    </div>
                 </div>
 
                 {/* Search bar (expandable) */}
@@ -778,7 +931,7 @@ export default function ChatPage() {
 
                         {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto px-4 py-4">
-                            {selectedConv.messages.map(msg => (
+                            {displayMessages.map(msg => (
                                 <ChatBubble key={msg.id} msg={msg} />
                             ))}
                             <div ref={chatEndRef} />
@@ -822,13 +975,15 @@ export default function ChatPage() {
                                         </button>
                                     </div>
                                     <button
-                                        className={`flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold text-white rounded-lg transition-colors ${inputMode === 'note'
+                                        onClick={handleSend}
+                                        disabled={sending || !messageText.trim()}
+                                        className={`flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold text-white rounded-lg transition-colors disabled:opacity-50 ${inputMode === 'note'
                                             ? 'bg-[#F59E0B] hover:bg-[#D97706]'
                                             : 'bg-primary hover:bg-primary-hover'
                                             }`}
                                     >
                                         <Send className="w-3.5 h-3.5" />
-                                        {inputMode === 'note' ? 'Send Note' : 'Send'}
+                                        {sending ? 'Sending...' : inputMode === 'note' ? 'Send Note' : 'Send'}
                                     </button>
                                 </div>
                             </div>
