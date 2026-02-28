@@ -54,7 +54,9 @@ Format webhook body dari Meta:
 type WebhookHandler struct {
 	DB          *pgxpool.Pool
 	Hub         *services.Hub
-	VerifyToken string // Token verifikasi yang kita tentukan
+	VerifyToken string                    // Token verifikasi yang kita tentukan
+	AI          *services.GeminiService   // Cika AI untuk auto-reply
+	WA          *services.WhatsAppService // Untuk kirim reply ke WhatsApp
 }
 
 // VerifyWebhook — GET /webhook
@@ -198,6 +200,12 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 			CreatedAt:      now,
 		},
 	})
+
+	// 7. 🤖 Cika AI Auto-Reply
+	//    Jika AI aktif, generate respons pintar dan kirim balik ke WhatsApp
+	if h.AI != nil && h.AI.IsEnabled() && content != "" {
+		go h.handleAIReply(ctx, convID, msg.From, customerName, content)
+	}
 }
 
 // handleStatusUpdate memproses status pesan (delivered, read)
@@ -215,6 +223,69 @@ func (h *WebhookHandler) handleStatusUpdate(status webhookStatus) {
 	}
 
 	log.Printf("📋 Status update: %s → %s", status.ID, status.Status)
+}
+
+// handleAIReply — 🤖 Cika AI auto-reply
+// Dipanggil async setelah pesan customer disimpan
+// Flow: Gemini API → WhatsApp reply → simpan DB → broadcast WS
+func (h *WebhookHandler) handleAIReply(ctx context.Context, convID, customerPhone, customerName, customerMessage string) {
+	// 1. Generate reply dari Gemini
+	reply, err := h.AI.GenerateReply(ctx, h.DB, convID, customerMessage)
+	if err != nil {
+		log.Printf("⚠️ Cika gagal generate reply: %v", err)
+		return
+	}
+
+	// 2. Kirim reply ke WhatsApp customer
+	waMessageID, err := h.WA.SendTextMessage(customerPhone, reply)
+	if err != nil {
+		log.Printf("⚠️ Cika gagal kirim reply ke WhatsApp: %v", err)
+		return
+	}
+
+	// 3. Simpan reply ke database (direction: outbound, message_type: ai)
+	var replyMsgID string
+	err = h.DB.QueryRow(ctx,
+		`INSERT INTO messages (conversation_id, direction, content, message_type, wa_message_id)
+		 VALUES ($1, 'outbound', $2, 'ai', $3)
+		 RETURNING id`,
+		convID, reply, waMessageID,
+	).Scan(&replyMsgID)
+
+	if err != nil {
+		log.Printf("⚠️ Gagal simpan AI reply ke DB: %v", err)
+		return
+	}
+
+	// 4. Update last_message di conversation
+	now := time.Now()
+	_, _ = h.DB.Exec(ctx,
+		`UPDATE conversations SET last_message = $1, last_message_at = $2 WHERE id = $3`,
+		reply, now, convID,
+	)
+
+	log.Printf("🤖 Cika → %s: %s", customerPhone, reply)
+
+	// 5. Broadcast AI reply ke dashboard via WebSocket
+	h.Hub.BroadcastMessage(&models.WebSocketMessage{
+		Type: "new_message",
+		Conversation: &models.Conversation{
+			ID:            convID,
+			CustomerPhone: customerPhone,
+			CustomerName:  customerName,
+			LastMessage:   reply,
+			LastMessageAt: &now,
+		},
+		Message: &models.Message{
+			ID:             replyMsgID,
+			ConversationID: convID,
+			Direction:      "outbound",
+			Content:        reply,
+			MessageType:    "ai",
+			WAMessageID:    waMessageID,
+			CreatedAt:      now,
+		},
+	})
 }
 
 // ── Webhook JSON types (format dari Meta) ──

@@ -671,14 +671,17 @@ export default function ChatPage() {
                 setLiveMessages(prev => [...prev, newMsg]);
 
                 // Update conversation list juga
-                if (msg.conversation) {
-                    loadConversations();
-                }
+                loadConversations();
             }
         });
         wsRef.current = ws;
 
-        return () => { ws?.close(); };
+        // Auto-polling tiap 5 detik sebagai backup WebSocket
+        const pollInterval = setInterval(() => {
+            loadConversations();
+        }, 5000);
+
+        return () => { ws?.close(); clearInterval(pollInterval); };
     }, [loadConversations]);
 
     // ── Load messages saat pilih conversation ──

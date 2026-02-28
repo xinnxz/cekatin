@@ -60,12 +60,21 @@ func main() {
 	// ─── 3. Init Services ───
 	waService := services.NewWhatsAppService(cfg.WAAccessToken, cfg.WAPhoneNumberID)
 	wsHub := services.NewHub()
+	aiService := services.NewGeminiService(cfg.GeminiAPIKeys, cfg.AIEnabled)
+
+	if aiService.IsEnabled() {
+		log.Printf("🤖 Cika AI aktif (%d API keys)", len(cfg.GeminiAPIKeys))
+	} else {
+		log.Println("⏸️ Cika AI nonaktif (AI_ENABLED=false atau tidak ada API key)")
+	}
 
 	// ─── 4. Init Handlers ───
 	webhookHandler := &handlers.WebhookHandler{
 		DB:          db,
 		Hub:         wsHub,
 		VerifyToken: cfg.WAVerifyToken,
+		AI:          aiService,
+		WA:          waService,
 	}
 
 	messageHandler := &handlers.MessageHandler{

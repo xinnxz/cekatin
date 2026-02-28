@@ -88,7 +88,7 @@ function StartNode({ data, selected }: NodeProps) {
                 <span className="text-[14px] font-bold text-white">Start point</span>
             </div>
             <div className="bg-white px-5 py-3">
-                <p className="text-[12.5px] text-[#6B7280]">{data.condition || 'Select Condition'}</p>
+                <p className="text-[12.5px] text-[#6B7280]">{String(data.condition || 'Select Condition')}</p>
             </div>
             <Handle type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-[#1E3A5F] !border-2 !border-white" />
         </div>
@@ -110,8 +110,8 @@ function ConditionNode({ data, selected }: NodeProps) {
                 <span className="text-[13px] font-bold text-white">Condition</span>
             </div>
             <div className="bg-[#FEF3C7] px-4 py-3">
-                <p className="text-[13px] font-semibold text-[#92400E]">{data.label || 'Condition'}</p>
-                <p className="text-[11px] text-[#B45309] mt-0.5">{data.description || ''}</p>
+                <p className="text-[13px] font-semibold text-[#92400E]">{String(data.label || 'Condition')}</p>
+                <p className="text-[11px] text-[#B45309] mt-0.5">{String(data.description || '')}</p>
             </div>
             {selected && (
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-primary font-medium">Selected</div>
@@ -135,8 +135,8 @@ function ActionNode({ data, selected }: NodeProps) {
                 <span className="text-[13px] font-bold text-white">Action</span>
             </div>
             <div className="bg-[#D1FAE5] px-4 py-3">
-                <p className="text-[13px] font-semibold text-[#065F46]">{data.label || 'Action'}</p>
-                <p className="text-[11px] text-[#047857] mt-0.5">{data.description || ''}</p>
+                <p className="text-[13px] font-semibold text-[#065F46]">{String(data.label || 'Action')}</p>
+                <p className="text-[11px] text-[#047857] mt-0.5">{String(data.description || '')}</p>
             </div>
             <Handle type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-[#10B981] !border-2 !border-white" />
         </div>
@@ -157,7 +157,7 @@ function MessageNode({ data, selected }: NodeProps) {
                 <span className="text-[13px] font-bold text-white">Send Message</span>
             </div>
             <div className="bg-[#EDE9FE] px-4 py-3">
-                <p className="text-[12px] text-[#5B21B6]">{data.message || 'Enter message...'}</p>
+                <p className="text-[12px] text-[#5B21B6]">{String(data.message || 'Enter message...')}</p>
             </div>
             <Handle type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-[#8B5CF6] !border-2 !border-white" />
         </div>

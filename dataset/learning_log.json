@@ -935,12 +935,28 @@
       "confidence": 0.5972,
       "routing": "nlp_driven",
       "timestamp": "2026-02-27T16:51:00.666790"
+    },
+    {
+      "message": "tes",
+      "preprocessed": "tes",
+      "intent": "unknown",
+      "confidence": 0.159,
+      "routing": "ai_driven",
+      "timestamp": "2026-03-01T06:32:20.289368"
+    },
+    {
+      "message": "produk apa saja yang dijual",
+      "preprocessed": "produk jual",
+      "intent": "tanya_produk",
+      "confidence": 0.9476,
+      "routing": "nlp_driven",
+      "timestamp": "2026-03-01T06:32:52.014566"
     }
   ],
   "stats": {
-    "total": 117,
-    "nlp_driven": 81,
-    "ai_driven": 36,
+    "total": 119,
+    "nlp_driven": 82,
+    "ai_driven": 37,
     "patterns_learned": 7
   }
 }

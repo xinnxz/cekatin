@@ -24,8 +24,14 @@ Headers yang ditambahkan:
 // CORSMiddleware mengizinkan cross-origin requests dari dashboard
 func CORSMiddleware(dashboardURL string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Izinkan request dari dashboard URL
-		c.Header("Access-Control-Allow-Origin", dashboardURL)
+		// Untuk development: izinkan origin dari localhost (port berapapun)
+		// Ini penting karena Next.js dev server bisa pindah port (3000, 3001, dll)
+		origin := c.Request.Header.Get("Origin")
+		if origin != "" {
+			c.Header("Access-Control-Allow-Origin", origin)
+		} else {
+			c.Header("Access-Control-Allow-Origin", dashboardURL)
+		}
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		c.Header("Access-Control-Allow-Credentials", "true")
