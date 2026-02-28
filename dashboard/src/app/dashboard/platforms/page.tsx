@@ -210,7 +210,21 @@ function PlatformModal({ open, onClose, onSelect }: {
     );
 }
 
-/* ── WhatsApp Business Setup Wizard ── */
+/* ── WhatsApp Business Setup Wizard ──
+   Penjelasan alur (persis cekat.ai):
+   
+   Step 1: Pilih/buat WhatsApp Business Account + profile + website
+   Step 2: Masukkan nama bisnis + display name + peringatan
+   Step 3: Input nomor telepon + kode negara + pilih metode verifikasi (SMS/Phone)
+   Step 4: Halaman sukses "Selamat! Inbox berhasil dibuat" + link Meta Business Suite
+   
+   Fitur:
+   - Progress bar di atas (3 step circles + garis penghubung)
+   - Country code dropdown (Indonesia +62 default)
+   - Verifikasi via SMS atau Phone Call
+   - Warning text berwarna merah tentang batasan API
+   - Success page dengan icon celebratory + link ke Meta
+*/
 function WhatsAppSetup({ onBack, onFinish }: { onBack: () => void; onFinish: () => void }) {
     const [step, setStep] = useState(1);
     const [accountType, setAccountType] = useState('create');
@@ -219,157 +233,331 @@ function WhatsAppSetup({ onBack, onFinish }: { onBack: () => void; onFinish: () 
     const [bizName, setBizName] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [phone, setPhone] = useState('');
+    const [countryCode, setCountryCode] = useState('+62');
+    const [verifyMethod, setVerifyMethod] = useState<'sms' | 'call'>('sms');
+
+    // Daftar kode negara umum
+    const countryCodes = [
+        { code: '+62', label: '🇮🇩 Indonesia (+62)' },
+        { code: '+60', label: '🇲🇾 Malaysia (+60)' },
+        { code: '+65', label: '🇸🇬 Singapore (+65)' },
+        { code: '+66', label: '🇹🇭 Thailand (+66)' },
+        { code: '+63', label: '🇵🇭 Philippines (+63)' },
+        { code: '+1', label: '🇺🇸 USA (+1)' },
+        { code: '+44', label: '🇬🇧 UK (+44)' },
+        { code: '+91', label: '🇮🇳 India (+91)' },
+        { code: '+81', label: '🇯🇵 Japan (+81)' },
+        { code: '+61', label: '🇦🇺 Australia (+61)' },
+    ];
+
+    // Step 4 = success
+    if (step === 4) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#F9FAFB]">
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, type: 'spring' }}
+                    className="text-center max-w-md"
+                >
+                    {/* Success icon */}
+                    <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+                        <Check className="w-10 h-10 text-green-600" />
+                    </div>
+                    <h1 className="text-[24px] font-bold text-foreground mb-2">
+                        🎉 Selamat! Inbox Berhasil Dibuat
+                    </h1>
+                    <p className="text-[13px] text-[#6B7280] mb-6 leading-relaxed">
+                        Inbox WhatsApp Business Anda sudah berhasil dipasang.
+                        Sekarang Anda bisa mulai menerima dan menjawab pesan dari pelanggan melalui WhatsApp!
+                    </p>
+
+                    {/* Meta links */}
+                    <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 mb-6 text-left space-y-3">
+                        <h3 className="text-[14px] font-semibold text-foreground">Langkah Selanjutnya</h3>
+                        <a href="#" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#F3F4F6] transition-colors group">
+                            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                                <ExternalLink className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-[12.5px] font-medium text-foreground group-hover:text-primary">Atur Billing di Meta Business Suite</p>
+                                <p className="text-[11px] text-[#9CA3AF]">Tambahkan metode pembayaran untuk mengirim pesan</p>
+                            </div>
+                        </a>
+                        <a href="#" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#F3F4F6] transition-colors group">
+                            <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                                <ExternalLink className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div>
+                                <p className="text-[12.5px] font-medium text-foreground group-hover:text-primary">Ganti Foto Profil WhatsApp</p>
+                                <p className="text-[11px] text-[#9CA3AF]">Ubah foto profil bisnis Anda di Meta Business Suite</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <button
+                        onClick={onFinish}
+                        className="px-8 py-2.5 text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors"
+                    >
+                        Kembali ke Daftar Inbox
+                    </button>
+                </motion.div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 overflow-y-auto p-8">
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
-                <div className="flex items-center gap-3 mb-8">
+                <div className="flex items-center gap-3 mb-6">
                     <PlatformIcon type="whatsapp" size={40} />
-                    <h1 className="text-[22px] font-bold text-foreground">Instructions</h1>
+                    <div>
+                        <h1 className="text-[22px] font-bold text-foreground">Instructions</h1>
+                        <p className="text-[12px] text-[#6B7280]">Setup WhatsApp Business API</p>
+                    </div>
                 </div>
 
-                {/* Step 1: Business Info */}
-                <div className="flex gap-8 mb-8">
-                    <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-6">
-                        <h3 className="text-[15px] font-semibold text-foreground mb-1">
-                            Create or select your WhatsApp Business account
-                        </h3>
-                        <p className="text-[12px] text-[#6B7280] mb-4">
-                            This WhatsApp Business account will belong to your business portfolio.
-                        </p>
-
-                        <label className="text-[12px] font-medium text-[#374151] block mb-1.5">Choose a WhatsApp Business account</label>
-                        <select
-                            value={accountType}
-                            onChange={e => setAccountType(e.target.value)}
-                            className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] mb-4 focus:outline-none focus:border-primary"
-                        >
-                            <option value="create">Create a WhatsApp Business account</option>
-                            <option value="existing">Use existing account</option>
-                        </select>
-
-                        <label className="text-[12px] font-medium text-[#374151] block mb-1.5">Create or select a WhatsApp Business profile</label>
-                        <select
-                            value={profileType}
-                            onChange={e => setProfileType(e.target.value)}
-                            className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] mb-4 focus:outline-none focus:border-primary"
-                        >
-                            <option value="create">Create a new WhatsApp Business profile</option>
-                            <option value="existing">Use existing profile</option>
-                        </select>
-
-                        <label className="text-[12px] font-medium text-[#374151] block mb-1">Business website or profile page</label>
-                        <p className="text-[11px] text-[#9CA3AF] mb-1.5">
-                            If you don&apos;t have a business website, you can use a URL from any of your social media profile pages.
-                        </p>
-                        <input
-                            type="text"
-                            value={website}
-                            onChange={e => setWebsite(e.target.value)}
-                            placeholder="https://yourwebsite.com"
-                            className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary"
-                        />
-                    </div>
-
-                    {/* Step indicator + instructions */}
-                    <div className="w-[260px] flex-shrink-0">
-                        <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[14px] font-bold flex-shrink-0">1</div>
-                            <div>
-                                <h4 className="text-[15px] font-semibold text-foreground mb-2">Tambahkan Info Bisnis Anda</h4>
-                                <p className="text-[12px] text-[#6B7280] leading-relaxed">
-                                    Pilih akun business manager atau buat yang baru. Jika anda ingin menghubungkan akun WhatsApp dengan FB Ads, pilih business yang terhubung dengan akun FB Ads anda.
-                                </p>
-                            </div>
+                {/* ── Progress Indicator ──
+                   3 step circles dengan garis penghubung
+                   Warna: active = primary, done = green, pending = gray */}
+                <div className="flex items-center justify-center mb-8">
+                    {[1, 2, 3].map((s, i) => (
+                        <div key={s} className="flex items-center">
+                            <button
+                                onClick={() => s <= step && setStep(s)}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-bold transition-all ${s < step ? 'bg-green-500 text-white' :
+                                        s === step ? 'bg-primary text-white shadow-md shadow-primary/30' :
+                                            'bg-[#E5E7EB] text-[#9CA3AF]'
+                                    }`}
+                            >
+                                {s < step ? <Check className="w-5 h-5" /> : s}
+                            </button>
+                            {i < 2 && (
+                                <div className={`w-20 h-0.5 mx-1 ${s < step ? 'bg-green-500' : 'bg-[#E5E7EB]'}`} />
+                            )}
                         </div>
-                    </div>
+                    ))}
                 </div>
 
-                {/* Step 2: Buat Akun WhatsApp Bisnis */}
-                <div className="flex gap-8 mb-8">
-                    <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-6">
-                        <label className="text-[12px] font-medium text-[#374151] block mb-1.5">
-                            WhatsApp business account name
-                            <span className="ml-1 text-[#9CA3AF]" title="Info">
-                                <AlertCircle className="w-3.5 h-3.5 inline" />
-                            </span>
-                        </label>
-                        <div className="relative mb-4">
+                {/* ═══ Step 1: Business Info ═══ */}
+                {step === 1 && (
+                    <div className="flex gap-8">
+                        <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-6">
+                            <h3 className="text-[15px] font-semibold text-foreground mb-1">
+                                Create or select your WhatsApp Business account
+                            </h3>
+                            <p className="text-[12px] text-[#6B7280] mb-4">
+                                This WhatsApp Business account will belong to your business portfolio.
+                            </p>
+
+                            <label className="text-[12px] font-medium text-[#374151] block mb-1.5">Choose a WhatsApp Business account</label>
+                            <select
+                                value={accountType}
+                                onChange={e => setAccountType(e.target.value)}
+                                className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] mb-4 focus:outline-none focus:border-primary"
+                            >
+                                <option value="create">Create a WhatsApp Business account</option>
+                                <option value="existing">Use existing account</option>
+                            </select>
+
+                            <label className="text-[12px] font-medium text-[#374151] block mb-1.5">Create or select a WhatsApp Business profile</label>
+                            <select
+                                value={profileType}
+                                onChange={e => setProfileType(e.target.value)}
+                                className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] mb-4 focus:outline-none focus:border-primary"
+                            >
+                                <option value="create">Create a new WhatsApp Business profile</option>
+                                <option value="existing">Use existing profile</option>
+                            </select>
+
+                            <label className="text-[12px] font-medium text-[#374151] block mb-1">Business website or profile page</label>
+                            <p className="text-[11px] text-[#9CA3AF] mb-1.5">
+                                If you don&apos;t have a business website, you can use a URL from any of your social media profile pages.
+                            </p>
                             <input
                                 type="text"
-                                value={bizName}
-                                onChange={e => setBizName(e.target.value)}
+                                value={website}
+                                onChange={e => setWebsite(e.target.value)}
+                                placeholder="https://yourwebsite.com"
                                 className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary"
                             />
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[#9CA3AF]">{bizName.length}/255</span>
                         </div>
 
-                        <label className="text-[12px] font-medium text-[#374151] block mb-1">WhatsApp business display name</label>
-                        <p className="text-[11px] text-[#9CA3AF] mb-1.5">
-                            Your display name should match your business name and adhere to WhatsApp Business display name guidelines.
-                        </p>
-                        <input
-                            type="text"
-                            value={displayName}
-                            onChange={e => setDisplayName(e.target.value)}
-                            className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary"
-                        />
-                    </div>
-
-                    <div className="w-[260px] flex-shrink-0">
-                        <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[14px] font-bold flex-shrink-0">2</div>
-                            <div>
-                                <h4 className="text-[15px] font-semibold text-foreground mb-2">Buat Akun WhatsApp Bisnis</h4>
-                                <p className="text-[12px] text-[#6B7280] leading-relaxed">
-                                    Masukkan nama bisnis anda untuk ditampilkan di WhatsApp Bisnis.
-                                </p>
+                        {/* Instruksi kanan */}
+                        <div className="w-[260px] flex-shrink-0">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[14px] font-bold flex-shrink-0">1</div>
+                                <div>
+                                    <h4 className="text-[15px] font-semibold text-foreground mb-2">Tambahkan Info Bisnis Anda</h4>
+                                    <p className="text-[12px] text-[#6B7280] leading-relaxed">
+                                        Pilih akun business manager atau buat yang baru. Jika anda ingin menghubungkan akun WhatsApp dengan FB Ads, pilih business yang terhubung dengan akun FB Ads anda.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                {/* Step 3: Phone Number */}
-                <div className="flex gap-8 mb-8">
-                    <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-6">
-                        <label className="text-[12px] font-medium text-[#374151] block mb-1.5">Phone number</label>
-                        <p className="text-[11px] text-[#9CA3AF] mb-1.5">
-                            Enter the phone number you want to use for WhatsApp Business API. This number will no longer be accessible via regular WhatsApp.
-                        </p>
-                        <input
-                            type="tel"
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                            placeholder="+62 xxx-xxxx-xxxx"
-                            className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary"
-                        />
-                    </div>
+                {/* ═══ Step 2: Account Name & Display Name ═══ */}
+                {step === 2 && (
+                    <div className="flex gap-8">
+                        <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-6">
+                            <label className="text-[12px] font-medium text-[#374151] block mb-1.5">
+                                WhatsApp business account name
+                                <span className="ml-1 text-[#9CA3AF]" title="Info">
+                                    <AlertCircle className="w-3.5 h-3.5 inline" />
+                                </span>
+                            </label>
+                            <div className="relative mb-4">
+                                <input
+                                    type="text"
+                                    value={bizName}
+                                    onChange={e => setBizName(e.target.value)}
+                                    placeholder="Enter your business name"
+                                    className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[#9CA3AF]">{bizName.length}/255</span>
+                            </div>
 
-                    <div className="w-[260px] flex-shrink-0">
-                        <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[14px] font-bold flex-shrink-0">3</div>
-                            <div>
-                                <h4 className="text-[15px] font-semibold text-foreground mb-2">Daftarkan Nomor Telepon</h4>
-                                <p className="text-[12px] text-[#6B7280] leading-relaxed">
-                                    Nomor ini akan digunakan untuk menerima dan mengirim pesan melalui WhatsApp Business API. Pastikan nomor belum terdaftar di WhatsApp.
-                                </p>
+                            <label className="text-[12px] font-medium text-[#374151] block mb-1">WhatsApp business display name</label>
+                            <p className="text-[11px] text-[#9CA3AF] mb-1.5">
+                                Your display name should match your business name and adhere to WhatsApp Business display name guidelines.
+                            </p>
+                            <input
+                                type="text"
+                                value={displayName}
+                                onChange={e => setDisplayName(e.target.value)}
+                                placeholder="Display name (visible to customers)"
+                                className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary"
+                            />
+                        </div>
+
+                        <div className="w-[260px] flex-shrink-0">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[14px] font-bold flex-shrink-0">2</div>
+                                <div>
+                                    <h4 className="text-[15px] font-semibold text-foreground mb-2">Buat Akun WhatsApp Bisnis</h4>
+                                    <p className="text-[12px] text-[#6B7280] leading-relaxed">
+                                        Masukkan nama bisnis anda untuk ditampilkan di WhatsApp Bisnis.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                {/* Action Buttons */}
-                <div className="flex justify-end gap-3 mt-4">
-                    <button onClick={onBack} className="px-6 py-2.5 text-[13px] font-medium text-foreground border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6]">
-                        Cancel
+                {/* ═══ Step 3: Phone Number + Verification ═══ */}
+                {step === 3 && (
+                    <div className="flex gap-8">
+                        <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-6">
+                            {/* Phone Number with Country Code */}
+                            <label className="text-[12px] font-medium text-[#374151] block mb-1.5">Phone number</label>
+                            <p className="text-[11px] text-[#9CA3AF] mb-2">
+                                Enter the phone number you want to use for WhatsApp Business API.
+                            </p>
+                            <div className="flex gap-2 mb-4">
+                                <select
+                                    value={countryCode}
+                                    onChange={e => setCountryCode(e.target.value)}
+                                    className="w-[200px] border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary bg-white"
+                                >
+                                    {countryCodes.map(cc => (
+                                        <option key={cc.code} value={cc.code}>{cc.label}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={e => setPhone(e.target.value)}
+                                    placeholder="812-3456-7890"
+                                    className="flex-1 border border-[#E5E7EB] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-primary"
+                                />
+                            </div>
+
+                            {/* Verification Method */}
+                            <label className="text-[12px] font-medium text-[#374151] block mb-2">Verification method</label>
+                            <div className="flex gap-3 mb-5">
+                                <button
+                                    onClick={() => setVerifyMethod('sms')}
+                                    className={`flex-1 py-3 px-4 rounded-lg border-2 text-[13px] font-medium transition-all text-center ${verifyMethod === 'sms'
+                                            ? 'border-primary bg-[#EEF2FF] text-primary'
+                                            : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                                        }`}
+                                >
+                                    📱 SMS
+                                </button>
+                                <button
+                                    onClick={() => setVerifyMethod('call')}
+                                    className={`flex-1 py-3 px-4 rounded-lg border-2 text-[13px] font-medium transition-all text-center ${verifyMethod === 'call'
+                                            ? 'border-primary bg-[#EEF2FF] text-primary'
+                                            : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                                        }`}
+                                >
+                                    📞 Phone Call
+                                </button>
+                            </div>
+
+                            {/* Warning */}
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                <div className="flex items-start gap-2">
+                                    <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="text-[12px] text-red-600 font-medium mb-1">Perhatian Penting</p>
+                                        <p className="text-[11px] text-red-500 leading-relaxed">
+                                            Nomor ini <strong>tidak boleh terdaftar</strong> di WhatsApp reguler (personal).
+                                            Jika nomor sudah terdaftar di WhatsApp, hapus dulu akun WhatsApp-nya sebelum mendaftar ke API.
+                                            Nomor ini akan menjadi nomor WhatsApp Business API dan tidak bisa digunakan di aplikasi WhatsApp biasa.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="w-[260px] flex-shrink-0">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[14px] font-bold flex-shrink-0">3</div>
+                                <div>
+                                    <h4 className="text-[15px] font-semibold text-foreground mb-2">Daftarkan Nomor Telepon</h4>
+                                    <p className="text-[12px] text-[#6B7280] leading-relaxed">
+                                        Nomor ini akan digunakan untuk menerima dan mengirim pesan melalui WhatsApp Business API.
+                                        Pastikan nomor belum terdaftar di WhatsApp reguler.
+                                    </p>
+                                    <p className="text-[11px] text-primary mt-3 font-medium">
+                                        💡 Anda akan menerima kode verifikasi via {verifyMethod === 'sms' ? 'SMS' : 'telepon'} ke nomor ini.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Action Buttons — dinamis per step */}
+                <div className="flex justify-between mt-8">
+                    <button
+                        onClick={step === 1 ? onBack : () => setStep(step - 1)}
+                        className="px-6 py-2.5 text-[13px] font-medium text-foreground border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6] transition-colors"
+                    >
+                        {step === 1 ? 'Cancel' : '← Previous'}
                     </button>
                     <button
-                        onClick={onFinish}
-                        className="px-6 py-2.5 text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg flex items-center gap-2"
+                        onClick={() => {
+                            if (step < 3) {
+                                setStep(step + 1);
+                            } else {
+                                setStep(4); // Go to success page
+                            }
+                        }}
+                        className="px-6 py-2.5 text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded-lg flex items-center gap-2 transition-colors"
                     >
-                        Connect with WhatsApp
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        {step < 3 ? (
+                            <>Next Step →</>
+                        ) : (
+                            <>
+                                Connect with WhatsApp
+                                <ExternalLink className="w-3.5 h-3.5" />
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
@@ -586,10 +774,10 @@ function InboxSettings({ inbox }: { inbox: Inbox }) {
                         <div className="flex items-center gap-2 mt-0.5">
                             <span className="text-[12px] text-[#6B7280]">{meta.label}</span>
                             <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${inbox.status === 'active'
-                                    ? 'bg-green-50 text-green-600 border border-green-200'
-                                    : inbox.status === 'pending'
-                                        ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
-                                        : 'bg-gray-100 text-gray-600 border border-gray-200'
+                                ? 'bg-green-50 text-green-600 border border-green-200'
+                                : inbox.status === 'pending'
+                                    ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                                    : 'bg-gray-100 text-gray-600 border border-gray-200'
                                 }`}>
                                 {inbox.status}
                             </span>
@@ -835,8 +1023,8 @@ export default function ConnectedPlatformsPage() {
                                         key={inbox.id}
                                         onClick={() => { setSelectedInboxId(inbox.id); setSetupStep(null); }}
                                         className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all ${isActive
-                                                ? 'bg-[#EEF2FF] border border-[#C7D2FE]'
-                                                : 'hover:bg-[#F9FAFB] border border-transparent'
+                                            ? 'bg-[#EEF2FF] border border-[#C7D2FE]'
+                                            : 'hover:bg-[#F9FAFB] border border-transparent'
                                             }`}
                                     >
                                         <PlatformIcon type={inbox.platform} size={36} />
