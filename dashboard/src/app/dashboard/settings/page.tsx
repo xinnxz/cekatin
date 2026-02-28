@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     Settings, Users, GitBranch, Ticket, MessageSquare, Zap, Tag,
     Star, Clock, Code, Bot, Timer, Shield, Search, Plus, Trash2,
@@ -602,6 +603,7 @@ const sectionComponents: Record<SettingsSection, React.FC> = {
 export default function SettingsPage() {
     const [active, setActive] = useState<SettingsSection>('general');
     const [search, setSearch] = useState('');
+    const router = useRouter();
 
     const ActiveComponent = sectionComponents[active];
     const filteredItems = menuItems.filter(m => m.label.toLowerCase().includes(search.toLowerCase()));
@@ -614,7 +616,7 @@ export default function SettingsPage() {
                 <div className="px-4 pt-5 pb-3 border-b border-[#E5E7EB]">
                     <div className="flex items-center justify-between mb-3">
                         <h2 className="text-[17px] font-bold text-foreground">Settings</h2>
-                        <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F4F6]">
+                        <button onClick={() => router.back()} className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F4F6] transition-colors" title="Close Settings">
                             <X className="w-4 h-4 text-[#6B7280]" />
                         </button>
                     </div>
@@ -643,8 +645,8 @@ export default function SettingsPage() {
                         return (
                             <button key={item.key} onClick={() => setActive(item.key)}
                                 className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium transition-colors ${active === item.key
-                                        ? 'text-primary bg-primary/5 border-l-3 border-primary'
-                                        : 'text-[#6B7280] hover:text-foreground hover:bg-[#F9FAFB]'
+                                    ? 'text-primary bg-primary/5 border-l-3 border-primary'
+                                    : 'text-[#6B7280] hover:text-foreground hover:bg-[#F9FAFB]'
                                     }`}>
                                 <Icon className="w-4 h-4 flex-shrink-0" />
                                 <span className="truncate">{item.label}</span>

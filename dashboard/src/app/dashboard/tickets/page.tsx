@@ -73,24 +73,31 @@ export default function TicketsPage() {
             {/* ── Toolbar ── */}
             <div className="flex items-center gap-2 px-5 py-3 bg-white border-b border-[#E5E7EB] flex-shrink-0">
 
-                {/* View Toggle */}
-                <div className="flex items-center border border-[#E5E7EB] rounded-lg overflow-hidden">
+                {/* View Toggle — Segmented Control (cekat.ai style)
+                   Penjelasan: Menggunakan pill-style segmented control
+                   - Background abu-abu sebagai container
+                   - Active tab: latar putih + shadow → efek slide
+                   - Mirip iOS/macOS segmented control */}
+                <div className="flex items-center bg-[#F3F4F6] rounded-lg p-0.5">
                     <button
                         onClick={() => setView('kanban')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium transition-colors ${view === 'kanban' ? 'bg-[#F3F4F6] text-foreground' : 'text-[#6B7280] hover:bg-[#F9FAFB]'
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-md transition-all duration-200 ${view === 'kanban'
+                            ? 'bg-white text-foreground shadow-sm'
+                            : 'text-[#6B7280] hover:text-foreground'
                             }`}
                     >
                         <LayoutGrid className="w-3.5 h-3.5" />
-                        Kanban View
+                        Kanban
                     </button>
-                    <div className="w-px h-6 bg-[#E5E7EB]" />
                     <button
                         onClick={() => setView('list')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium transition-colors ${view === 'list' ? 'bg-[#F3F4F6] text-foreground' : 'text-[#6B7280] hover:bg-[#F9FAFB]'
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-md transition-all duration-200 ${view === 'list'
+                            ? 'bg-white text-foreground shadow-sm'
+                            : 'text-[#6B7280] hover:text-foreground'
                             }`}
                     >
                         <List className="w-3.5 h-3.5" />
-                        List View
+                        List
                     </button>
                 </div>
 

@@ -607,23 +607,28 @@ export default function AIAgentsPage() {
                                 .filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()))
                                 .map(agent => (
                                     <div key={agent.id}
-                                        className="bg-white border border-[#E5E7EB] rounded-2xl p-5 text-center hover:shadow-lg transition-shadow cursor-pointer group">
-                                        <h3 className="text-[15px] font-bold text-foreground mb-3">{agent.name}</h3>
-                                        <div className="w-14 h-14 rounded-full bg-[#6B7280] flex items-center justify-center mx-auto mb-3">
-                                            <span className="text-white text-[16px] font-bold">{agent.initials}</span>
-                                        </div>
-                                        <p className="text-[12px] text-[#9CA3AF] mb-4">{agent.description || '-'}</p>
-                                        <div className="flex items-center justify-center gap-2">
-                                            <button onClick={() => openAgent(agent)}
-                                                className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-medium text-foreground border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6]">
-                                                <Settings className="w-3 h-3" /> Settings
-                                            </button>
-                                            <button className="w-8 h-8 flex items-center justify-center border border-primary rounded-lg text-primary hover:bg-[#EEF2FF]">
-                                                <Copy className="w-3.5 h-3.5" />
-                                            </button>
-                                            <button className="w-8 h-8 flex items-center justify-center border border-red-200 rounded-lg text-red-500 hover:bg-red-50">
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
+                                        className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+                                        {/* Accent gradient bar */}
+                                        <div className="h-1.5 bg-gradient-to-r from-primary via-[#6366F1] to-[#8B5CF6]" />
+                                        <div className="p-5 text-center">
+                                            <h3 className="text-[15px] font-bold text-foreground mb-3">{agent.name}</h3>
+                                            {/* Robot/Bot Avatar — cekat.ai style */}
+                                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 via-[#6366F1]/10 to-[#8B5CF6]/10 flex items-center justify-center mx-auto mb-3 border border-primary/20">
+                                                <Bot className="w-7 h-7 text-primary" />
+                                            </div>
+                                            <p className="text-[12px] text-[#9CA3AF] mb-4">{agent.description || '-'}</p>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button onClick={() => openAgent(agent)}
+                                                    className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-medium text-foreground border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6]">
+                                                    <Settings className="w-3 h-3" /> Settings
+                                                </button>
+                                                <button className="w-8 h-8 flex items-center justify-center border border-primary rounded-lg text-primary hover:bg-[#EEF2FF]">
+                                                    <Copy className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button className="w-8 h-8 flex items-center justify-center border border-red-200 rounded-lg text-red-500 hover:bg-red-50">
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
