@@ -42,6 +42,8 @@ interface ChatMessage {
     senderName: string;
     text: string;
     time: string;
+    status?: 'sent' | 'delivered' | 'read'; // for read receipts
+    waMessageId?: string;
 }
 
 interface Conversation {
@@ -404,6 +406,11 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
                 </div>
                 <p className={`text-[10.5px] mt-0.5 ${isCustomer ? 'text-left' : 'text-right'} text-[#9CA3AF]`}>
                     {msg.senderName} · {msg.time}
+                    {!isCustomer && msg.status && (
+                        <span className={`ml-1 ${msg.status === 'read' ? 'text-[#3B82F6]' : ''}`}>
+                            {msg.status === 'sent' ? '✓' : msg.status === 'delivered' ? '✓✓' : msg.status === 'read' ? '✓✓' : ''}
+                        </span>
+                    )}
                 </p>
             </div>
         </div>

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -158,4 +159,76 @@ func (h *ContactHandler) UpdateContact(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"contact": contact})
+}
+
+// GetContactConversations — GET /api/contacts/:id/conversations
+// Customer history: semua conversation untuk contact ini
+func (h *ContactHandler) GetContactConversations(c *gin.Context) {
+	id := c.Param("id")
+	ctx := context.Background()
+
+	var phone string
+	if err := h.DB.QueryRow(ctx, `SELECT phone FROM contacts WHERE id = $1`, id).Scan(&phone); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Contact not found"})
+		return
+	}
+
+	rows, err := h.DB.Query(ctx,
+		`SELECT id, platform, status, last_message, last_message_at, created_at
+		 FROM conversations WHERE customer_phone = $1 ORDER BY created_at DESC`, phone)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query"})
+		return
+	}
+	defer rows.Close()
+
+	type ConvSummary struct {
+		ID            string     `json:"id"`
+		Platform      string     `json:"platform"`
+		Status        string     `json:"status"`
+		LastMessage   string     `json:"last_message"`
+		LastMessageAt *time.Time `json:"last_message_at"`
+		CreatedAt     time.Time  `json:"created_at"`
+	}
+
+	var convs []ConvSummary
+	for rows.Next() {
+		var cs ConvSummary
+		if err := rows.Scan(&cs.ID, &cs.Platform, &cs.Status, &cs.LastMessage, &cs.LastMessageAt, &cs.CreatedAt); err != nil {
+			continue
+		}
+		convs = append(convs, cs)
+	}
+	if convs == nil {
+		convs = []ConvSummary{}
+	}
+	c.JSON(http.StatusOK, gin.H{"conversations": convs, "total": len(convs)})
+}
+
+// ExportContactsCSV — GET /api/contacts/export
+// Download semua contacts sebagai CSV
+func (h *ContactHandler) ExportContactsCSV(c *gin.Context) {
+	rows, err := h.DB.Query(context.Background(),
+		`SELECT name, email, phone, notes, tags, created_at FROM contacts ORDER BY created_at DESC`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query"})
+		return
+	}
+	defer rows.Close()
+
+	c.Header("Content-Type", "text/csv")
+	c.Header("Content-Disposition", "attachment; filename=contacts.csv")
+	c.Writer.WriteString("Name,Email,Phone,Notes,Tags,Created At\n")
+
+	for rows.Next() {
+		var name, email, phone, notes, tags string
+		var createdAt time.Time
+		if err := rows.Scan(&name, &email, &phone, &notes, &tags, &createdAt); err != nil {
+			continue
+		}
+		// Escape commas in fields
+		line := fmt.Sprintf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+			name, email, phone, notes, tags, createdAt.Format("2006-01-02 15:04:05"))
+		c.Writer.WriteString(line)
+	}
 }

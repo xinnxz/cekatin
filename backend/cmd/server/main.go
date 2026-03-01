@@ -128,10 +128,12 @@ func main() {
 
 		// Contacts
 		api.GET("/contacts", contactHandler.ListContacts)
+		api.GET("/contacts/export", contactHandler.ExportContactsCSV)
 		api.GET("/contacts/:id", contactHandler.GetContact)
 		api.GET("/contacts/phone/:phone", contactHandler.GetContactByPhone)
 		api.POST("/contacts", contactHandler.CreateContact)
 		api.PATCH("/contacts/:id", contactHandler.UpdateContact)
+		api.GET("/contacts/:id/conversations", contactHandler.GetContactConversations)
 	}
 
 	// WebSocket endpoint — dashboard connects here for real-time updates

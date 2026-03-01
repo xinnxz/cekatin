@@ -309,6 +309,15 @@ func (h *WebhookHandler) handleStatusUpdate(status webhookStatus) {
 		return
 	}
 
+	// Broadcast status update ke dashboard via WebSocket
+	h.Hub.BroadcastMessage(&models.WebSocketMessage{
+		Type: "status_update",
+		Message: &models.Message{
+			WAMessageID: status.ID,
+			Status:      status.Status,
+		},
+	})
+
 	log.Printf("📋 Status update: %s → %s", status.ID, status.Status)
 }
 
