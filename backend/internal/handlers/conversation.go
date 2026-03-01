@@ -26,13 +26,13 @@ type ConversationHandler struct {
 }
 
 // conversationColumns — kolom SELECT untuk conversations (DRY principle)
-const conversationColumns = `id, inbox_id, customer_phone, customer_name, platform, 
+const conversationColumns = `id, inbox_id, contact_id, customer_phone, customer_name, platform, 
 	status, ai_enabled, assigned_agent, last_message, last_message_at, created_at`
 
 // scanConversation — scan satu row conversation ke struct
 func scanConversation(scan func(dest ...any) error) (models.Conversation, error) {
 	var conv models.Conversation
-	err := scan(&conv.ID, &conv.InboxID, &conv.CustomerPhone, &conv.CustomerName,
+	err := scan(&conv.ID, &conv.InboxID, &conv.ContactID, &conv.CustomerPhone, &conv.CustomerName,
 		&conv.Platform, &conv.Status, &conv.AIEnabled, &conv.AssignedAgent,
 		&conv.LastMessage, &conv.LastMessageAt, &conv.CreatedAt)
 	return conv, err

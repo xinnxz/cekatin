@@ -72,10 +72,24 @@ func Migrate(pool *pgxpool.Pool) error {
 			created_at    TIMESTAMPTZ DEFAULT NOW()
 		)`,
 
+		// Tabel contacts — profil customer
+		`CREATE TABLE IF NOT EXISTS contacts (
+			id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			name        VARCHAR(255) DEFAULT '',
+			email       VARCHAR(255) DEFAULT '',
+			phone       VARCHAR(20) NOT NULL UNIQUE,
+			notes       TEXT DEFAULT '',
+			tags        TEXT DEFAULT '',
+			avatar_url  VARCHAR(500) DEFAULT '',
+			created_at  TIMESTAMPTZ DEFAULT NOW(),
+			updated_at  TIMESTAMPTZ DEFAULT NOW()
+		)`,
+
 		// Tabel conversations — satu thread per customer per inbox
 		`CREATE TABLE IF NOT EXISTS conversations (
 			id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			inbox_id        UUID REFERENCES inboxes(id) ON DELETE CASCADE,
+			contact_id      UUID REFERENCES contacts(id) ON DELETE SET NULL,
 			customer_phone  VARCHAR(20) NOT NULL,
 			customer_name   VARCHAR(255) DEFAULT '',
 			platform        VARCHAR(50) NOT NULL,
@@ -117,6 +131,14 @@ func Migrate(pool *pgxpool.Pool) error {
 			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
 				WHERE table_name='conversations' AND column_name='assigned_agent') THEN
 				ALTER TABLE conversations ADD COLUMN assigned_agent VARCHAR(100) DEFAULT '';
+			END IF;
+		END $$`,
+
+		// Migration: tambah contact_id ke conversations
+		`DO $$ BEGIN
+			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+				WHERE table_name='conversations' AND column_name='contact_id') THEN
+				ALTER TABLE conversations ADD COLUMN contact_id UUID REFERENCES contacts(id) ON DELETE SET NULL;
 			END IF;
 		END $$`,
 	}

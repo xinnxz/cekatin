@@ -36,10 +36,10 @@ type Inbox struct {
 }
 
 // Conversation merepresentasikan satu thread percakapan dengan customer
-// Satu customer + satu inbox = satu conversation
 type Conversation struct {
 	ID            string     `json:"id" db:"id"`
 	InboxID       string     `json:"inbox_id" db:"inbox_id"`
+	ContactID     *string    `json:"contact_id" db:"contact_id"`
 	CustomerPhone string     `json:"customer_phone" db:"customer_phone"`
 	CustomerName  string     `json:"customer_name" db:"customer_name"`
 	Platform      string     `json:"platform" db:"platform"`
@@ -49,6 +49,19 @@ type Conversation struct {
 	LastMessage   string     `json:"last_message" db:"last_message"`
 	LastMessageAt *time.Time `json:"last_message_at" db:"last_message_at"`
 	CreatedAt     time.Time  `json:"created_at" db:"created_at"`
+}
+
+// Contact merepresentasikan profil customer
+type Contact struct {
+	ID        string    `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
+	Email     string    `json:"email" db:"email"`
+	Phone     string    `json:"phone" db:"phone"`
+	Notes     string    `json:"notes" db:"notes"`
+	Tags      string    `json:"tags" db:"tags"` // comma-separated: "VIP,Order"
+	AvatarURL string    `json:"avatar_url" db:"avatar_url"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // Message merepresentasikan satu pesan dalam conversation

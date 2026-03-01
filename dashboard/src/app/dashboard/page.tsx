@@ -940,8 +940,8 @@ export default function ChatPage() {
                                         } catch { /* silent */ }
                                     }}
                                     className={`px-2.5 py-1.5 text-[11px] font-semibold rounded-lg flex items-center gap-1.5 transition-all ${(selectedConv.aiEnabled ?? true)
-                                            ? 'bg-[#DBEAFE] text-[#2563EB] hover:bg-[#BFDBFE]'
-                                            : 'bg-[#F3F4F6] text-[#9CA3AF] hover:bg-[#E5E7EB]'
+                                        ? 'bg-[#DBEAFE] text-[#2563EB] hover:bg-[#BFDBFE]'
+                                        : 'bg-[#F3F4F6] text-[#9CA3AF] hover:bg-[#E5E7EB]'
                                         }`}
                                     title={(selectedConv.aiEnabled ?? true) ? 'Cika AI aktif — klik untuk nonaktifkan' : 'Cika AI nonaktif — klik untuk aktifkan'}
                                 >
@@ -949,13 +949,60 @@ export default function ChatPage() {
                                     <span>{(selectedConv.aiEnabled ?? true) ? 'Cika ON' : 'Cika OFF'}</span>
                                 </button>
                                 {selectedConv.status === 'unassigned' && (
-                                    <button className="px-3 py-1.5 text-[12px] font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover transition-colors">
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/conversations/${selectedConv.id}`, {
+                                                    method: 'PATCH',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ status: 'open' }),
+                                                });
+                                                setConversations(prev => prev.map(c =>
+                                                    c.id === selectedConv.id ? { ...c, status: 'assigned' as ConvStatus } : c
+                                                ));
+                                            } catch { /* silent */ }
+                                        }}
+                                        className="px-3 py-1.5 text-[12px] font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover transition-colors"
+                                    >
                                         Takeover
                                     </button>
                                 )}
                                 {selectedConv.status === 'assigned' && (
-                                    <button className="px-3 py-1.5 text-[12px] font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors">
-                                        Resolve
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/conversations/${selectedConv.id}`, {
+                                                    method: 'PATCH',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ status: 'resolved' }),
+                                                });
+                                                setConversations(prev => prev.map(c =>
+                                                    c.id === selectedConv.id ? { ...c, status: 'resolved' as ConvStatus } : c
+                                                ));
+                                            } catch { /* silent */ }
+                                        }}
+                                        className="px-3 py-1.5 text-[12px] font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors"
+                                    >
+                                        ✓ Resolve
+                                    </button>
+                                )}
+                                {selectedConv.status === 'resolved' && (
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/conversations/${selectedConv.id}`, {
+                                                    method: 'PATCH',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ status: 'open' }),
+                                                });
+                                                setConversations(prev => prev.map(c =>
+                                                    c.id === selectedConv.id ? { ...c, status: 'assigned' as ConvStatus } : c
+                                                ));
+                                            } catch { /* silent */ }
+                                        }}
+                                        className="px-3 py-1.5 text-[12px] font-semibold text-[#6B7280] bg-[#F3F4F6] rounded-lg hover:bg-[#E5E7EB] transition-colors"
+                                    >
+                                        ↩ Reopen
                                     </button>
                                 )}
                                 <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F3F4F6] text-[#6B7280]">

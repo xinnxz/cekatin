@@ -85,6 +85,7 @@ func main() {
 
 	inboxHandler := &handlers.InboxHandler{DB: db}
 	convHandler := &handlers.ConversationHandler{DB: db}
+	contactHandler := &handlers.ContactHandler{DB: db}
 
 	// ─── 5. Setup Gin Router ───
 	router := gin.Default()
@@ -124,6 +125,13 @@ func main() {
 		// Messages
 		api.GET("/conversations/:id/messages", messageHandler.GetMessages)
 		api.POST("/messages/send", messageHandler.SendMessage)
+
+		// Contacts
+		api.GET("/contacts", contactHandler.ListContacts)
+		api.GET("/contacts/:id", contactHandler.GetContact)
+		api.GET("/contacts/phone/:phone", contactHandler.GetContactByPhone)
+		api.POST("/contacts", contactHandler.CreateContact)
+		api.PATCH("/contacts/:id", contactHandler.UpdateContact)
 	}
 
 	// WebSocket endpoint — dashboard connects here for real-time updates

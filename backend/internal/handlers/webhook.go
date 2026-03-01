@@ -127,6 +127,18 @@ func (h *WebhookHandler) processWebhookAsync(body webhookBody) {
 func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName string) {
 	ctx := context.Background()
 
+	// 0. Auto-create/update contact berdasarkan nomor HP
+	var contactID string
+	_ = h.DB.QueryRow(ctx,
+		`INSERT INTO contacts (name, phone)
+		 VALUES ($1, $2)
+		 ON CONFLICT (phone) DO UPDATE SET
+		   name = COALESCE(NULLIF($1, ''), contacts.name),
+		   updated_at = NOW()
+		 RETURNING id`,
+		customerName, msg.From,
+	).Scan(&contactID)
+
 	// 1. Cari conversation yang sudah ada untuk customer ini
 	var convID string
 	var aiEnabled bool
@@ -136,21 +148,27 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 		msg.From,
 	).Scan(&convID, &aiEnabled)
 
-	// 2. Jika belum ada → buat conversation baru
+	// 2. Jika belum ada → buat conversation baru (link contact_id)
 	if err != nil {
 		err = h.DB.QueryRow(ctx,
-			`INSERT INTO conversations (customer_phone, customer_name, platform, inbox_id, ai_enabled)
-			 VALUES ($1, $2, 'whatsapp', (SELECT id FROM inboxes WHERE platform='whatsapp' LIMIT 1), true)
+			`INSERT INTO conversations (customer_phone, customer_name, platform, inbox_id, ai_enabled, contact_id)
+			 VALUES ($1, $2, 'whatsapp', (SELECT id FROM inboxes WHERE platform='whatsapp' LIMIT 1), true,
+			   NULLIF($3, '')::uuid)
 			 RETURNING id`,
-			msg.From, customerName,
+			msg.From, customerName, contactID,
 		).Scan(&convID)
 
 		if err != nil {
 			log.Printf("❌ Gagal buat conversation: %v", err)
 			return
 		}
-		aiEnabled = true // Conversation baru → AI aktif default
-		log.Printf("📝 Conversation baru dibuat: %s", convID)
+		aiEnabled = true
+		log.Printf("📝 Conversation baru dibuat: %s (contact: %s)", convID, contactID)
+	} else if contactID != "" {
+		// Link contact_id ke existing conversation (jika belum di-link)
+		_, _ = h.DB.Exec(ctx,
+			`UPDATE conversations SET contact_id = $1 WHERE id = $2 AND contact_id IS NULL`,
+			contactID, convID)
 	}
 
 	// 3. Extract isi pesan (text)
