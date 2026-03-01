@@ -80,6 +80,8 @@ export interface Conversation {
     customer_name: string;
     platform: string;
     status: string;
+    ai_enabled: boolean;
+    assigned_agent: string;
     last_message: string;
     last_message_at: string | null;
     created_at: string;

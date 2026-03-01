@@ -60,6 +60,7 @@ interface Conversation {
     pipelineStatus: string;
     createdAt: string;
     assignedAt: string;
+    aiEnabled?: boolean;
 }
 
 // ──────────────────────────────────────────────────
@@ -573,6 +574,7 @@ export default function ChatPage() {
                     pipelineStatus: 'New Lead',
                     createdAt: new Date(c.created_at).toLocaleString('id-ID'),
                     assignedAt: '-',
+                    aiEnabled: c.ai_enabled !== false,
                 })));
                 setBackendConnected(true);
             } else {
@@ -922,6 +924,30 @@ export default function ChatPage() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-1.5">
+                                {/* AI Toggle Button */}
+                                <button
+                                    onClick={async () => {
+                                        const newVal = !(selectedConv.aiEnabled ?? true);
+                                        try {
+                                            await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/conversations/${selectedConv.id}`, {
+                                                method: 'PATCH',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ ai_enabled: newVal }),
+                                            });
+                                            setConversations(prev => prev.map(c =>
+                                                c.id === selectedConv.id ? { ...c, aiEnabled: newVal } : c
+                                            ));
+                                        } catch { /* silent */ }
+                                    }}
+                                    className={`px-2.5 py-1.5 text-[11px] font-semibold rounded-lg flex items-center gap-1.5 transition-all ${(selectedConv.aiEnabled ?? true)
+                                            ? 'bg-[#DBEAFE] text-[#2563EB] hover:bg-[#BFDBFE]'
+                                            : 'bg-[#F3F4F6] text-[#9CA3AF] hover:bg-[#E5E7EB]'
+                                        }`}
+                                    title={(selectedConv.aiEnabled ?? true) ? 'Cika AI aktif — klik untuk nonaktifkan' : 'Cika AI nonaktif — klik untuk aktifkan'}
+                                >
+                                    <span>{(selectedConv.aiEnabled ?? true) ? '🤖' : '⏸️'}</span>
+                                    <span>{(selectedConv.aiEnabled ?? true) ? 'Cika ON' : 'Cika OFF'}</span>
+                                </button>
                                 {selectedConv.status === 'unassigned' && (
                                     <button className="px-3 py-1.5 text-[12px] font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover transition-colors">
                                         Takeover
