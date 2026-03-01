@@ -80,6 +80,8 @@ func Migrate(pool *pgxpool.Pool) error {
 			customer_name   VARCHAR(255) DEFAULT '',
 			platform        VARCHAR(50) NOT NULL,
 			status          VARCHAR(20) DEFAULT 'open',
+			ai_enabled      BOOLEAN DEFAULT true,
+			assigned_agent  VARCHAR(100) DEFAULT '',
 			last_message    TEXT DEFAULT '',
 			last_message_at TIMESTAMPTZ,
 			created_at      TIMESTAMPTZ DEFAULT NOW()
@@ -105,6 +107,18 @@ func Migrate(pool *pgxpool.Pool) error {
 
 		// Index untuk cari conversation berdasarkan customer phone
 		`CREATE INDEX IF NOT EXISTS idx_conversations_phone ON conversations(customer_phone)`,
+
+		// Migration: tambah kolom ai_enabled jika belum ada (untuk DB lama)
+		`DO $$ BEGIN
+			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+				WHERE table_name='conversations' AND column_name='ai_enabled') THEN
+				ALTER TABLE conversations ADD COLUMN ai_enabled BOOLEAN DEFAULT true;
+			END IF;
+			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+				WHERE table_name='conversations' AND column_name='assigned_agent') THEN
+				ALTER TABLE conversations ADD COLUMN assigned_agent VARCHAR(100) DEFAULT '';
+			END IF;
+		END $$`,
 	}
 
 	for _, q := range queries {

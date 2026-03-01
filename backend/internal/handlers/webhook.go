@@ -128,17 +128,18 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 
 	// 1. Cari conversation yang sudah ada untuk customer ini
 	var convID string
+	var aiEnabled bool
 	err := h.DB.QueryRow(ctx,
-		`SELECT id FROM conversations WHERE customer_phone = $1 AND status = 'open' 
+		`SELECT id, ai_enabled FROM conversations WHERE customer_phone = $1 AND status = 'open' 
 		 ORDER BY created_at DESC LIMIT 1`,
 		msg.From,
-	).Scan(&convID)
+	).Scan(&convID, &aiEnabled)
 
 	// 2. Jika belum ada → buat conversation baru
 	if err != nil {
 		err = h.DB.QueryRow(ctx,
-			`INSERT INTO conversations (customer_phone, customer_name, platform, inbox_id)
-			 VALUES ($1, $2, 'whatsapp', (SELECT id FROM inboxes WHERE platform='whatsapp' LIMIT 1))
+			`INSERT INTO conversations (customer_phone, customer_name, platform, inbox_id, ai_enabled)
+			 VALUES ($1, $2, 'whatsapp', (SELECT id FROM inboxes WHERE platform='whatsapp' LIMIT 1), true)
 			 RETURNING id`,
 			msg.From, customerName,
 		).Scan(&convID)
@@ -147,6 +148,7 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 			log.Printf("❌ Gagal buat conversation: %v", err)
 			return
 		}
+		aiEnabled = true // Conversation baru → AI aktif default
 		log.Printf("📝 Conversation baru dibuat: %s", convID)
 	}
 
@@ -202,9 +204,13 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 	})
 
 	// 7. 🤖 Cika AI Auto-Reply
-	//    Jika AI aktif, generate respons pintar dan kirim balik ke WhatsApp
-	if h.AI != nil && h.AI.IsEnabled() && content != "" {
-		go h.handleAIReply(ctx, convID, msg.From, customerName, content)
+	if h.AI != nil && h.AI.IsEnabled() && content != "" && aiEnabled {
+		// Cek apakah customer minta bicara dengan manusia (handoff)
+		if isHandoffRequest(content) {
+			go h.handleHandoff(ctx, convID, msg.From, customerName)
+		} else {
+			go h.handleAIReply(ctx, convID, msg.From, customerName, content)
+		}
 	}
 }
 
