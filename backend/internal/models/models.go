@@ -38,14 +38,14 @@ type Inbox struct {
 // Conversation merepresentasikan satu thread percakapan dengan customer
 type Conversation struct {
 	ID            string     `json:"id" db:"id"`
-	InboxID       string     `json:"inbox_id" db:"inbox_id"`
+	InboxID       *string    `json:"inbox_id" db:"inbox_id"`
 	ContactID     *string    `json:"contact_id" db:"contact_id"`
 	CustomerPhone string     `json:"customer_phone" db:"customer_phone"`
 	CustomerName  string     `json:"customer_name" db:"customer_name"`
 	Platform      string     `json:"platform" db:"platform"`
-	Status        string     `json:"status" db:"status"`         // open, resolved, pending
-	AIEnabled     bool       `json:"ai_enabled" db:"ai_enabled"` // toggle Cika AI on/off
-	AssignedAgent string     `json:"assigned_agent" db:"assigned_agent"`
+	Status        string     `json:"status" db:"status"`
+	AIEnabled     bool       `json:"ai_enabled" db:"ai_enabled"`
+	AssignedAgent *string    `json:"assigned_agent" db:"assigned_agent"`
 	LastMessage   string     `json:"last_message" db:"last_message"`
 	LastMessageAt *time.Time `json:"last_message_at" db:"last_message_at"`
 	CreatedAt     time.Time  `json:"created_at" db:"created_at"`
@@ -70,9 +70,12 @@ type Message struct {
 	ConversationID string    `json:"conversation_id" db:"conversation_id"`
 	Direction      string    `json:"direction" db:"direction"` // inbound (masuk), outbound (keluar)
 	Content        string    `json:"content" db:"content"`
-	MessageType    string    `json:"message_type" db:"message_type"`   // text, image, document
-	WAMessageID    string    `json:"wa_message_id" db:"wa_message_id"` // ID pesan dari WhatsApp
-	Status         string    `json:"status" db:"status"`               // sent, delivered, read, failed
+	MessageType    string    `json:"message_type" db:"message_type"`       // text, image, video, document, audio, sticker
+	WAMessageID    string    `json:"wa_message_id" db:"wa_message_id"`     // ID pesan dari WhatsApp
+	Status         string    `json:"status" db:"status"`                   // sent, delivered, read, failed
+	MediaURL       string    `json:"media_url" db:"media_url"`             // URL media (gambar, video, dokumen, audio)
+	MediaMimeType  string    `json:"media_mime_type" db:"media_mime_type"` // MIME type (image/jpeg, video/mp4, dll)
+	MediaFilename  string    `json:"media_filename" db:"media_filename"`   // Nama file asli
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -81,8 +84,10 @@ type Message struct {
 // SendMessageRequest — body JSON saat kirim pesan dari dashboard
 type SendMessageRequest struct {
 	ConversationID string `json:"conversation_id" binding:"required"`
-	Content        string `json:"content" binding:"required"`
-	MessageType    string `json:"message_type"` // default "text"
+	Content        string `json:"content"`
+	MessageType    string `json:"message_type"`   // text, image, video, document, audio
+	MediaURL       string `json:"media_url"`      // URL media untuk dikirim
+	MediaFilename  string `json:"media_filename"` // Nama file (untuk document)
 }
 
 // CreateInboxRequest — body JSON saat tambah inbox baru

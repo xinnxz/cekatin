@@ -171,20 +171,78 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 			contactID, convID)
 	}
 
-	// 3. Extract isi pesan (text)
+	// 3. Extract isi pesan — support untuk semua jenis media
 	content := ""
 	messageType := msg.Type
-	if msg.Text != nil {
-		content = msg.Text.Body
+	var mediaURL, mediaMimeType, mediaFilename string
+
+	switch msg.Type {
+	case "text":
+		if msg.Text != nil {
+			content = msg.Text.Body
+		}
+	case "image":
+		if msg.Image != nil {
+			content = msg.Image.Caption
+			if content == "" {
+				content = "📷 Gambar"
+			}
+			mediaMimeType = msg.Image.MimeType
+			// Download media URL dari WhatsApp
+			if h.WA != nil {
+				mediaURL, _ = h.WA.GetMediaURL(msg.Image.ID)
+			}
+		}
+	case "video":
+		if msg.Video != nil {
+			content = msg.Video.Caption
+			if content == "" {
+				content = "🎥 Video"
+			}
+			mediaMimeType = msg.Video.MimeType
+			if h.WA != nil {
+				mediaURL, _ = h.WA.GetMediaURL(msg.Video.ID)
+			}
+		}
+	case "audio":
+		if msg.Audio != nil {
+			content = "🎵 Voice Note"
+			mediaMimeType = msg.Audio.MimeType
+			if h.WA != nil {
+				mediaURL, _ = h.WA.GetMediaURL(msg.Audio.ID)
+			}
+		}
+	case "document":
+		if msg.Document != nil {
+			mediaFilename = msg.Document.Filename
+			content = msg.Document.Caption
+			if content == "" {
+				content = "📄 " + mediaFilename
+			}
+			mediaMimeType = msg.Document.MimeType
+			if h.WA != nil {
+				mediaURL, _ = h.WA.GetMediaURL(msg.Document.ID)
+			}
+		}
+	case "sticker":
+		if msg.Sticker != nil {
+			content = "🏷️ Sticker"
+			mediaMimeType = msg.Sticker.MimeType
+			if h.WA != nil {
+				mediaURL, _ = h.WA.GetMediaURL(msg.Sticker.ID)
+			}
+		}
+	default:
+		content = "[" + msg.Type + "]"
 	}
 
-	// 4. Simpan pesan ke database
+	// 4. Simpan pesan ke database (termasuk media fields)
 	var messageID string
 	err = h.DB.QueryRow(ctx,
-		`INSERT INTO messages (conversation_id, direction, content, message_type, wa_message_id)
-		 VALUES ($1, 'inbound', $2, $3, $4)
+		`INSERT INTO messages (conversation_id, direction, content, message_type, wa_message_id, media_url, media_mime_type, media_filename)
+		 VALUES ($1, 'inbound', $2, $3, $4, $5, $6, $7)
 		 RETURNING id`,
-		convID, content, messageType, msg.ID,
+		convID, content, messageType, msg.ID, mediaURL, mediaMimeType, mediaFilename,
 	).Scan(&messageID)
 
 	if err != nil {
@@ -218,6 +276,9 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 			Content:        content,
 			MessageType:    messageType,
 			WAMessageID:    msg.ID,
+			MediaURL:       mediaURL,
+			MediaMimeType:  mediaMimeType,
+			MediaFilename:  mediaFilename,
 			CreatedAt:      now,
 		},
 	})
@@ -425,14 +486,36 @@ type webhookValue struct {
 }
 
 type webhookMessage struct {
-	From string          `json:"from"`
-	ID   string          `json:"id"`
-	Type string          `json:"type"`
-	Text *webhookMsgText `json:"text"`
+	From     string              `json:"from"`
+	ID       string              `json:"id"`
+	Type     string              `json:"type"`
+	Text     *webhookMsgText     `json:"text"`
+	Image    *webhookMsgMedia    `json:"image"`
+	Video    *webhookMsgMedia    `json:"video"`
+	Audio    *webhookMsgMedia    `json:"audio"`
+	Document *webhookMsgDocument `json:"document"`
+	Sticker  *webhookMsgMedia    `json:"sticker"`
 }
 
 type webhookMsgText struct {
 	Body string `json:"body"`
+}
+
+// webhookMsgMedia — format media dari WA webhook (image, video, audio, sticker)
+type webhookMsgMedia struct {
+	ID       string `json:"id"` // Media ID untuk download via Graph API
+	MimeType string `json:"mime_type"`
+	Caption  string `json:"caption"` // Caption (opsional, hanya image/video)
+	SHA256   string `json:"sha256"`
+}
+
+// webhookMsgDocument — format dokumen dari WA webhook (PDF, DOCX, dll)
+type webhookMsgDocument struct {
+	ID       string `json:"id"`
+	MimeType string `json:"mime_type"`
+	Caption  string `json:"caption"`
+	Filename string `json:"filename"` // Nama file asli
+	SHA256   string `json:"sha256"`
 }
 
 type webhookContact struct {

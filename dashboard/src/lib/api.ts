@@ -105,9 +105,12 @@ export interface ChatMessage {
     conversation_id: string;
     direction: 'inbound' | 'outbound';
     content: string;
-    message_type: string;
+    message_type: string;       // text, image, video, document, audio, sticker
     wa_message_id: string;
     status: string;
+    media_url: string;          // URL media (gambar, video, dokumen, audio)
+    media_mime_type: string;    // MIME type (image/jpeg, video/mp4, dll)
+    media_filename: string;     // Nama file asli (untuk dokumen)
     created_at: string;
 }
 

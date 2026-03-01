@@ -44,6 +44,10 @@ interface ChatMessage {
     time: string;
     status?: 'sent' | 'delivered' | 'read'; // for read receipts
     waMessageId?: string;
+    messageType?: string;       // text, image, video, document, audio, sticker
+    mediaUrl?: string;          // URL media (untuk render gambar/video/dokumen/audio)
+    mediaMimeType?: string;     // MIME type
+    mediaFilename?: string;     // Nama file asli
 }
 
 interface Conversation {
@@ -398,11 +402,87 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
         );
     }
 
+    // Render konten media berdasarkan messageType
+    const renderMedia = () => {
+        if (!msg.mediaUrl || !msg.messageType || msg.messageType === 'text') return null;
+
+        switch (msg.messageType) {
+            case 'image':
+                return (
+                    <div className="mb-1">
+                        <img
+                            src={msg.mediaUrl}
+                            alt={msg.text || 'Image'}
+                            className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                            style={{ maxHeight: '280px', objectFit: 'cover' }}
+                            onClick={() => window.open(msg.mediaUrl, '_blank')}
+                        />
+                    </div>
+                );
+            case 'video':
+                return (
+                    <div className="mb-1">
+                        <video
+                            src={msg.mediaUrl}
+                            controls
+                            className="max-w-full rounded-lg"
+                            style={{ maxHeight: '280px' }}
+                        />
+                    </div>
+                );
+            case 'audio':
+                return (
+                    <div className="mb-1">
+                        <audio src={msg.mediaUrl} controls className="w-full" style={{ maxWidth: '250px' }} />
+                    </div>
+                );
+            case 'document':
+                return (
+                    <div className="mb-1">
+                        <a
+                            href={msg.mediaUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ${isCustomer ? 'bg-white border border-[#E5E7EB]' : 'bg-white/20'
+                                } hover:opacity-80 transition-opacity`}
+                        >
+                            <span className="text-lg">📄</span>
+                            <div className="min-w-0">
+                                <p className="font-medium truncate">{msg.mediaFilename || 'Document'}</p>
+                                <p className={`text-[10px] ${isCustomer ? 'text-[#6B7280]' : 'opacity-70'}`}>
+                                    Tap to download
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                );
+            case 'sticker':
+                return (
+                    <div className="mb-1">
+                        <img
+                            src={msg.mediaUrl}
+                            alt="Sticker"
+                            className="rounded"
+                            style={{ maxWidth: '120px', maxHeight: '120px' }}
+                        />
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    const hasMedia = msg.mediaUrl && msg.messageType && msg.messageType !== 'text';
+    const hasCaption = msg.text && !msg.text.startsWith('📷') && !msg.text.startsWith('🎥') && !msg.text.startsWith('🎵') && !msg.text.startsWith('📄') && !msg.text.startsWith('🏷');
+
     return (
         <div className={`flex mb-3 ${isCustomer ? 'justify-start' : 'justify-end'}`}>
             <div className={`max-w-[70%]`}>
-                <div className={`px-3 py-2 rounded-xl text-[13px] leading-relaxed ${bubbleStyles[msg.sender]}`}>
-                    {msg.text}
+                <div className={`px-3 py-2 rounded-xl text-[13px] leading-relaxed ${bubbleStyles[msg.sender]} ${hasMedia ? 'p-1.5' : ''}`}>
+                    {renderMedia()}
+                    {(!hasMedia || hasCaption) && (
+                        <p className={hasMedia ? 'px-1.5 pb-0.5' : ''}>{msg.text}</p>
+                    )}
                 </div>
                 <p className={`text-[10.5px] mt-0.5 ${isCustomer ? 'text-left' : 'text-right'} text-[#9CA3AF]`}>
                     {msg.senderName} · {msg.time}
@@ -663,6 +743,10 @@ export default function ChatPage() {
                         time: new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
                         status: m.status as ChatMessage['status'],
                         waMessageId: m.wa_message_id,
+                        messageType: m.message_type,
+                        mediaUrl: m.media_url || undefined,
+                        mediaMimeType: m.media_mime_type || undefined,
+                        mediaFilename: m.media_filename || undefined,
                     };
                 }));
             }

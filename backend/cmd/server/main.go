@@ -86,6 +86,11 @@ func main() {
 	inboxHandler := &handlers.InboxHandler{DB: db}
 	convHandler := &handlers.ConversationHandler{DB: db}
 	contactHandler := &handlers.ContactHandler{DB: db}
+	widgetHandler := &handlers.WidgetHandler{
+		DB:  db,
+		AI:  aiService,
+		Hub: wsHub,
+	}
 
 	// ─── 5. Setup Gin Router ───
 	router := gin.Default()
@@ -134,7 +139,15 @@ func main() {
 		api.POST("/contacts", contactHandler.CreateContact)
 		api.PATCH("/contacts/:id", contactHandler.UpdateContact)
 		api.GET("/contacts/:id/conversations", contactHandler.GetContactConversations)
+
+		// Widget (embeddable chat)
+		api.GET("/widget/config", widgetHandler.WidgetConfig)
+		api.GET("/widget/history", widgetHandler.WidgetHistory)
+		api.POST("/chat", widgetHandler.WidgetChat)
 	}
+
+	// Serve widget.js as static file
+	router.StaticFile("/widget.js", "../widget/src/widget.js")
 
 	// WebSocket endpoint — dashboard connects here for real-time updates
 	router.GET("/ws", func(c *gin.Context) {

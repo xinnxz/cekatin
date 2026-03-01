@@ -61,22 +61,27 @@ func (h *MessageHandler) SendMessage(c *gin.Context) {
 		return
 	}
 
-	// 2. Kirim via WhatsApp API
-	waMessageID, err := h.WA.SendTextMessage(customerPhone, req.Content)
+	// 2. Kirim via WhatsApp API (text atau media)
+	var waMessageID string
+	if req.MessageType == "text" || req.MessageType == "" {
+		waMessageID, err = h.WA.SendTextMessage(customerPhone, req.Content)
+	} else {
+		waMessageID, err = h.WA.SendMediaMessage(customerPhone, req.MessageType, req.MediaURL, req.Content, req.MediaFilename)
+	}
 	if err != nil {
 		log.Printf("❌ Gagal kirim WA: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send: " + err.Error()})
 		return
 	}
 
-	// 3. Simpan pesan ke database
+	// 3. Simpan pesan ke database (termasuk media fields)
 	var messageID string
 	now := time.Now()
 	err = h.DB.QueryRow(ctx,
-		`INSERT INTO messages (conversation_id, direction, content, message_type, wa_message_id, status)
-		 VALUES ($1, 'outbound', $2, $3, $4, 'sent')
+		`INSERT INTO messages (conversation_id, direction, content, message_type, wa_message_id, status, media_url, media_filename)
+		 VALUES ($1, 'outbound', $2, $3, $4, 'sent', $5, $6)
 		 RETURNING id`,
-		req.ConversationID, req.Content, req.MessageType, waMessageID,
+		req.ConversationID, req.Content, req.MessageType, waMessageID, req.MediaURL, req.MediaFilename,
 	).Scan(&messageID)
 
 	if err != nil {
@@ -100,6 +105,8 @@ func (h *MessageHandler) SendMessage(c *gin.Context) {
 		MessageType:    req.MessageType,
 		WAMessageID:    waMessageID,
 		Status:         "sent",
+		MediaURL:       req.MediaURL,
+		MediaFilename:  req.MediaFilename,
 		CreatedAt:      now,
 	}
 
@@ -123,7 +130,9 @@ func (h *MessageHandler) GetMessages(c *gin.Context) {
 	ctx := context.Background()
 
 	rows, err := h.DB.Query(ctx,
-		`SELECT id, conversation_id, direction, content, message_type, wa_message_id, status, created_at
+		`SELECT id, conversation_id, direction, content, message_type, wa_message_id, status, 
+		        COALESCE(media_url, '') as media_url, COALESCE(media_mime_type, '') as media_mime_type, 
+		        COALESCE(media_filename, '') as media_filename, created_at
 		 FROM messages
 		 WHERE conversation_id = $1
 		 ORDER BY created_at ASC`,
@@ -139,7 +148,7 @@ func (h *MessageHandler) GetMessages(c *gin.Context) {
 	for rows.Next() {
 		var m models.Message
 		if err := rows.Scan(&m.ID, &m.ConversationID, &m.Direction, &m.Content,
-			&m.MessageType, &m.WAMessageID, &m.Status, &m.CreatedAt); err != nil {
+			&m.MessageType, &m.WAMessageID, &m.Status, &m.MediaURL, &m.MediaMimeType, &m.MediaFilename, &m.CreatedAt); err != nil {
 			continue
 		}
 		messages = append(messages, m)

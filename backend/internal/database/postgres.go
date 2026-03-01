@@ -141,6 +141,22 @@ func Migrate(pool *pgxpool.Pool) error {
 				ALTER TABLE conversations ADD COLUMN contact_id UUID REFERENCES contacts(id) ON DELETE SET NULL;
 			END IF;
 		END $$`,
+
+		// Migration: tambah media_url dan media_mime_type ke messages (untuk gambar, video, dokumen, audio)
+		`DO $$ BEGIN
+			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+				WHERE table_name='messages' AND column_name='media_url') THEN
+				ALTER TABLE messages ADD COLUMN media_url TEXT DEFAULT '';
+			END IF;
+			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+				WHERE table_name='messages' AND column_name='media_mime_type') THEN
+				ALTER TABLE messages ADD COLUMN media_mime_type VARCHAR(100) DEFAULT '';
+			END IF;
+			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+				WHERE table_name='messages' AND column_name='media_filename') THEN
+				ALTER TABLE messages ADD COLUMN media_filename VARCHAR(500) DEFAULT '';
+			END IF;
+		END $$`,
 	}
 
 	for _, q := range queries {
