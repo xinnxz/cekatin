@@ -412,6 +412,46 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
 
 /* ── Conversation Details Panel ── */
 function DetailsPanel({ conv }: { conv: Conversation }) {
+    const [contact, setContact] = useState<{ name: string; email: string; notes: string; tags: string; id: string } | null>(null);
+    const [editEmail, setEditEmail] = useState('');
+    const [editNotes, setEditNotes] = useState('');
+    const saveTimeout = useRef<NodeJS.Timeout | null>(null);
+
+    // Fetch contact data when conversation changes
+    useEffect(() => {
+        const fetchContact = async () => {
+            try {
+                const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+                const res = await fetch(`${BACKEND}/api/contacts/phone/${conv.phone}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setContact(data.contact);
+                    setEditEmail(data.contact.email || '');
+                    setEditNotes(data.contact.notes || '');
+                }
+            } catch { /* not found — contact belum ada */ }
+        };
+        fetchContact();
+    }, [conv.phone]);
+
+    // Auto-save notes/email (debounced 1s)
+    const autoSave = useCallback((field: string, value: string) => {
+        if (!contact?.id) return;
+        if (saveTimeout.current) clearTimeout(saveTimeout.current);
+        saveTimeout.current = setTimeout(async () => {
+            try {
+                const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+                await fetch(`${BACKEND}/api/contacts/${contact.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [field]: value }),
+                });
+            } catch { /* silent */ }
+        }, 1000);
+    }, [contact?.id]);
+
+    const tags = contact?.tags ? contact.tags.split(',').filter(Boolean) : conv.labels || [];
+
     return (
         <div className="w-[300px] bg-white border-l border-[#E5E7EB] flex flex-col flex-shrink-0 overflow-y-auto">
             {/* Contact Info Header */}
@@ -428,8 +468,23 @@ function DetailsPanel({ conv }: { conv: Conversation }) {
                 <div className="flex items-center gap-2 text-[12px] text-[#6B7280]">
                     <PlatformDot platform={conv.platform} />
                     <span>{platformConfig[conv.platform].label}</span>
+                    {(conv.aiEnabled ?? true)
+                        ? <span className="ml-auto px-1.5 py-0.5 text-[10px] font-medium bg-[#DBEAFE] text-[#2563EB] rounded">🤖 AI On</span>
+                        : <span className="ml-auto px-1.5 py-0.5 text-[10px] font-medium bg-[#F3F4F6] text-[#9CA3AF] rounded">⏸️ AI Off</span>
+                    }
                 </div>
             </div>
+
+            {/* Email */}
+            <DetailSection title="Email">
+                <input
+                    type="email"
+                    value={editEmail}
+                    onChange={e => { setEditEmail(e.target.value); autoSave('email', e.target.value); }}
+                    placeholder="customer@email.com"
+                    className="w-full text-[12.5px] border border-[#E5E7EB] rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-primary"
+                />
+            </DetailSection>
 
             {/* Pipeline Status */}
             <DetailSection title="Pipeline Status">
@@ -443,12 +498,12 @@ function DetailsPanel({ conv }: { conv: Conversation }) {
                 </select>
             </DetailSection>
 
-            {/* Labels */}
+            {/* Labels / Tags */}
             <DetailSection title="Labels">
                 <div className="flex flex-wrap gap-1.5">
-                    {conv.labels.map(l => (
+                    {tags.map(l => (
                         <span key={l} className="px-2 py-0.5 text-[11px] font-medium bg-[#EEF2FF] text-primary border border-[#C7D2FE] rounded-full">
-                            {l}
+                            {l.trim()}
                         </span>
                     ))}
                     <button className="px-2 py-0.5 text-[11px] text-[#9CA3AF] border border-dashed border-[#D1D5DB] rounded-full hover:border-primary hover:text-primary">
@@ -467,23 +522,23 @@ function DetailsPanel({ conv }: { conv: Conversation }) {
                 </div>
             </DetailSection>
 
-            {/* Collaborator */}
-            <DetailSection title="Collaborator">
-                <button className="text-[12px] text-primary hover:underline">+ Add Collaborator</button>
-            </DetailSection>
-
             {/* Notes */}
             <DetailSection title="Notes">
                 <textarea
-                    placeholder="Add internal note..."
-                    className="w-full text-[12px] border border-[#E5E7EB] rounded-lg px-2.5 py-2 resize-none h-16 focus:outline-none focus:border-primary"
+                    value={editNotes}
+                    onChange={e => { setEditNotes(e.target.value); autoSave('notes', e.target.value); }}
+                    placeholder="Add internal note about this customer..."
+                    className="w-full text-[12px] border border-[#E5E7EB] rounded-lg px-2.5 py-2 resize-none h-20 focus:outline-none focus:border-primary"
                 />
+                {editNotes !== (contact?.notes || '') && (
+                    <p className="text-[10px] text-[#9CA3AF] mt-1">Saving...</p>
+                )}
             </DetailSection>
 
             {/* AI Summary */}
             <DetailSection title="AI Summary">
                 <p className="text-[12px] text-[#6B7280] leading-relaxed bg-[#F9FAFB] p-2.5 rounded-lg border border-[#E5E7EB]">
-                    {conv.aiSummary}
+                    {conv.aiSummary || 'No AI summary yet'}
                 </p>
             </DetailSection>
 
@@ -496,12 +551,7 @@ function DetailsPanel({ conv }: { conv: Conversation }) {
                 </div>
             </DetailSection>
 
-            {/* Block & Tickets */}
-            <DetailSection title="Tickets">
-                <p className="text-[12px] text-[#9CA3AF]">No linked tickets</p>
-                <button className="mt-2 text-[12px] text-primary hover:underline">+ Link Ticket</button>
-            </DetailSection>
-
+            {/* Block */}
             <div className="p-4 border-t border-[#E5E7EB]">
                 <button className="w-full text-[12px] text-red-500 border border-red-200 rounded-lg py-1.5 hover:bg-red-50 transition-colors">
                     Block Conversation

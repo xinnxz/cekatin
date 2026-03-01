@@ -76,6 +76,7 @@ export interface Inbox {
 export interface Conversation {
     id: string;
     inbox_id: string;
+    contact_id: string | null;
     customer_phone: string;
     customer_name: string;
     platform: string;
@@ -85,6 +86,18 @@ export interface Conversation {
     last_message: string;
     last_message_at: string | null;
     created_at: string;
+}
+
+export interface Contact {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    notes: string;
+    tags: string;
+    avatar_url: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface ChatMessage {
@@ -146,6 +159,22 @@ export const backend = {
         (await backendFetch<{ status: string; message: ChatMessage }>('/api/messages/send', {
             method: 'POST', body: JSON.stringify({ conversation_id: conversationId, content, message_type: 'text' }),
         })).message,
+
+    // Contacts
+    getContacts: async () =>
+        (await backendFetch<{ contacts: Contact[] }>('/api/contacts')).contacts,
+    getContact: async (id: string) =>
+        (await backendFetch<{ contact: Contact }>(`/api/contacts/${id}`)).contact,
+    getContactByPhone: async (phone: string) =>
+        (await backendFetch<{ contact: Contact }>(`/api/contacts/phone/${phone}`)).contact,
+    createContact: async (data: Partial<Contact>) =>
+        (await backendFetch<{ contact: Contact }>('/api/contacts', {
+            method: 'POST', body: JSON.stringify(data),
+        })).contact,
+    updateContact: async (id: string, data: Partial<Contact>) =>
+        (await backendFetch<{ contact: Contact }>(`/api/contacts/${id}`, {
+            method: 'PATCH', body: JSON.stringify(data),
+        })).contact,
 
     // WebSocket — real-time updates dari Go backend
     connectWebSocket(onMessage: (msg: WSMessage) => void): WebSocket | null {
