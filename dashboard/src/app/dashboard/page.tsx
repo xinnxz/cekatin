@@ -661,6 +661,8 @@ export default function ChatPage() {
                         senderName: isInbound ? 'Customer' : isAI ? 'Cika (AI)' : 'Agent',
                         text: m.content,
                         time: new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                        status: m.status as ChatMessage['status'],
+                        waMessageId: m.wa_message_id,
                     };
                 }));
             }
