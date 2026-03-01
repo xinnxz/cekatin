@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -214,23 +215,6 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 	}
 }
 
-// handleStatusUpdate memproses status pesan (delivered, read)
-func (h *WebhookHandler) handleStatusUpdate(status webhookStatus) {
-	ctx := context.Background()
-
-	// Update status pesan di database
-	_, err := h.DB.Exec(ctx,
-		`UPDATE messages SET status = $1 WHERE wa_message_id = $2`,
-		status.Status, status.ID,
-	)
-	if err != nil {
-		log.Printf("❌ Gagal update status: %v", err)
-		return
-	}
-
-	log.Printf("📋 Status update: %s → %s", status.ID, status.Status)
-}
-
 // handleAIReply — 🤖 Cika AI auto-reply
 // Dipanggil async setelah pesan customer disimpan
 // Flow: Gemini API → WhatsApp reply → simpan DB → broadcast WS
@@ -287,6 +271,102 @@ func (h *WebhookHandler) handleAIReply(ctx context.Context, convID, customerPhon
 			ConversationID: convID,
 			Direction:      "outbound",
 			Content:        reply,
+			MessageType:    "ai",
+			WAMessageID:    waMessageID,
+			CreatedAt:      now,
+		},
+	})
+}
+
+// handleStatusUpdate memproses status pesan (delivered, read)
+func (h *WebhookHandler) handleStatusUpdate(status webhookStatus) {
+	ctx := context.Background()
+
+	_, err := h.DB.Exec(ctx,
+		`UPDATE messages SET status = $1 WHERE wa_message_id = $2`,
+		status.Status, status.ID,
+	)
+	if err != nil {
+		log.Printf("❌ Gagal update status: %v", err)
+		return
+	}
+
+	log.Printf("📋 Status update: %s → %s", status.ID, status.Status)
+}
+
+// ── Handoff Detection ──
+
+// handoffKeywords — kata kunci yang menandakan customer ingin bicara dengan manusia
+var handoffKeywords = []string{
+	"bicara manusia", "bicara orang", "bicara agent", "bicara cs",
+	"mau cs", "minta cs", "hubungi cs",
+	"agent manusia", "customer service", "human agent",
+	"operator", "mau complain", "mau komplain",
+	"gak paham", "ga ngerti", "bukan ini",
+	"stop ai", "stop bot", "matikan bot",
+}
+
+// isHandoffRequest mendeteksi apakah pesan customer meminta bicara dengan manusia
+func isHandoffRequest(message string) bool {
+	lower := strings.ToLower(message)
+	for _, keyword := range handoffKeywords {
+		if strings.Contains(lower, keyword) {
+			return true
+		}
+	}
+	return false
+}
+
+// handleHandoff — disable AI dan kirim pesan handoff ke customer
+func (h *WebhookHandler) handleHandoff(ctx context.Context, convID, customerPhone, customerName string) {
+	// 1. Disable AI untuk conversation ini
+	_, _ = h.DB.Exec(ctx,
+		`UPDATE conversations SET ai_enabled = false WHERE id = $1`, convID)
+
+	log.Printf("🤝 Handoff: AI dinonaktifkan untuk conversation %s", convID)
+
+	// 2. Kirim pesan handoff ke customer
+	handoffMsg := "Baik kak, Cika hubungkan ke tim customer service kami ya! 🤝 " +
+		"Mohon tunggu sebentar, agent kami akan segera membalas. Terima kasih atas kesabarannya! 🙏"
+
+	waMessageID, err := h.WA.SendTextMessage(customerPhone, handoffMsg)
+	if err != nil {
+		log.Printf("⚠️ Gagal kirim handoff message: %v", err)
+		return
+	}
+
+	// 3. Simpan handoff message ke database
+	var replyMsgID string
+	_ = h.DB.QueryRow(ctx,
+		`INSERT INTO messages (conversation_id, direction, content, message_type, wa_message_id)
+		 VALUES ($1, 'outbound', $2, 'ai', $3)
+		 RETURNING id`,
+		convID, handoffMsg, waMessageID,
+	).Scan(&replyMsgID)
+
+	// 4. Update last_message
+	now := time.Now()
+	_, _ = h.DB.Exec(ctx,
+		`UPDATE conversations SET last_message = $1, last_message_at = $2 WHERE id = $3`,
+		handoffMsg, now, convID,
+	)
+
+	// 5. Broadcast ke dashboard
+	h.Hub.BroadcastMessage(&models.WebSocketMessage{
+		Type: "new_message",
+		Conversation: &models.Conversation{
+			ID:            convID,
+			CustomerPhone: customerPhone,
+			CustomerName:  customerName,
+			AIEnabled:     false,
+			LastMessage:   handoffMsg,
+			LastMessageAt: &now,
+		},
+		Message: &models.Message{
+			ID:             replyMsgID,
+			ConversationID: convID,
+			Direction:      "outbound",
+			Content:        handoffMsg,
 			MessageType:    "ai",
 			WAMessageID:    waMessageID,
 			CreatedAt:      now,
