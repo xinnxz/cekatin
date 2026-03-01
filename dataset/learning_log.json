@@ -951,12 +951,36 @@
       "confidence": 0.9476,
       "routing": "nlp_driven",
       "timestamp": "2026-03-01T06:32:52.014566"
+    },
+    {
+      "message": "tes",
+      "preprocessed": "tes",
+      "intent": "unknown",
+      "confidence": 0.159,
+      "routing": "ai_driven",
+      "timestamp": "2026-03-01T11:12:16.560609"
+    },
+    {
+      "message": "Halo, ada produk apa saja?",
+      "preprocessed": "halo produk",
+      "intent": "greeting",
+      "confidence": 0.5082,
+      "routing": "nlp_driven",
+      "timestamp": "2026-03-01T11:14:45.304981"
+    },
+    {
+      "message": "Jam berapa toko buka?",
+      "preprocessed": "jam toko buka",
+      "intent": "tanya_jam_buka",
+      "confidence": 0.9802,
+      "routing": "nlp_driven",
+      "timestamp": "2026-03-01T11:16:32.282488"
     }
   ],
   "stats": {
-    "total": 119,
-    "nlp_driven": 82,
-    "ai_driven": 37,
+    "total": 122,
+    "nlp_driven": 84,
+    "ai_driven": 38,
     "patterns_learned": 7
   }
 }
