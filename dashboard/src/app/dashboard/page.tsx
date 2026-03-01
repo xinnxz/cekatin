@@ -732,11 +732,19 @@ export default function ChatPage() {
                     senderName: isInbound ? 'Customer' : isAI ? 'Cika (AI)' : 'Agent',
                     text: msg.message.content,
                     time: new Date(msg.message.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                    status: msg.message.status as ChatMessage['status'],
+                    waMessageId: msg.message.wa_message_id,
                 };
                 setLiveMessages(prev => [...prev, newMsg]);
-
-                // Update conversation list juga
                 loadConversations();
+            }
+            // Handle read receipts (status_update)
+            if (msg.type === 'status_update' && msg.message) {
+                const waId = msg.message.wa_message_id;
+                const newStatus = msg.message.status as ChatMessage['status'];
+                setLiveMessages(prev => prev.map(m =>
+                    m.waMessageId === waId ? { ...m, status: newStatus } : m
+                ));
             }
         });
         wsRef.current = ws;
