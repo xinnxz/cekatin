@@ -37,11 +37,10 @@ const modalClose = document.getElementById('modalClose');
 const bgParticles = document.getElementById('bgParticles');
 
 // API Base URL
-// Auto-detect: jika dibuka via Flask (port 5000), pakai relative path
-// Jika dibuka via Live Server (port 5500, dll), pakai absolute URL ke Flask
-const API_BASE = window.location.port === '5000' 
-    ? '' 
-    : 'http://localhost:5000';
+// Production (Railway, Vercel, dll): pakai relative path (same origin)
+// Local dev di port selain 5000 (Live Server): pakai absolute URL ke Flask
+const isLocalDev = window.location.hostname === 'localhost' && window.location.port !== '5000';
+const API_BASE = isLocalDev ? 'http://localhost:5000' : '';
 const API_URL = API_BASE + '/api/chat';
 
 // Session ID unik per tab browser — agar Gemini bisa ingat konteks percakapan
