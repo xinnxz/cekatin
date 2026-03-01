@@ -183,7 +183,7 @@ func (g *GeminiService) GenerateReply(ctx context.Context, db *pgxpool.Pool, con
 	// 4. Pilih API key (rotasi round-robin)
 	apiKey := g.getNextKey()
 	url := fmt.Sprintf(
-		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=%s",
+		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=%s",
 		apiKey,
 	)
 
