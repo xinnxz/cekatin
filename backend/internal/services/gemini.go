@@ -72,22 +72,25 @@ func (g *GeminiService) getNextKey() string {
 }
 
 // ── System Prompt untuk Cika ──
-const cikaSystemPrompt = `Kamu adalah "Cika", asisten AI customer service yang cerdas dan ramah.
+const cikaSystemPrompt = `Kamu adalah "Cika", asisten AI customer service yang cerdas, ramah, dan natural.
 
-ATURAN PENTING:
+ATURAN:
 1. Jawab SELALU dalam Bahasa Indonesia yang natural dan ramah
-2. Gunakan emoji secukupnya untuk terasa friendly (tidak berlebihan)
-3. Jawab SINGKAT dan TO THE POINT (maksimal 2-3 kalimat)
-4. Jika tidak tahu jawabannya, arahkan ke agent manusia
-5. Jangan pernah bilang kamu adalah AI — kamu adalah customer service Cika
-6. Bersikap profesional tapi tetap hangat dan personal
-7. Jika customer bertanya soal harga/stok/pengiriman, jawab sewajarnya
-8. Jika customer marah/komplain, respons dengan empati dulu baru solusi
+2. Gunakan emoji secukupnya agar terasa friendly
+3. Jawab dengan lengkap dan jelas, tapi jangan bertele-tele
+4. Jika tidak tahu jawabannya, arahkan ke agent manusia dengan sopan
+5. Jangan pernah bilang kamu adalah AI/robot — kamu adalah CS bernama Cika
+6. Bersikap profesional tapi tetap hangat, seperti teman yang helpful
+7. Jika customer bertanya soal harga/stok/pengiriman, jawab sewajarnya dan tanyakan detail
+8. Jika customer marah/komplain, respons dengan empati dulu baru tawarkan solusi
+9. Boleh bercanda ringan jika suasana santai
+10. Selalu akhiri dengan pertanyaan follow-up agar percakapan tetap mengalir
 
 CONTOH GAYA JAWABAN:
-- "Halo kak! 👋 Terima kasih sudah menghubungi kami. Ada yang bisa Cika bantu?"
-- "Siap kak, pesanannya sedang diproses ya! Estimasi pengiriman 2-3 hari kerja 📦"
-- "Mohon maaf ya kak atas ketidaknyamanannya 🙏 Cika bantu cek dulu ya"
+- "Halo kak! 👋 Selamat datang! Perkenalkan, aku Cika. Ada yang bisa Cika bantu hari ini?"
+- "Wah, pesanannya sudah dalam proses pengiriman ya kak! Estimasi sampai 2-3 hari kerja. Kakak mau Cika bantu tracking-nya? 📦"
+- "Mohon maaf ya kak atas ketidaknyamanannya 🙏 Cika paham pasti frustrasi. Boleh ceritakan detail masalahnya supaya Cika bisa bantu selesaikan?"
+- "Untuk produk itu harganya Rp150.000 kak. Lagi ada promo free ongkir juga lho! Mau Cika buatkan pesanannya? 😊"
 `
 
 // ── Struct untuk Gemini API request/response ──
@@ -144,24 +147,19 @@ func (g *GeminiService) GenerateReply(ctx context.Context, db *pgxpool.Pool, con
 	}
 
 	// 1. Ambil 10 pesan terakhir dari conversation sebagai history
-	//    Ini memberikan context ke Gemini agar jawaban lebih relevan
 	history := g.getConversationHistory(ctx, db, conversationID)
 
 	// 2. Build contents array untuk Gemini API
 	contents := []geminiContent{}
-
-	// Tambahkan history sebagai context
 	for _, h := range history {
 		contents = append(contents, h)
 	}
-
-	// Tambahkan pesan terbaru dari customer
 	contents = append(contents, geminiContent{
 		Role:  "user",
 		Parts: []geminiPart{{Text: customerMessage}},
 	})
 
-	// 3. Buat request ke Gemini API
+	// 3. Buat request body
 	reqBody := geminiRequest{
 		Contents: contents,
 		SystemInstruction: &geminiContent{
@@ -169,8 +167,8 @@ func (g *GeminiService) GenerateReply(ctx context.Context, db *pgxpool.Pool, con
 			Parts: []geminiPart{{Text: cikaSystemPrompt}},
 		},
 		GenerationConfig: &geminiGenConfig{
-			Temperature:     0.7, // Cukup kreatif tapi tetap konsisten
-			MaxOutputTokens: 256, // Dibatasi agar jawaban singkat
+			Temperature:     0.7,
+			MaxOutputTokens: 1024,
 			TopP:            0.9,
 		},
 	}
@@ -180,50 +178,66 @@ func (g *GeminiService) GenerateReply(ctx context.Context, db *pgxpool.Pool, con
 		return "", fmt.Errorf("gagal marshal request: %w", err)
 	}
 
-	// 4. Pilih API key (rotasi round-robin)
-	apiKey := g.getNextKey()
-	url := fmt.Sprintf(
-		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=%s",
-		apiKey,
-	)
+	// 4. Retry loop — coba semua key jika kena rate limit (429)
+	maxRetries := len(g.apiKeys)
+	var lastErr error
 
-	// 5. Kirim HTTP request ke Gemini
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
-	if err != nil {
-		return "", fmt.Errorf("gagal buat request: %w", err)
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		apiKey := g.getNextKey()
+		url := fmt.Sprintf(
+			"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=%s",
+			apiKey,
+		)
+
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+		if err != nil {
+			return "", fmt.Errorf("gagal buat request: %w", err)
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := g.httpClient.Do(req)
+		if err != nil {
+			lastErr = fmt.Errorf("gagal kirim request ke Gemini: %w", err)
+			continue
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			lastErr = fmt.Errorf("gagal baca response: %w", err)
+			continue
+		}
+
+		var result geminiResponse
+		if err := json.Unmarshal(respBody, &result); err != nil {
+			return "", fmt.Errorf("gagal parse response: %w", err)
+		}
+
+		// Jika 429 (rate limit) → coba key berikutnya
+		if result.Error != nil && result.Error.Code == 429 {
+			log.Printf("⚠️ Key #%d rate limited, coba key berikutnya... (attempt %d/%d)",
+				(atomic.LoadUint64(&g.keyIndex)-1)%uint64(len(g.apiKeys))+1, attempt+1, maxRetries)
+			lastErr = fmt.Errorf("rate limited")
+			time.Sleep(500 * time.Millisecond) // Brief pause
+			continue
+		}
+
+		// Error lain → langsung return error
+		if result.Error != nil {
+			return "", fmt.Errorf("Gemini API error [%d]: %s", result.Error.Code, result.Error.Message)
+		}
+
+		// Sukses → extract text
+		if len(result.Candidates) > 0 && len(result.Candidates[0].Content.Parts) > 0 {
+			reply := result.Candidates[0].Content.Parts[0].Text
+			log.Printf("🤖 Cika reply: %s", reply)
+			return reply, nil
+		}
+
+		return "", fmt.Errorf("Gemini response kosong")
 	}
-	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := g.httpClient.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("gagal kirim request ke Gemini: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// 6. Baca dan parse response
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("gagal baca response: %w", err)
-	}
-
-	var result geminiResponse
-	if err := json.Unmarshal(respBody, &result); err != nil {
-		return "", fmt.Errorf("gagal parse response: %w", err)
-	}
-
-	// 7. Cek error
-	if result.Error != nil {
-		return "", fmt.Errorf("Gemini API error [%d]: %s", result.Error.Code, result.Error.Message)
-	}
-
-	// 8. Extract text dari response
-	if len(result.Candidates) > 0 && len(result.Candidates[0].Content.Parts) > 0 {
-		reply := result.Candidates[0].Content.Parts[0].Text
-		log.Printf("🤖 Cika reply: %s", reply)
-		return reply, nil
-	}
-
-	return "", fmt.Errorf("Gemini response kosong")
+	return "", fmt.Errorf("semua %d API key rate limited: %v", maxRetries, lastErr)
 }
 
 // getConversationHistory mengambil 10 pesan terakhir dari database

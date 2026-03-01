@@ -74,7 +74,7 @@ func Load() *Config {
 
 	// Load Gemini API keys (support multiple keys untuk rotasi)
 	geminiKeys := []string{}
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= 30; i++ {
 		key := os.Getenv(fmt.Sprintf("GEMINI_API_KEY_%d", i))
 		if key != "" {
 			geminiKeys = append(geminiKeys, key)
