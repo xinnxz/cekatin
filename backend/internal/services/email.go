@@ -22,7 +22,7 @@ Service ini mendukung:
 Konfigurasi dari .env:
   EMAIL_SMTP_HOST=smtp.gmail.com
   EMAIL_SMTP_PORT=587
-  EMAIL_FROM=support@cekatin.id
+  EMAIL_FROM=support@cepat.chat
   EMAIL_PASSWORD=app-password
 
 Untuk Gmail, perlu App Password (bukan password account biasa)

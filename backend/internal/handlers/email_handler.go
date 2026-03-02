@@ -28,7 +28,7 @@ Endpoints:
 - GET  /api/email/threads/:id   → Detail thread + semua messages
 
 Alur email masuk:
-1. Customer kirim email ke support@cekatin.id
+1. Customer kirim email ke support@cepat.chat
 2. Email forwarding service (Mailgun/SendGrid/custom) POST ke /api/email/inbound
 3. Handler buat conversation + simpan sebagai message
 4. Cika AI reply (jika enabled)

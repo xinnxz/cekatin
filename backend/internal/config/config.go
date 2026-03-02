@@ -48,6 +48,9 @@ type Config struct {
 	EmailFrom     string
 	EmailFromName string
 	EmailPassword string
+
+	// Auth (JWT)
+	JWTSecret string
 }
 
 // Load membaca .env file dan mengembalikan Config struct
@@ -84,6 +87,8 @@ func Load() *Config {
 		EmailFrom:     getEnv("EMAIL_FROM", ""),
 		EmailFromName: getEnv("EMAIL_FROM_NAME", "CekatIn Support"),
 		EmailPassword: getEnv("EMAIL_PASSWORD", ""),
+
+		JWTSecret: getEnv("JWT_SECRET", "cepat-chat-jwt-secret-2026"),
 	}
 
 	// Load Gemini API keys (support multiple keys untuk rotasi)

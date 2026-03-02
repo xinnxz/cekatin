@@ -216,6 +216,30 @@ func Migrate(pool *pgxpool.Pool) error {
 				ALTER TABLE conversations ADD COLUMN visitor_info JSONB DEFAULT '{}';
 			END IF;
 		END $$`,
+
+		// Tabel users — manajemen pengguna (agen, supervisor, super agent)
+		`CREATE TABLE IF NOT EXISTS users (
+			id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			email         VARCHAR(255) UNIQUE NOT NULL,
+			password_hash TEXT NOT NULL,
+			name          VARCHAR(255) NOT NULL,
+			role          VARCHAR(20) DEFAULT 'agent',
+			avatar_url    TEXT DEFAULT '',
+			team_id       UUID,
+			status        VARCHAR(20) DEFAULT 'active',
+			last_login_at TIMESTAMPTZ,
+			created_at    TIMESTAMPTZ DEFAULT NOW(),
+			updated_at    TIMESTAMPTZ DEFAULT NOW()
+		)`,
+
+		// Tabel teams — grup agent per departemen/skill
+		`CREATE TABLE IF NOT EXISTS teams (
+			id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			name        VARCHAR(255) NOT NULL,
+			description TEXT DEFAULT '',
+			supervisor_id UUID,
+			created_at  TIMESTAMPTZ DEFAULT NOW()
+		)`,
 	}
 
 	for _, q := range queries {

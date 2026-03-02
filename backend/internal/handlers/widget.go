@@ -73,7 +73,7 @@ func (h *WidgetHandler) WidgetConfig(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"botName":         "Cika",
 			"primaryColor":    "#4F46E5",
-			"greetingMessage": "Halo! 👋 Saya Cika, asisten virtual CekatIn. Ada yang bisa saya bantu?",
+			"greetingMessage": "Halo! 👋 Saya Cika, asisten virtual Cepat Chat. Ada yang bisa saya bantu?",
 			"logoUrl":         "",
 			"prechatEnabled":  false,
 			"prechatFields":   []string{"name"},

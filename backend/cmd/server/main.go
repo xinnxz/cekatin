@@ -62,6 +62,7 @@ func main() {
 	wsHub := services.NewHub()
 	aiService := services.NewGeminiService(cfg.GeminiAPIKeys, cfg.AIEnabled)
 	emailService := services.NewEmailService(cfg.EmailSMTPHost, cfg.EmailSMTPPort, cfg.EmailFrom, cfg.EmailFromName, cfg.EmailPassword)
+	authService := services.NewAuthService(cfg.JWTSecret)
 
 	if aiService.IsEnabled() {
 		log.Printf("🤖 Cika AI aktif (%d API keys)", len(cfg.GeminiAPIKeys))
@@ -102,6 +103,10 @@ func main() {
 		AI:    aiService,
 		Hub:   wsHub,
 	}
+	authHandler := &handlers.AuthHandler{
+		DB:   db,
+		Auth: authService,
+	}
 
 	// ─── 5. Setup Gin Router ───
 	router := gin.Default()
@@ -123,6 +128,23 @@ func main() {
 	// WhatsApp Webhook
 	router.GET("/webhook", webhookHandler.VerifyWebhook)
 	router.POST("/webhook", webhookHandler.ReceiveWebhook)
+
+	// ─── Auth routes (public — tanpa token) ───
+	auth := router.Group("/api/auth")
+	{
+		auth.POST("/register", authHandler.Register)
+		auth.POST("/login", authHandler.Login)
+		auth.POST("/refresh", authHandler.RefreshToken)
+	}
+
+	// ─── Auth routes (protected — butuh token) ───
+	authProtected := router.Group("/api/auth")
+	authProtected.Use(middleware.AuthRequired(authService))
+	{
+		authProtected.GET("/me", authHandler.Me)
+		authProtected.PATCH("/me", authHandler.UpdateMe)
+		authProtected.GET("/users", authHandler.ListUsers)
+	}
 
 	// API Routes
 	api := router.Group("/api")
