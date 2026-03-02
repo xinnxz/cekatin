@@ -148,7 +148,7 @@ const sampleInboxes: Inbox[] = [
             { url: 'https://instagram.com/reonshop', label: 'Instagram' },
             { url: 'https://wa.me/628123456789', label: 'WhatsApp' },
         ],
-        embedCode: '<script src="https://cekatin.reonshop.com/widget.js" data-tenant="reonshop"></script>',
+        embedCode: '<script src="https://widget.cepat.chat/widget.js" data-tenant="reonshop"></script>',
     },
     {
         id: 'inbox-3',
@@ -327,8 +327,8 @@ function WhatsAppSetup({ onBack, onFinish }: { onBack: () => void; onFinish: () 
                             <button
                                 onClick={() => s <= step && setStep(s)}
                                 className={`w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-bold transition-all ${s < step ? 'bg-green-500 text-white' :
-                                        s === step ? 'bg-primary text-white shadow-md shadow-primary/30' :
-                                            'bg-[#E5E7EB] text-[#9CA3AF]'
+                                    s === step ? 'bg-primary text-white shadow-md shadow-primary/30' :
+                                        'bg-[#E5E7EB] text-[#9CA3AF]'
                                     }`}
                             >
                                 {s < step ? <Check className="w-5 h-5" /> : s}
@@ -481,8 +481,8 @@ function WhatsAppSetup({ onBack, onFinish }: { onBack: () => void; onFinish: () 
                                 <button
                                     onClick={() => setVerifyMethod('sms')}
                                     className={`flex-1 py-3 px-4 rounded-lg border-2 text-[13px] font-medium transition-all text-center ${verifyMethod === 'sms'
-                                            ? 'border-primary bg-[#EEF2FF] text-primary'
-                                            : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                                        ? 'border-primary bg-[#EEF2FF] text-primary'
+                                        : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
                                         }`}
                                 >
                                     📱 SMS
@@ -490,8 +490,8 @@ function WhatsAppSetup({ onBack, onFinish }: { onBack: () => void; onFinish: () 
                                 <button
                                     onClick={() => setVerifyMethod('call')}
                                     className={`flex-1 py-3 px-4 rounded-lg border-2 text-[13px] font-medium transition-all text-center ${verifyMethod === 'call'
-                                            ? 'border-primary bg-[#EEF2FF] text-primary'
-                                            : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
+                                        ? 'border-primary bg-[#EEF2FF] text-primary'
+                                        : 'border-[#E5E7EB] text-[#6B7280] hover:border-[#D1D5DB]'
                                         }`}
                                 >
                                     📞 Phone Call
@@ -707,8 +707,8 @@ function OAuthConnect({ platform, onBack, onFinish }: { platform: 'instagram' | 
             <h2 className="text-[20px] font-bold text-foreground mt-6 mb-2">Connect {platformMeta[platform].label}</h2>
             <p className="text-[13px] text-[#6B7280] text-center max-w-md mb-8">
                 {platform === 'instagram'
-                    ? 'Connect your Instagram Business account to start receiving DMs directly in CekatIn. You need a Facebook Page linked to your Instagram account.'
-                    : 'Connect your Facebook Page to receive Messenger messages in CekatIn. Make sure you have admin access to the Facebook Page.'
+                    ? 'Connect your Instagram Business account to start receiving DMs directly in Cepat Chat. You need a Facebook Page linked to your Instagram account.'
+                    : 'Connect your Facebook Page to receive Messenger messages in Cepat Chat. Make sure you have admin access to the Facebook Page.'
                 }
             </p>
 

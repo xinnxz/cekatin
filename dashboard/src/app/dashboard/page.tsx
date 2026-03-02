@@ -1018,7 +1018,7 @@ export default function ChatPage() {
                                 <span className="text-3xl">🤖</span>
                             </div>
                             <h1 className="text-xl font-semibold text-center text-foreground">
-                                Selamat datang kembali di CekatIn!
+                                Selamat datang kembali di Cepat Chat!
                             </h1>
                             <p className="text-[13px] text-[#9CA3AF] mt-1">Ikuti langkah-langkah berikut untuk memulai</p>
                         </div>

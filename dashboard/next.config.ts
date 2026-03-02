@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 /**
- * Next.js Config — CekatIn Dashboard
+ * Next.js Config — Cepat Chat Dashboard
  * 
  * Penjelasan:
  * - rewrites() berfungsi sebagai proxy API

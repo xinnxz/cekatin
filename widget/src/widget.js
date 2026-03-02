@@ -1,10 +1,10 @@
 /**
- * CekatIn Embeddable Chat Widget — widget.js
+ * Cepat Chat Embeddable Widget — widget.js
  * ===========================================
  * Cara kerja singkat:
  *
  *  1. Baca atribut data-* dari tag <script> yang memanggil file ini.
- *  2. Buat Shadow DOM di dalam #cekatin-root agar CSS kita tidak
+ *  2. Buat Shadow DOM di dalam #cepat-chat-root agar CSS kita tidak
  *     berbenturan dengan CSS website client (dan sebaliknya).
  *  3. Inject HTML + CSS ke dalam Shadow DOM.
  *  4. Fetch konfigurasi tenant dari backend (/api/widget/config).
@@ -24,8 +24,8 @@
 
 (function () {
   // Guards: jangan inisialisasi lebih dari sekali
-  if (window.__cekatInLoaded) return;
-  window.__cekatInLoaded = true;
+  if (window.__cepatChatLoaded) return;
+  window.__cepatChatLoaded = true;
 
   /* ─────────────── 1. Baca Config dari <script> tag ──────────────── */
   const $script = document.currentScript || (() => {
@@ -57,7 +57,7 @@
    * yang menggunakan iframe atau inject style biasa.
    */
   const $host = document.createElement('div');
-  $host.id = 'cekatin-widget-root';
+  $host.id = 'cepat-chat-widget-root';
   document.body.appendChild($host);
 
   const shadow = $host.attachShadow({ mode: 'open' });
@@ -125,7 +125,7 @@
       </form>
 
       <div class="ck-powered">
-        Powered by <a href="https://cekatin.id" target="_blank" rel="noopener">CekatIn</a>
+        Powered by <a href="https://cepat.chat" target="_blank" rel="noopener">Cepat Chat</a>
       </div>
     </div>
   `;
@@ -199,7 +199,7 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (err) {
-      console.warn('[CekatIn Widget] API error:', err.message);
+      console.warn('[Cepat Chat Widget] API error:', err.message);
       return null;
     }
   }

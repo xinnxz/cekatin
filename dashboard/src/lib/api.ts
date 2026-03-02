@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   CekatIn API Client — Dashboard ↔ Go Backend
+   Cepat Chat API Client — Dashboard ↔ Go Backend
 
    Penjelasan:
    File ini menghubungkan dashboard Next.js ke Go backend.
@@ -35,7 +35,7 @@ export async function api<T = unknown>(
     };
 
     if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('cekatin_token');
+        const token = localStorage.getItem('cepat_chat_token');
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }

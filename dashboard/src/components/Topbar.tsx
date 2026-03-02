@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-    CekatInLogo,
+    CepatChatLogo,
     IconChat,
     IconOrders,
     IconCRM,
@@ -210,7 +210,7 @@ export default function Topbar() {
             {/* Left: Logo + Navigation Tabs */}
             <div className="flex items-center gap-1">
                 <Link href="/dashboard" className="flex items-center mr-4">
-                    <CekatInLogo size={32} />
+                    <CepatChatLogo size={32} />
                 </Link>
                 <nav className="flex items-center">
                     {topNavItems.map((item) => {

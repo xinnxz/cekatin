@@ -19,7 +19,7 @@ import (
 Cika AI Service — Auto-reply menggunakan Gemini API
 
 Penjelasan:
-- Cika adalah AI customer service assistant untuk CekatIn
+- Cika adalah AI customer service assistant untuk Cepat Chat
 - Menggunakan Gemini API (Google) untuk generate respons pintar
 - Mendukung rotasi API key (multiple keys) untuk menghindari rate limit
 - Context-aware: mengambil 10 pesan terakhir sebagai conversation history

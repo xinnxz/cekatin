@@ -85,7 +85,7 @@ func Load() *Config {
 		EmailSMTPHost: getEnv("EMAIL_SMTP_HOST", ""),
 		EmailSMTPPort: getEnv("EMAIL_SMTP_PORT", "465"),
 		EmailFrom:     getEnv("EMAIL_FROM", ""),
-		EmailFromName: getEnv("EMAIL_FROM_NAME", "CekatIn Support"),
+		EmailFromName: getEnv("EMAIL_FROM_NAME", "Cepat Chat Support"),
 		EmailPassword: getEnv("EMAIL_PASSWORD", ""),
 
 		JWTSecret: getEnv("JWT_SECRET", "cepat-chat-jwt-secret-2026"),

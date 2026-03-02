@@ -1,17 +1,17 @@
 'use client';
 
 /* ═══════════════════════════════════════════════════════
-   CekatIn SVG Icons — Custom hand-crafted icons
+   Cepat Chat SVG Icons — Custom hand-crafted icons
    Bukan pakai library, semua SVG dibuat sendiri
    ═══════════════════════════════════════════════════════ */
 
-// CekatIn Logo — circular rotating arrows (terinspirasi cekat.ai tapi unique)
-export function CekatInLogo({ size = 32, className = '' }: { size?: number; className?: string }) {
+// Cepat Chat Logo — circular rotating arrows
+export function CepatChatLogo({ size = 32, className = '' }: { size?: number; className?: string }) {
     return (
         <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={className}>
             {/* Background circle with gradient */}
             <circle cx="20" cy="20" r="20" fill="url(#logoGrad)" />
-            {/* Inner rotating arrows — unique CekatIn shape */}
+            {/* Inner rotating arrows — unique Cepat Chat shape */}
             <path
                 d="M20 10 C25 10, 29 14, 29 19 L26 19"
                 stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"
@@ -35,7 +35,7 @@ export function CekatInLogo({ size = 32, className = '' }: { size?: number; clas
 }
 
 // Small icon variant for sidebar
-export function CekatInLogoSmall({ size = 24 }: { size?: number }) {
+export function CepatChatLogoSmall({ size = 24 }: { size?: number }) {
     return (
         <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="12" fill="url(#logoSmGrad)" />

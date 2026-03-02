@@ -17,7 +17,7 @@ import (
 Email Handler — Kirim & terima email sebagai conversation
 
 Penjelasan:
-Email masuk dikonversi menjadi conversation di CekatIn,
+Email masuk dikonversi menjadi conversation di Cepat Chat,
 mirip seperti pesan WhatsApp. Agent bisa reply email
 langsung dari dashboard.
 

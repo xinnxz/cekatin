@@ -26,7 +26,7 @@ import { X, Send, Bot } from 'lucide-react';
    Penjelasan:
    - FAB (Floating Action Button) di pojok kanan bawah
    - Klik → pop-up chat kecil muncul
-   - Bisa tanya bantuan tentang fitur CekatIn
+   - Bisa tanya bantuan tentang fitur Cepat Chat
    - Mirip fitur "Clara" di cekat.ai yang ada di pojok kanan bawah */
 function ClaraAssistant() {
     const [open, setOpen] = useState(false);
@@ -44,7 +44,7 @@ function ClaraAssistant() {
                         </div>
                         <div className="flex-1">
                             <h3 className="text-[13px] font-semibold text-white">Clara</h3>
-                            <p className="text-[10px] text-white/70">CekatIn AI Assistant</p>
+                            <p className="text-[10px] text-white/70">Cepat Chat AI Assistant</p>
                         </div>
                         <button onClick={() => setOpen(false)}
                             className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
@@ -60,13 +60,13 @@ function ClaraAssistant() {
                             </div>
                             <div className="bg-white rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-[#E5E7EB] max-w-[85%]">
                                 <p className="text-[12px] text-foreground leading-relaxed">
-                                    Halo! 👋 Saya <strong>Clara</strong>, asisten AI CekatIn.
+                                    Halo! 👋 Saya <strong>Clara</strong>, asisten AI Cepat Chat.
                                     Saya bisa membantu Anda dengan:
                                 </p>
                                 <ul className="text-[11px] text-[#6B7280] mt-2 space-y-1 list-disc list-inside">
                                     <li>Menghubungkan platform (WhatsApp, IG)</li>
                                     <li>Mengatur AI Agent</li>
-                                    <li>Tips & trik CekatIn</li>
+                                    <li>Tips & trik Cepat Chat</li>
                                     <li>Pertanyaan billing & fitur</li>
                                 </ul>
                             </div>

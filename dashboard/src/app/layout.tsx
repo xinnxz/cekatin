@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CekatIn — Admin Dashboard",
-  description: "Kelola chatbot AI Anda dengan mudah. Dashboard admin untuk CekatIn platform.",
+  title: "Cepat Chat — Admin Dashboard",
+  description: "Kelola chatbot AI Anda dengan mudah. Dashboard admin untuk Cepat Chat platform.",
 };
 
 export default function RootLayout({

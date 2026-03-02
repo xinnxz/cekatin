@@ -16,7 +16,7 @@ import (
 
 /*
 ═══════════════════════════════════════════════════════
-CekatIn Go Backend — Entry Point
+Cepat Chat Go Backend — Entry Point
 
 Urutan startup:
 1. Load config dari .env
@@ -32,7 +32,7 @@ Cara menjalankan:
   go run cmd/server/main.go
 
 Hasil:
-  🚀 CekatIn Backend running on :8080
+  🚀 Cepat Chat Backend running on :8080
   ✅ Connected to PostgreSQL
   ✅ Database migration complete
 ═══════════════════════════════════════════════════════
@@ -120,7 +120,7 @@ func main() {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
-			"service": "CekatIn Backend",
+			"service": "Cepat Chat Backend",
 			"version": "1.0.0",
 		})
 	})
