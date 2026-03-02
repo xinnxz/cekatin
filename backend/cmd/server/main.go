@@ -7,11 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 
-	"github.com/xinnxz/cekatin-backend/internal/config"
-	"github.com/xinnxz/cekatin-backend/internal/database"
-	"github.com/xinnxz/cekatin-backend/internal/handlers"
-	"github.com/xinnxz/cekatin-backend/internal/middleware"
-	"github.com/xinnxz/cekatin-backend/internal/services"
+	"github.com/xinnxz/cepatchat/internal/config"
+	"github.com/xinnxz/cepatchat/internal/database"
+	"github.com/xinnxz/cepatchat/internal/handlers"
+	"github.com/xinnxz/cepatchat/internal/middleware"
+	"github.com/xinnxz/cepatchat/internal/services"
 )
 
 /*

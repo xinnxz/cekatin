@@ -1,4 +1,4 @@
-module github.com/xinnxz/cekatin-backend
+module github.com/xinnxz/cepatchat
 
 go 1.25.0
 

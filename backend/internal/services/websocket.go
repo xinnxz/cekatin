@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
-	"github.com/xinnxz/cekatin-backend/internal/models"
+	"github.com/xinnxz/cepatchat/internal/models"
 )
 
 /*

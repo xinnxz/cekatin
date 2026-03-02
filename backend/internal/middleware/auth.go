@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/xinnxz/cekatin-backend/internal/services"
+	"github.com/xinnxz/cepatchat/internal/services"
 )
 
 /*

@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/xinnxz/cekatin-backend/internal/models"
-	"github.com/xinnxz/cekatin-backend/internal/services"
+	"github.com/xinnxz/cepatchat/internal/models"
+	"github.com/xinnxz/cepatchat/internal/services"
 )
 
 /*
