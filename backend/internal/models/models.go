@@ -110,10 +110,31 @@ type UpdateInboxRequest struct {
 	Status      *string `json:"status"`
 }
 
+// Call merepresentasikan satu log panggilan
+type Call struct {
+	ID              string     `json:"id" db:"id"`
+	ConversationID  string     `json:"conversation_id" db:"conversation_id"`
+	ContactID       *string    `json:"contact_id" db:"contact_id"`
+	CallerPhone     string     `json:"caller_phone" db:"caller_phone"`
+	CalleePhone     string     `json:"callee_phone" db:"callee_phone"`
+	Direction       string     `json:"direction" db:"direction"` // inbound, outbound
+	CallType        string     `json:"call_type" db:"call_type"` // voice, video
+	Status          string     `json:"status" db:"status"`       // ringing, answered, missed, rejected, ended, busy
+	DurationSeconds int        `json:"duration_seconds" db:"duration_seconds"`
+	AssignedAgent   string     `json:"assigned_agent" db:"assigned_agent"`
+	RecordingURL    string     `json:"recording_url" db:"recording_url"`
+	WACallID        string     `json:"wa_call_id" db:"wa_call_id"`
+	StartedAt       *time.Time `json:"started_at" db:"started_at"`
+	AnsweredAt      *time.Time `json:"answered_at" db:"answered_at"`
+	EndedAt         *time.Time `json:"ended_at" db:"ended_at"`
+	CreatedAt       time.Time  `json:"created_at" db:"created_at"`
+}
+
 // WebSocketMessage — format pesan yang dikirim via WebSocket ke dashboard
 // Digunakan untuk real-time notification saat ada pesan masuk baru
 type WebSocketMessage struct {
-	Type         string        `json:"type"` // "new_message", "status_update"
+	Type         string        `json:"type"` // "new_message", "status_update", "incoming_call", "call_update"
 	Conversation *Conversation `json:"conversation,omitempty"`
 	Message      *Message      `json:"message,omitempty"`
+	Call         *Call         `json:"call,omitempty"`
 }

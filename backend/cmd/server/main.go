@@ -91,6 +91,10 @@ func main() {
 		AI:  aiService,
 		Hub: wsHub,
 	}
+	callHandler := &handlers.CallHandler{
+		DB:  db,
+		Hub: wsHub,
+	}
 
 	// ─── 5. Setup Gin Router ───
 	router := gin.Default()
@@ -146,6 +150,15 @@ func main() {
 		api.GET("/widget/config", widgetHandler.WidgetConfig)
 		api.GET("/widget/history", widgetHandler.WidgetHistory)
 		api.POST("/chat", widgetHandler.WidgetChat)
+
+		// Calls (WhatsApp Call infrastructure)
+		api.GET("/calls", callHandler.ListCalls)
+		api.GET("/calls/analytics", callHandler.CallAnalytics)
+		api.GET("/calls/:id", callHandler.GetCall)
+		api.POST("/calls", callHandler.LogCall)
+		api.PATCH("/calls/:id/status", callHandler.UpdateCallStatus)
+		api.PATCH("/calls/:id/assign", callHandler.AssignCall)
+		api.PATCH("/calls/:id/transfer", callHandler.TransferCall)
 	}
 
 	// Serve widget.js as static file

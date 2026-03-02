@@ -157,6 +157,30 @@ func Migrate(pool *pgxpool.Pool) error {
 				ALTER TABLE messages ADD COLUMN media_filename VARCHAR(500) DEFAULT '';
 			END IF;
 		END $$`,
+
+		// Tabel calls — log panggilan WhatsApp
+		`CREATE TABLE IF NOT EXISTS calls (
+			id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+			contact_id      UUID REFERENCES contacts(id) ON DELETE SET NULL,
+			caller_phone    VARCHAR(20) NOT NULL,
+			callee_phone    VARCHAR(20) NOT NULL,
+			direction       VARCHAR(10) NOT NULL,
+			call_type       VARCHAR(10) DEFAULT 'voice',
+			status          VARCHAR(20) DEFAULT 'ringing',
+			duration_seconds INTEGER DEFAULT 0,
+			assigned_agent  VARCHAR(100) DEFAULT '',
+			recording_url   TEXT DEFAULT '',
+			wa_call_id      VARCHAR(100) DEFAULT '',
+			started_at      TIMESTAMPTZ,
+			answered_at     TIMESTAMPTZ,
+			ended_at        TIMESTAMPTZ,
+			created_at      TIMESTAMPTZ DEFAULT NOW()
+		)`,
+
+		// Index untuk calls
+		`CREATE INDEX IF NOT EXISTS idx_calls_conversation ON calls(conversation_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_calls_status ON calls(status)`,
 	}
 
 	for _, q := range queries {
