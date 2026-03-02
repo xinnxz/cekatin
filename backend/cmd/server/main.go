@@ -61,6 +61,7 @@ func main() {
 	waService := services.NewWhatsAppService(cfg.WAAccessToken, cfg.WAPhoneNumberID)
 	wsHub := services.NewHub()
 	aiService := services.NewGeminiService(cfg.GeminiAPIKeys, cfg.AIEnabled)
+	emailService := services.NewEmailService(cfg.EmailSMTPHost, cfg.EmailSMTPPort, cfg.EmailFrom, cfg.EmailFromName, cfg.EmailPassword)
 
 	if aiService.IsEnabled() {
 		log.Printf("🤖 Cika AI aktif (%d API keys)", len(cfg.GeminiAPIKeys))
@@ -94,6 +95,12 @@ func main() {
 	callHandler := &handlers.CallHandler{
 		DB:  db,
 		Hub: wsHub,
+	}
+	emailHandler := &handlers.EmailHandler{
+		DB:    db,
+		Email: emailService,
+		AI:    aiService,
+		Hub:   wsHub,
 	}
 
 	// ─── 5. Setup Gin Router ───
@@ -166,6 +173,12 @@ func main() {
 		api.PATCH("/calls/:id/status", callHandler.UpdateCallStatus)
 		api.PATCH("/calls/:id/assign", callHandler.AssignCall)
 		api.PATCH("/calls/:id/transfer", callHandler.TransferCall)
+
+		// Email
+		api.POST("/email/send", emailHandler.SendEmail)
+		api.POST("/email/inbound", emailHandler.InboundEmail)
+		api.GET("/email/threads", emailHandler.ListEmailThreads)
+		api.GET("/email/threads/:id", emailHandler.GetEmailThread)
 	}
 
 	// Serve widget.js as static file

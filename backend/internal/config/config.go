@@ -41,6 +41,13 @@ type Config struct {
 	// AI (Cika)
 	GeminiAPIKeys []string // Satu atau lebih Gemini API key
 	AIEnabled     bool     // Toggle on/off auto-reply
+
+	// Email (SMTP)
+	EmailSMTPHost string
+	EmailSMTPPort string
+	EmailFrom     string
+	EmailFromName string
+	EmailPassword string
 }
 
 // Load membaca .env file dan mengembalikan Config struct
@@ -70,6 +77,13 @@ func Load() *Config {
 		DashboardURL: getEnv("DASHBOARD_URL", "http://localhost:3000"),
 
 		AIEnabled: getEnv("AI_ENABLED", "true") == "true",
+
+		// Email SMTP
+		EmailSMTPHost: getEnv("EMAIL_SMTP_HOST", ""),
+		EmailSMTPPort: getEnv("EMAIL_SMTP_PORT", "465"),
+		EmailFrom:     getEnv("EMAIL_FROM", ""),
+		EmailFromName: getEnv("EMAIL_FROM_NAME", "CekatIn Support"),
+		EmailPassword: getEnv("EMAIL_PASSWORD", ""),
 	}
 
 	// Load Gemini API keys (support multiple keys untuk rotasi)
