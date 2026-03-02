@@ -100,6 +100,16 @@ type CreateInboxRequest struct {
 	WabaID      string `json:"waba_id"`
 }
 
+// UpdateInboxRequest — body JSON saat update inbox (semua field optional, pointer-based)
+type UpdateInboxRequest struct {
+	Name        *string `json:"name"`
+	PhoneNumber *string `json:"phone_number"`
+	AccessToken *string `json:"access_token"`
+	PhoneID     *string `json:"phone_id"`
+	WabaID      *string `json:"waba_id"`
+	Status      *string `json:"status"`
+}
+
 // WebSocketMessage — format pesan yang dikirim via WebSocket ke dashboard
 // Digunakan untuk real-time notification saat ada pesan masuk baru
 type WebSocketMessage struct {

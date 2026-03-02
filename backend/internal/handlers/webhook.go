@@ -232,6 +232,35 @@ func (h *WebhookHandler) handleIncomingMessage(msg webhookMessage, customerName 
 				mediaURL, _ = h.WA.GetMediaURL(msg.Sticker.ID)
 			}
 		}
+	case "interactive":
+		// Customer klik button atau pilih item dari list
+		messageType = "text" // Simpan sebagai text di DB
+		if msg.Interactive != nil {
+			switch msg.Interactive.Type {
+			case "button_reply":
+				if msg.Interactive.ButtonReply != nil {
+					content = msg.Interactive.ButtonReply.Title
+					log.Printf("🔘 Button reply: %s (id: %s)", content, msg.Interactive.ButtonReply.ID)
+				}
+			case "list_reply":
+				if msg.Interactive.ListReply != nil {
+					content = msg.Interactive.ListReply.Title
+					log.Printf("📋 List reply: %s (id: %s)", content, msg.Interactive.ListReply.ID)
+				}
+			}
+		}
+	case "reaction":
+		// Customer kirim emoji reaction ke pesan
+		if msg.Reaction != nil {
+			if msg.Reaction.Emoji != "" {
+				content = msg.Reaction.Emoji + " (reaction)"
+				log.Printf("😀 Reaction: %s ke pesan %s", msg.Reaction.Emoji, msg.Reaction.MessageID)
+			} else {
+				content = "(unreaction)"
+				log.Printf("❌ Unreaction di pesan %s", msg.Reaction.MessageID)
+			}
+		}
+		messageType = "reaction"
 	default:
 		content = "[" + msg.Type + "]"
 	}
@@ -486,15 +515,18 @@ type webhookValue struct {
 }
 
 type webhookMessage struct {
-	From     string              `json:"from"`
-	ID       string              `json:"id"`
-	Type     string              `json:"type"`
-	Text     *webhookMsgText     `json:"text"`
-	Image    *webhookMsgMedia    `json:"image"`
-	Video    *webhookMsgMedia    `json:"video"`
-	Audio    *webhookMsgMedia    `json:"audio"`
-	Document *webhookMsgDocument `json:"document"`
-	Sticker  *webhookMsgMedia    `json:"sticker"`
+	From        string                 `json:"from"`
+	ID          string                 `json:"id"`
+	Type        string                 `json:"type"`
+	Text        *webhookMsgText        `json:"text"`
+	Image       *webhookMsgMedia       `json:"image"`
+	Video       *webhookMsgMedia       `json:"video"`
+	Audio       *webhookMsgMedia       `json:"audio"`
+	Document    *webhookMsgDocument    `json:"document"`
+	Sticker     *webhookMsgMedia       `json:"sticker"`
+	Interactive *webhookMsgInteractive `json:"interactive"`
+	Reaction    *webhookMsgReaction    `json:"reaction"`
+	Context     *webhookMsgContext     `json:"context"` // Reply-to context
 }
 
 type webhookMsgText struct {
@@ -528,4 +560,29 @@ type webhookContact struct {
 type webhookStatus struct {
 	ID     string `json:"id"`
 	Status string `json:"status"` // sent, delivered, read, failed
+}
+
+// webhookMsgInteractive — response saat customer klik button/list item
+type webhookMsgInteractive struct {
+	Type        string                   `json:"type"` // "button_reply" atau "list_reply"
+	ButtonReply *webhookInteractiveReply `json:"button_reply"`
+	ListReply   *webhookInteractiveReply `json:"list_reply"`
+}
+
+type webhookInteractiveReply struct {
+	ID          string `json:"id"`          // Button/Row ID yang diklik
+	Title       string `json:"title"`       // Button/Row title
+	Description string `json:"description"` // Hanya untuk list_reply
+}
+
+// webhookMsgReaction — reaksi emoji dari customer
+type webhookMsgReaction struct {
+	MessageID string `json:"message_id"` // Pesan yang di-react
+	Emoji     string `json:"emoji"`      // Emoji karakter (kosong = unreact)
+}
+
+// webhookMsgContext — konteks reply-to (pesan yang di-reply)
+type webhookMsgContext struct {
+	From      string `json:"from"` // Pengirim pesan asli
+	MessageID string `json:"id"`   // ID pesan yang di-reply
 }

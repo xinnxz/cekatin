@@ -120,7 +120,9 @@ func main() {
 		api.GET("/inboxes", inboxHandler.ListInboxes)
 		api.POST("/inboxes", inboxHandler.CreateInbox)
 		api.GET("/inboxes/:id", inboxHandler.GetInbox)
+		api.PATCH("/inboxes/:id", inboxHandler.UpdateInbox)
 		api.DELETE("/inboxes/:id", inboxHandler.DeleteInbox)
+		api.POST("/inboxes/:id/verify", inboxHandler.VerifyInbox)
 
 		// Conversations
 		api.GET("/conversations", convHandler.ListConversations)
