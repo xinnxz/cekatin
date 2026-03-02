@@ -181,6 +181,41 @@ func Migrate(pool *pgxpool.Pool) error {
 		// Index untuk calls
 		`CREATE INDEX IF NOT EXISTS idx_calls_conversation ON calls(conversation_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_calls_status ON calls(status)`,
+
+		// Tabel widget_configs — konfigurasi widget per tenant
+		`CREATE TABLE IF NOT EXISTS widget_configs (
+			id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			tenant_slug      VARCHAR(100) UNIQUE NOT NULL,
+			bot_name         VARCHAR(100) DEFAULT 'Cika',
+			primary_color    VARCHAR(20) DEFAULT '#4F46E5',
+			greeting_message TEXT DEFAULT 'Halo! 👋 Ada yang bisa kami bantu?',
+			logo_url         TEXT DEFAULT '',
+			prechat_enabled  BOOLEAN DEFAULT false,
+			prechat_fields   JSONB DEFAULT '["name"]',
+			offline_enabled  BOOLEAN DEFAULT false,
+			offline_message  TEXT DEFAULT 'Kami sedang offline. Silakan tinggalkan pesan.',
+			working_hours    JSONB DEFAULT '{"start":"08:00","end":"22:00","timezone":"Asia/Jakarta"}',
+			created_at       TIMESTAMPTZ DEFAULT NOW(),
+			updated_at       TIMESTAMPTZ DEFAULT NOW()
+		)`,
+
+		// Tabel widget_ip_blacklist — blokir IP spam
+		`CREATE TABLE IF NOT EXISTS widget_ip_blacklist (
+			id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			ip_address VARCHAR(50) NOT NULL,
+			reason     VARCHAR(255) DEFAULT '',
+			expires_at TIMESTAMPTZ,
+			created_at TIMESTAMPTZ DEFAULT NOW()
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_widget_ip ON widget_ip_blacklist(ip_address)`,
+
+		// Tambah kolom visitor_info ke conversations (untuk web)
+		`DO $$ BEGIN
+			IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+				WHERE table_name='conversations' AND column_name='visitor_info') THEN
+				ALTER TABLE conversations ADD COLUMN visitor_info JSONB DEFAULT '{}';
+			END IF;
+		END $$`,
 	}
 
 	for _, q := range queries {

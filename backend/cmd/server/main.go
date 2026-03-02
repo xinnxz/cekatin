@@ -148,8 +148,15 @@ func main() {
 
 		// Widget (embeddable chat)
 		api.GET("/widget/config", widgetHandler.WidgetConfig)
+		api.PUT("/widget/config", widgetHandler.UpdateWidgetConfig)
 		api.GET("/widget/history", widgetHandler.WidgetHistory)
+		api.POST("/widget/prechat", widgetHandler.WidgetPrechat)
 		api.POST("/chat", widgetHandler.WidgetChat)
+
+		// Widget IP Blacklist (admin)
+		api.GET("/widget/blacklist", widgetHandler.ListIPBlacklist)
+		api.POST("/widget/blacklist", widgetHandler.AddIPBlacklist)
+		api.DELETE("/widget/blacklist", widgetHandler.RemoveIPBlacklist)
 
 		// Calls (WhatsApp Call infrastructure)
 		api.GET("/calls", callHandler.ListCalls)
