@@ -212,11 +212,12 @@ func (h *EmailHandler) InboundEmail(c *gin.Context) {
 		`UPDATE conversations SET last_message = $1, last_message_at = $2 WHERE id = $3`,
 		"📧 "+req.Subject, now, convID)
 
-	// 4. Auto-create contact
+	// 4. Auto-create contact (email sebagai identifier utama)
+	// Karena contacts table punya phone UNIQUE, kita pakai email sebagai phone fallback
 	h.DB.Exec(ctx,
-		`INSERT INTO contacts (name, email, phone) VALUES ($1, $2, '')
-		 ON CONFLICT DO NOTHING`,
-		req.From, req.From)
+		`INSERT INTO contacts (name, email, phone) VALUES ($1, $2, $3)
+		 ON CONFLICT (phone) DO UPDATE SET email = $2, name = $1`,
+		req.From, req.From, req.From)
 
 	// 5. Broadcast ke dashboard
 	h.Hub.BroadcastMessage(&models.WebSocketMessage{

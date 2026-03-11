@@ -1,3 +1,0 @@
-# 
-
-{"ai_providers":{"providers":[{"active":[1,2,3,4,5],"available":true,"cooldown":[],"current":1,"disabled":[],"model":"gemini-2.5-flash","provider":"gemini","requests":{"key_1":0,"key_2":0,"key_3":0,"key_4":0,"key_5":0},"total":5}],"total_capacity_rpd":100},"architecture":"hybrid_nlp_ai","mode":"hybrid","nlp_engine":{"confidence_threshold":0.5,"intents_count":12,"trained":true},"service":"CekatIn Chatbot","status":"healthy","timestamp":"2026-02-23T12:29:59.707668"}
